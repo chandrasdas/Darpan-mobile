@@ -453,6 +453,7 @@
 		.app-shell {
 			flex-direction: row;
 			flex-wrap: wrap;
+			align-content: flex-start;
 		}
 
 		/* Persistent sidebar */
