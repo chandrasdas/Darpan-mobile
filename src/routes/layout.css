@@ -1,0 +1,400 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+
+/* ──────────────────────────────────────────────
+   ETHEREAL ACADEMIC — Design Token Layer
+   Tailwind CSS v4 @theme configuration
+   ────────────────────────────────────────────── */
+
+@theme {
+	/* ── Font Families ── */
+	--font-heading: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+	--font-body: 'Lexend', ui-sans-serif, system-ui, sans-serif;
+
+	/* ── Spacing (8px base rhythm) ── */
+	--spacing-xs: 4px;
+	--spacing-sm: 12px;
+	--spacing-md: 24px;
+	--spacing-lg: 48px;
+	--spacing-xl: 80px;
+	--spacing-gutter: 24px;
+	--spacing-margin: 32px;
+
+	/* ── Border Radius ── */
+	--radius-sm: 0.25rem;
+	--radius-DEFAULT: 0.5rem;
+	--radius-md: 0.75rem;
+	--radius-lg: 1rem;
+	--radius-xl: 1.5rem;
+	--radius-full: 9999px;
+
+	/* ── Surface Palette ── */
+	--color-surface: #f7f9fb;
+	--color-surface-dim: #d8dadc;
+	--color-surface-bright: #f7f9fb;
+	--color-surface-lowest: #ffffff;
+	--color-surface-low: #f2f4f6;
+	--color-surface-container: #eceef0;
+	--color-surface-high: #e6e8ea;
+	--color-surface-highest: #e0e3e5;
+	--color-on-surface: #191c1e;
+	--color-on-surface-variant: #45464d;
+	--color-inverse-surface: #2d3133;
+	--color-inverse-on-surface: #eff1f3;
+	--color-surface-tint: #565e74;
+	--color-surface-variant: #e0e3e5;
+
+	/* ── Primary — "Midnight Ink" ── */
+	--color-primary: #000000;
+	--color-on-primary: #ffffff;
+	--color-primary-container: #131b2e;
+	--color-on-primary-container: #7c839b;
+	--color-inverse-primary: #bec6e0;
+	--color-primary-fixed: #dae2fd;
+	--color-primary-fixed-dim: #bec6e0;
+	--color-on-primary-fixed: #131b2e;
+	--color-on-primary-fixed-variant: #3f465c;
+
+	/* ── Secondary — "Slate Mist" ── */
+	--color-secondary: #505f76;
+	--color-on-secondary: #ffffff;
+	--color-secondary-container: #d0e1fb;
+	--color-on-secondary-container: #54647a;
+	--color-secondary-fixed: #d3e4fe;
+	--color-secondary-fixed-dim: #b7c8e1;
+	--color-on-secondary-fixed: #0b1c30;
+	--color-on-secondary-fixed-variant: #38485d;
+
+	/* ── Tertiary — "Refined Gold" ── */
+	--color-tertiary: #735c00;
+	--color-on-tertiary: #ffffff;
+	--color-tertiary-container: #cba72f;
+	--color-on-tertiary-container: #4e3d00;
+	--color-tertiary-fixed: #ffe088;
+	--color-tertiary-fixed-dim: #e9c349;
+	--color-on-tertiary-fixed: #241a00;
+	--color-on-tertiary-fixed-variant: #574500;
+
+	/* ── Error ── */
+	--color-error: #ba1a1a;
+	--color-on-error: #ffffff;
+	--color-error-container: #ffdad6;
+	--color-on-error-container: #93000a;
+
+	/* ── Outline ── */
+	--color-outline: #76777d;
+	--color-outline-variant: #c6c6cd;
+
+	/* ── Shadows (ambient, diffused with primary tint) ── */
+	--shadow-ambient-sm: 0 1px 4px 0 rgba(19, 27, 46, 0.06);
+	--shadow-ambient: 0 2px 8px -1px rgba(19, 27, 46, 0.08), 0 1px 4px -1px rgba(19, 27, 46, 0.04);
+	--shadow-ambient-md: 0 4px 16px -2px rgba(19, 27, 46, 0.1), 0 2px 6px -2px rgba(19, 27, 46, 0.06);
+	--shadow-ambient-lg:
+		0 8px 30px -4px rgba(19, 27, 46, 0.12), 0 4px 10px -4px rgba(19, 27, 46, 0.06);
+
+	/* ── Transition presets ── */
+	--ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+	/* ── Status Colors (desaturated, for chips/badges) ── */
+	--color-status-success: #e8f5e9;
+	--color-status-success-text: #1b5e20;
+	--color-status-warning: #fff8e1;
+	--color-status-warning-text: #e65100;
+	--color-status-info: #e3f2fd;
+	--color-status-info-text: #0d47a1;
+	--color-status-danger: #fce4ec;
+	--color-status-danger-text: #b71c1c;
+
+	/* ── Stat Card Palette ── */
+	--color-card-green: #e6f9ed;
+	--color-card-green-icon: #34a853;
+	--color-card-purple: #f0eaff;
+	--color-card-purple-icon: #7c4dff;
+	--color-card-blue: #e3f2fd;
+	--color-card-blue-icon: #2979ff;
+	--color-card-amber: #fff8e1;
+	--color-card-amber-icon: #ff8f00;
+}
+
+/* ──────────────────────────────────────────────
+   Base Layer — Resets & Defaults
+   ────────────────────────────────────────────── */
+
+@layer base {
+	*,
+	*::before,
+	*::after {
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	html {
+		font-family: var(--font-body);
+		color: var(--color-on-surface);
+		background-color: var(--color-surface);
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		scroll-behavior: smooth;
+	}
+
+	body {
+		min-height: 100dvh;
+	}
+
+	/* ── Typography Defaults ── */
+	h1,
+	h2,
+	h3,
+	h4 {
+		font-family: var(--font-heading);
+		color: var(--color-on-surface);
+		letter-spacing: -0.02em;
+	}
+
+	h1 {
+		font-size: 40px;
+		font-weight: 700;
+		line-height: 1.2;
+	}
+
+	h2 {
+		font-size: 32px;
+		font-weight: 600;
+		line-height: 1.3;
+		letter-spacing: -0.01em;
+	}
+
+	h3 {
+		font-size: 24px;
+		font-weight: 600;
+		line-height: 1.4;
+		letter-spacing: 0;
+	}
+
+	p,
+	span,
+	li {
+		font-family: var(--font-body);
+	}
+
+	/* Smooth focus styles */
+	:focus-visible {
+		outline: 2px solid var(--color-primary);
+		outline-offset: 2px;
+		border-radius: var(--radius-sm);
+	}
+}
+
+/* ──────────────────────────────────────────────
+   Component Layer — Reusable UI Classes
+   ────────────────────────────────────────────── */
+
+@layer components {
+	/* ── Buttons ── */
+	.btn-primary {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 12px 24px;
+		font-family: var(--font-heading);
+		font-size: 14px;
+		font-weight: 600;
+		letter-spacing: 0.05em;
+		color: var(--color-on-primary);
+		background-color: var(--color-primary);
+		border-radius: var(--radius-DEFAULT);
+		border: none;
+		cursor: pointer;
+		min-height: 44px;
+		transition: all 200ms var(--ease-smooth);
+	}
+
+	.btn-primary:hover {
+		background-color: var(--color-on-primary-fixed-variant);
+	}
+
+	.btn-primary:active {
+		transform: scale(0.97);
+	}
+
+	.btn-secondary {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 12px 24px;
+		font-family: var(--font-heading);
+		font-size: 14px;
+		font-weight: 600;
+		letter-spacing: 0.05em;
+		color: var(--color-secondary);
+		background-color: transparent;
+		border: 1.5px solid var(--color-outline-variant);
+		border-radius: var(--radius-DEFAULT);
+		cursor: pointer;
+		min-height: 44px;
+		transition: all 200ms var(--ease-smooth);
+	}
+
+	.btn-secondary:hover {
+		background-color: var(--color-surface-high);
+		border-color: var(--color-secondary);
+	}
+
+	/* ── Ghost Input ── */
+	.input-ghost {
+		width: 100%;
+		padding: 12px 16px;
+		font-family: var(--font-body);
+		font-size: 16px;
+		color: var(--color-on-surface);
+		background-color: var(--color-surface-low);
+		border: none;
+		border-bottom: 2px solid var(--color-outline-variant);
+		border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+		min-height: 44px;
+		transition: all 200ms var(--ease-smooth);
+	}
+
+	.input-ghost:focus {
+		background-color: var(--color-surface-lowest);
+		border: 2px solid var(--color-primary);
+		border-radius: var(--radius-DEFAULT);
+		outline: none;
+	}
+
+	/* ── Status Chip ── */
+	.chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		padding: 4px 12px;
+		font-family: var(--font-heading);
+		font-size: 12px;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		border-radius: var(--radius-xl);
+		white-space: nowrap;
+	}
+
+	.chip-success {
+		color: var(--color-status-success-text);
+		background-color: var(--color-status-success);
+	}
+
+	.chip-warning {
+		color: var(--color-status-warning-text);
+		background-color: var(--color-status-warning);
+	}
+
+	.chip-info {
+		color: var(--color-status-info-text);
+		background-color: var(--color-status-info);
+	}
+
+	.chip-danger {
+		color: var(--color-status-danger-text);
+		background-color: var(--color-status-danger);
+	}
+
+	/* ── Card ── */
+	.card {
+		background-color: var(--color-surface-lowest);
+		border-radius: var(--radius-lg);
+		box-shadow: var(--shadow-ambient);
+		padding: var(--spacing-md);
+		transition: box-shadow 300ms var(--ease-smooth);
+	}
+
+	.card:hover {
+		box-shadow: var(--shadow-ambient-md);
+	}
+
+	/* ── Glass Panel ── */
+	.glass {
+		background: rgba(255, 255, 255, 0.7);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		border: 1px solid rgba(255, 255, 255, 0.3);
+	}
+
+	/* ── Data Summary ── */
+	.data-value {
+		font-family: var(--font-heading);
+		font-size: 36px;
+		font-weight: 700;
+		line-height: 1.1;
+		letter-spacing: -0.02em;
+		color: var(--color-on-surface);
+	}
+
+	.data-label {
+		font-family: var(--font-body);
+		font-size: 13px;
+		font-weight: 400;
+		color: var(--color-on-surface-variant);
+		margin-top: 4px;
+	}
+
+	/* ── Zebra Striping ── */
+	.zebra-row:nth-child(even) {
+		background-color: #f8fafc;
+	}
+}
+
+/* ──────────────────────────────────────────────
+   Utility Layer — Helpers
+   ────────────────────────────────────────────── */
+
+@layer utilities {
+	.font-heading {
+		font-family: var(--font-heading);
+	}
+
+	.font-body {
+		font-family: var(--font-body);
+	}
+
+	.text-label {
+		font-family: var(--font-heading);
+		font-size: 14px;
+		font-weight: 500;
+		line-height: 1;
+		letter-spacing: 0.05em;
+	}
+
+	.text-body-lg {
+		font-family: var(--font-body);
+		font-size: 18px;
+		font-weight: 400;
+		line-height: 1.6;
+	}
+
+	.text-body-md {
+		font-family: var(--font-body);
+		font-size: 16px;
+		font-weight: 400;
+		line-height: 1.5;
+	}
+
+	.shadow-ambient-sm {
+		box-shadow: var(--shadow-ambient-sm);
+	}
+
+	.shadow-ambient {
+		box-shadow: var(--shadow-ambient);
+	}
+
+	.shadow-ambient-md {
+		box-shadow: var(--shadow-ambient-md);
+	}
+
+	.shadow-ambient-lg {
+		box-shadow: var(--shadow-ambient-lg);
+	}
+
+	/* Safe area insets for mobile */
+	.pb-safe {
+		padding-bottom: env(safe-area-inset-bottom, 0px);
+	}
+}
