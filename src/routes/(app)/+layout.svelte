@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import { onMount } from 'svelte';
 
 	let { children } = $props();
 
@@ -28,6 +29,60 @@
 	function closeSidebar() {
 		sidebarOpen = false;
 	}
+
+	/* ── Profile Menu & Theme State ── */
+	let profileMenuOpen = $state(false);
+	let useSystemTheme = $state(true);
+	let isDarkMode = $state(false);
+
+	function updateThemeClass() {
+		if (isDarkMode) {
+			document.documentElement.classList.add('dark');
+		} else {
+			document.documentElement.classList.remove('dark');
+		}
+	}
+
+	function handleSystemThemeChange(e: MediaQueryListEvent) {
+		if (useSystemTheme) {
+			isDarkMode = e.matches;
+			updateThemeClass();
+		}
+	}
+
+	function toggleSystemTheme() {
+		useSystemTheme = !useSystemTheme;
+		if (useSystemTheme) {
+			localStorage.removeItem('theme');
+			isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+			updateThemeClass();
+		} else {
+			localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+		}
+	}
+
+	function toggleManualTheme() {
+		if (useSystemTheme) return;
+		isDarkMode = !isDarkMode;
+		localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+		updateThemeClass();
+	}
+
+	onMount(() => {
+		const savedTheme = localStorage.getItem('theme');
+		if (savedTheme) {
+			useSystemTheme = false;
+			isDarkMode = savedTheme === 'dark';
+		} else {
+			useSystemTheme = true;
+			isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+		}
+
+		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+		mediaQuery.addEventListener('change', handleSystemThemeChange);
+
+		return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
+	});
 </script>
 
 <svelte:window bind:scrollY />
@@ -41,6 +96,7 @@
 
 	<!-- ── Sidebar ── -->
 	<aside class="sidebar" class:sidebar-open={sidebarOpen}>
+		<div class="sidebar-brand">DARPAN</div>
 		<div class="sidebar-inner">
 			<span class="sidebar-section-label">MANAGEMENT</span>
 			<nav class="sidebar-nav">
@@ -98,20 +154,66 @@
 					</svg>
 					<span class="notification-dot"></span>
 				</button>
-				<button class="avatar-btn" aria-label="Profile">
-					<div class="avatar-placeholder">
-						<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-							<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-						</svg>
-					</div>
-				</button>
+				<div class="profile-menu-container">
+					<button class="avatar-btn" aria-label="Profile" onclick={() => profileMenuOpen = !profileMenuOpen}>
+						<div class="avatar-placeholder">
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+								<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+							</svg>
+						</div>
+					</button>
+
+					{#if profileMenuOpen}
+						<button class="dropdown-backdrop" onclick={() => profileMenuOpen = false} aria-label="Close menu"></button>
+						<div class="profile-dropdown shadow-ambient-md">
+							<div class="dropdown-header">
+								<div class="dropdown-title">Administrator</div>
+								<div class="dropdown-subtitle">admin@darpan.edu</div>
+							</div>
+							<div class="dropdown-divider"></div>
+							<button class="dropdown-item" onclick={() => profileMenuOpen = false}>
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+								<span>Profile</span>
+							</button>
+							<button class="dropdown-item" onclick={() => profileMenuOpen = false}>
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+								<span>Edit Designation</span>
+							</button>
+							<div class="dropdown-divider"></div>
+							<div class="dropdown-section">
+								<div class="dropdown-section-title">Theme</div>
+								<label class="dropdown-checkbox">
+									<input type="checkbox" checked={useSystemTheme} onchange={toggleSystemTheme} />
+									<span>Use system's theme</span>
+								</label>
+								<div class="theme-toggle-group" class:disabled={useSystemTheme}>
+									<button class="theme-btn" class:active={!isDarkMode} onclick={() => { if (!useSystemTheme) toggleManualTheme(); }} aria-label="Light mode">
+										<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+										<span>Light</span>
+									</button>
+									<button class="theme-btn" class:active={isDarkMode} onclick={() => { if (!useSystemTheme) toggleManualTheme(); }} aria-label="Dark mode">
+										<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+										<span>Dark</span>
+									</button>
+								</div>
+							</div>
+							<div class="dropdown-divider"></div>
+							<button class="dropdown-item text-error" onclick={() => profileMenuOpen = false}>
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+								<span>Logout</span>
+							</button>
+						</div>
+					{/if}
+				</div>
 			</div>
 		</div>
 	</header>
 
 	<!-- ── Main Content Area ── -->
 	<main class="app-main">
-		{@render children()}
+		<div class="app-main-inner">
+			{@render children()}
+		</div>
 	</main>
 
 	<!-- ── Bottom Navigation (mobile only) ── -->
@@ -263,13 +365,168 @@
 		justify-content: center;
 	}
 
+	/* ── Profile Dropdown ── */
+	.profile-menu-container {
+		position: relative;
+	}
+
+	.profile-dropdown {
+		position: absolute;
+		top: calc(100% + 8px);
+		right: 0;
+		width: 260px;
+		background-color: var(--color-surface-lowest);
+		border: 1px solid var(--color-outline-variant);
+		border-radius: var(--radius-lg);
+		z-index: 60;
+		overflow: hidden;
+	}
+
+	.dropdown-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 55;
+		background: transparent;
+		border: none;
+		cursor: default;
+		width: 100%;
+		height: 100%;
+	}
+
+	.dropdown-header {
+		padding: 16px;
+		background-color: var(--color-surface-low);
+	}
+
+	.dropdown-title {
+		font-family: var(--font-heading);
+		font-size: 16px;
+		font-weight: 700;
+		color: var(--color-on-surface);
+	}
+
+	.dropdown-subtitle {
+		font-family: var(--font-body);
+		font-size: 13px;
+		color: var(--color-on-surface-variant);
+		margin-top: 2px;
+	}
+
+	.dropdown-divider {
+		height: 1px;
+		background-color: var(--color-outline-variant);
+		opacity: 0.5;
+	}
+
+	.dropdown-item {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		width: 100%;
+		padding: 12px 16px;
+		background: transparent;
+		border: none;
+		color: var(--color-on-surface);
+		font-family: var(--font-body);
+		font-size: 14px;
+		cursor: pointer;
+		text-align: left;
+		transition: background-color 200ms var(--ease-smooth);
+	}
+
+	.dropdown-item:hover {
+		background-color: var(--color-surface-high);
+	}
+
+	.dropdown-item.text-error {
+		color: var(--color-error);
+	}
+
+	.dropdown-item.text-error:hover {
+		background-color: var(--color-error-container);
+		color: var(--color-on-error-container);
+	}
+
+	.dropdown-section {
+		padding: 12px 16px;
+	}
+
+	.dropdown-section-title {
+		font-family: var(--font-heading);
+		font-size: 12px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--color-outline);
+		margin-bottom: 12px;
+	}
+
+	.dropdown-checkbox {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-family: var(--font-body);
+		font-size: 14px;
+		color: var(--color-on-surface);
+		cursor: pointer;
+		margin-bottom: 12px;
+	}
+
+	.dropdown-checkbox input[type="checkbox"] {
+		width: 16px;
+		height: 16px;
+		accent-color: var(--color-primary);
+		cursor: pointer;
+	}
+
+	.theme-toggle-group {
+		display: flex;
+		background-color: var(--color-surface-container);
+		border-radius: var(--radius-DEFAULT);
+		padding: 4px;
+		gap: 4px;
+	}
+
+	.theme-toggle-group.disabled {
+		opacity: 0.5;
+		pointer-events: none;
+	}
+
+	.theme-btn {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+		padding: 8px 0;
+		background: transparent;
+		border: none;
+		border-radius: var(--radius-sm);
+		color: var(--color-on-surface-variant);
+		font-family: var(--font-body);
+		font-size: 13px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 200ms var(--ease-smooth);
+	}
+
+	.theme-btn.active {
+		background-color: var(--color-surface-lowest);
+		color: var(--color-on-surface);
+		box-shadow: var(--shadow-ambient-sm);
+	}
+
 	/* ── Main Content ── */
 	.app-main {
 		flex: 1;
+		width: 100%;
+		padding-bottom: 88px;
+	}
+
+	.app-main-inner {
 		max-width: 600px;
 		margin: 0 auto;
 		width: 100%;
-		padding-bottom: 88px;
 	}
 
 	/* ── Bottom Navigation (mobile) ── */
@@ -383,6 +640,15 @@
 		white-space: nowrap;
 	}
 
+	.sidebar-brand {
+		font-family: var(--font-heading);
+		font-size: 18px;
+		font-weight: 800;
+		letter-spacing: 0.08em;
+		color: var(--color-on-surface);
+		padding: 24px 28px 4px;
+	}
+
 	.sidebar-inner {
 		display: flex;
 		flex-direction: column;
@@ -405,8 +671,11 @@
 		}
 
 		.app-main {
-			max-width: 960px;
 			padding-bottom: 32px;
+		}
+
+		.app-main-inner {
+			max-width: 960px;
 		}
 
 		.bottom-nav {
@@ -462,13 +731,13 @@
 			position: fixed;
 			top: 0;
 			left: 0;
-			z-index: 30;
+			z-index: 50;
 			width: 220px;
 			height: 100dvh;
 			background-color: var(--color-surface-lowest);
 			border-right: 1px solid var(--color-outline-variant);
 			transform: none;
-			padding-top: 68px; /* below header */
+			padding-top: 0;
 		}
 
 		.sidebar-overlay {
@@ -482,7 +751,12 @@
 		.app-header {
 			position: sticky;
 			z-index: 40;
-			width: 100%;
+			width: calc(100% - 220px);
+			margin-left: 220px;
+		}
+
+		.header-brand {
+			display: none;
 		}
 
 		.header-inner {
@@ -492,9 +766,12 @@
 
 		.app-main {
 			margin-left: 220px;
-			max-width: none;
 			width: calc(100% - 220px);
 			padding: 0 40px 48px;
+		}
+
+		.app-main-inner {
+			max-width: none;
 		}
 
 		.bottom-nav {
@@ -511,11 +788,19 @@
 			width: 260px;
 		}
 
+		.app-header {
+			width: calc(100% - 260px);
+			margin-left: 260px;
+		}
+
 		.app-main {
 			margin-left: 260px;
 			width: calc(100% - 260px);
 			padding: 0 56px 48px;
-			max-width: 1100px;
+		}
+
+		.app-main-inner {
+			max-width: 1440px;
 		}
 	}
 </style>

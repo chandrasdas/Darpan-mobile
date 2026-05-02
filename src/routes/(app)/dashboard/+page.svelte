@@ -248,19 +248,19 @@
 
 	/* Card color variants */
 	.stat-card-green {
-		background: linear-gradient(145deg, #e6faf0, #d4f5e4);
+		background: linear-gradient(145deg, var(--color-card-green), color-mix(in srgb, var(--color-card-green) 85%, var(--color-card-green-icon)));
 	}
 
 	.stat-card-purple {
-		background: linear-gradient(145deg, #f2eeff, #e8e0fd);
+		background: linear-gradient(145deg, var(--color-card-purple), color-mix(in srgb, var(--color-card-purple) 85%, var(--color-card-purple-icon)));
 	}
 
 	.stat-card-blue {
-		background: linear-gradient(145deg, #e3f2fd, #d1e8fa);
+		background: linear-gradient(145deg, var(--color-card-blue), color-mix(in srgb, var(--color-card-blue) 85%, var(--color-card-blue-icon)));
 	}
 
 	.stat-card-amber {
-		background: linear-gradient(145deg, #fff8e1, #fff0c2);
+		background: linear-gradient(145deg, var(--color-card-amber), color-mix(in srgb, var(--color-card-amber) 85%, var(--color-card-amber-icon)));
 	}
 
 	.stat-top {
@@ -279,23 +279,23 @@
 	}
 
 	.stat-icon-green {
-		color: #1a7a42;
-		background-color: rgba(26, 122, 66, 0.12);
+		color: var(--color-card-green-icon);
+		background-color: color-mix(in srgb, var(--color-card-green-icon) 15%, transparent);
 	}
 
 	.stat-icon-purple {
-		color: #6a3de8;
-		background-color: rgba(106, 61, 232, 0.12);
+		color: var(--color-card-purple-icon);
+		background-color: color-mix(in srgb, var(--color-card-purple-icon) 15%, transparent);
 	}
 
 	.stat-icon-blue {
-		color: #1565c0;
-		background-color: rgba(21, 101, 192, 0.12);
+		color: var(--color-card-blue-icon);
+		background-color: color-mix(in srgb, var(--color-card-blue-icon) 15%, transparent);
 	}
 
 	.stat-icon-amber {
-		color: #e65100;
-		background-color: rgba(230, 81, 0, 0.12);
+		color: var(--color-card-amber-icon);
+		background-color: color-mix(in srgb, var(--color-card-amber-icon) 15%, transparent);
 	}
 
 	.stat-badge {
@@ -308,18 +308,18 @@
 	}
 
 	.stat-badge-success {
-		color: #1b6d33;
-		background-color: rgba(27, 109, 51, 0.1);
+		color: var(--color-status-success-text);
+		background-color: color-mix(in srgb, var(--color-status-success-text) 15%, transparent);
 	}
 
 	.stat-badge-info {
-		color: #4a5792;
-		background-color: rgba(74, 87, 146, 0.1);
+		color: var(--color-status-info-text);
+		background-color: color-mix(in srgb, var(--color-status-info-text) 15%, transparent);
 	}
 
 	.stat-badge-warning {
-		color: #c25000;
-		background-color: rgba(194, 80, 0, 0.1);
+		color: var(--color-status-warning-text);
+		background-color: color-mix(in srgb, var(--color-status-warning-text) 15%, transparent);
 	}
 
 	.stat-body {
@@ -462,7 +462,7 @@
 	}
 
 	.activity-item-even {
-		background-color: #f8fafc;
+		background-color: var(--color-surface-container);
 	}
 
 	.activity-item:not(:last-child) {
