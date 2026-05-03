@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getExistingSetups, saveExamSetups } from './setup.remote';
+	import { getClasses } from '../../students/students.remote';
 	import { fade } from 'svelte/transition';
 	import { APP_NAME } from '$lib/config';
 	import type { PageData } from './$types';
@@ -13,6 +14,8 @@
 	let currentTerm = $state(data.defaults.term);
 	// svelte-ignore state_referenced_locally
 	let currentClass = $state(data.defaults.class);
+	// svelte-ignore state_referenced_locally
+	let classes = $state(data.classes);
 
 	// Reactive state for marks inputs
 	let markInputs = $state<Record<number, number | null>>({});
@@ -75,6 +78,18 @@
 		fetchSetups();
 	});
 
+	async function handleSessionChange(e: Event) {
+		const target = e.target as HTMLSelectElement;
+		currentSession = target.value;
+		classes = await getClasses(parseInt(currentSession)).run();
+		if (classes.length > 0) {
+			currentClass = classes[0].id.toString();
+		} else {
+			currentClass = '';
+		}
+		fetchSetups();
+	}
+
 	async function handleSave() {
 		if (!currentSession || !currentTerm || !currentClass) return;
 		isSaving = true;
@@ -134,20 +149,36 @@
 			
 			<div class="hero-filters">
 				<div class="filter-group">
-					<select bind:value={currentSession} onchange={fetchSetups} class="form-select filter-select">
+					<select value={currentSession} onchange={handleSessionChange} class="form-select filter-select">
 						{#each data.sessions as session (session.id)}
 							<option value={session.id.toString()}>{session.name}</option>
 						{/each}
 					</select>
 
-					<select bind:value={currentTerm} onchange={fetchSetups} class="form-select filter-select">
+					<select 
+						value={currentTerm} 
+						onchange={(e) => {
+							const target = e.target as HTMLSelectElement;
+							currentTerm = target.value;
+							fetchSetups();
+						}} 
+						class="form-select filter-select"
+					>
 						{#each data.examTerms as term (term.id)}
 							<option value={term.id.toString()}>{term.name}</option>
 						{/each}
 					</select>
 
-					<select bind:value={currentClass} onchange={fetchSetups} class="form-select filter-select">
-						{#each data.classes as cls (cls.id)}
+					<select 
+						value={currentClass} 
+						onchange={(e) => {
+							const target = e.target as HTMLSelectElement;
+							currentClass = target.value;
+							fetchSetups();
+						}} 
+						class="form-select filter-select"
+					>
+						{#each classes as cls (cls.id)}
 							<option value={cls.id.toString()}>{cls.name}</option>
 						{/each}
 					</select>

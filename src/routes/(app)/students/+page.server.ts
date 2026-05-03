@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db';
-import { studSections, studClasses, studSessions } from '$lib/server/db/schema/marksheet';
+import { studSections, studSessions } from '$lib/server/db/schema/marksheet';
 import type { PageServerLoad } from './$types';
 import { eq, desc, asc } from 'drizzle-orm';
 import { getFilteredStudents, getClasses } from './students.remote';
