@@ -1,12 +1,38 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
+	import { authClient } from '$lib/auth-client';
+	import type { AppUser } from '$lib/types';
 
-	let { sidebarOpen = $bindable(), headerShadow }: { sidebarOpen: boolean; headerShadow: boolean } = $props();
+	let { sidebarOpen = $bindable(), headerShadow, user }: {
+		sidebarOpen: boolean;
+		headerShadow: boolean;
+		user?: AppUser;
+	} = $props();
 
 	/* ── Profile Menu & Theme State ── */
 	let profileMenuOpen = $state(false);
 	let useSystemTheme = $state(true);
 	let isDarkMode = $state(false);
+	let loggingOut = $state(false);
+
+	// Derive display values from user
+	const userName = $derived(user?.name ?? 'User');
+	const userEmail = $derived(user?.email ?? '');
+	const userRole = $derived(
+		user?.role
+			? user.role.charAt(0).toUpperCase() + user.role.slice(1)
+			: 'Staff'
+	);
+	const userInitials = $derived(
+		userName
+			.split(' ')
+			.filter(Boolean)
+			.slice(0, 2)
+			.map((w: string) => w[0].toUpperCase())
+			.join('')
+	);
 
 	function updateThemeClass() {
 		if (isDarkMode) {
@@ -39,6 +65,12 @@
 		isDarkMode = !isDarkMode;
 		localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
 		updateThemeClass();
+	}
+
+	async function handleLogout() {
+		loggingOut = true;
+		await authClient.signOut();
+		goto(resolve('/login' as '/'));
 	}
 
 	onMount(() => {
@@ -84,10 +116,8 @@
 			</button>
 			<div class="profile-menu-container">
 				<button class="avatar-btn" aria-label="Profile" onclick={() => profileMenuOpen = !profileMenuOpen}>
-					<div class="avatar-placeholder">
-						<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-							<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-						</svg>
+					<div class="avatar-placeholder avatar-initials">
+						{userInitials}
 					</div>
 				</button>
 
@@ -95,9 +125,9 @@
 					<button class="dropdown-backdrop" onclick={() => profileMenuOpen = false} aria-label="Close menu"></button>
 					<div class="profile-dropdown shadow-ambient-md">
 						<div class="dropdown-header">
-							<div class="dropdown-title">John Doe</div>
-							<div class="dropdown-subtitle">john.doe@darpan.edu</div>
-							<div class="dropdown-role-badge">Role: Admin</div>
+							<div class="dropdown-title">{userName}</div>
+							<div class="dropdown-subtitle">{userEmail}</div>
+							<div class="dropdown-role-badge">Role: {userRole}</div>
 						</div>
 						<div class="dropdown-divider"></div>
 						<button class="dropdown-item" onclick={() => profileMenuOpen = false}>
@@ -123,9 +153,9 @@
 							</div>
 						</div>
 						<div class="dropdown-divider"></div>
-						<button class="dropdown-item text-error" onclick={() => profileMenuOpen = false}>
+						<button class="dropdown-item text-error" onclick={handleLogout} disabled={loggingOut}>
 							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-							<span>Logout</span>
+							<span>{loggingOut ? 'Logging out…' : 'Logout'}</span>
 						</button>
 					</div>
 				{/if}

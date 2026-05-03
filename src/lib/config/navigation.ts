@@ -1,5 +1,5 @@
-export type NavSubItem = { label: string; href: string };
-export type NavItem = { label: string; href?: string; icon: string; subItems?: NavSubItem[] };
+export type NavSubItem = { label: string; href: string; adminOnly?: boolean };
+export type NavItem = { label: string; href?: string; icon: string; subItems?: NavSubItem[]; adminOnly?: boolean };
 
 export const navItems: NavItem[] = [
 	{ label: 'Dashboard', href: '/dashboard', icon: 'home' },
@@ -18,6 +18,8 @@ export const navItems: NavItem[] = [
 		icon: 'groups',
 		subItems: [
 			{ label: 'Faculty List', href: '/staff' },
+			{ label: 'Add Staff', href: '/staff-entry' },
+			{ label: 'Allowed Staff', href: '/admin/allowed-staff', adminOnly: true },
 			{ label: 'Leave Management', href: '#' }
 		]
 	},
@@ -25,8 +27,8 @@ export const navItems: NavItem[] = [
 		label: 'Examinations', 
 		icon: 'assessment',
 		subItems: [
-			{ label: 'Exam Setup', href: '#' },
-			{ label: 'Marks Entry', href: '#' }
+			{ label: 'Exam Setup', href: '/admin/exam-setup' },
+			{ label: 'Marks Entry', href: '/admin/marks-entry' }
 		]
 	},
 	{ 

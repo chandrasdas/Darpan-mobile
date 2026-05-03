@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <!-- Primary indigo-to-violet gradient matching the app theme -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <!-- Subtle inner shadow / glow -->
+    <radialGradient id="glow" cx="35%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#818cf8" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Rounded square background -->
+  <rect width="512" height="512" rx="108" ry="108" fill="url(#bgGrad)"/>
+
+  <!-- Subtle glow overlay -->
+  <rect width="512" height="512" rx="108" ry="108" fill="url(#glow)"/>
+
+  <!-- Stylized "D" lettermark -->
+  <g transform="translate(228, 256) scale(1.2)">
+    <!-- Main "D" shape - bold, modern, rounded -->
+    <path
+      d="M-68,-120 L-68,120 L20,120 C95,120 148,68 148,0 C148,-68 95,-120 20,-120 Z
+         M-24,-76 L20,-76 C68,-76 100,-44 100,0 C100,44 68,76 20,76 L-24,76 Z"
+      fill="white"
+      opacity="0.95"
+    />
+  </g>
+</svg>

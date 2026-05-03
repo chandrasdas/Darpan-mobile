@@ -3,13 +3,23 @@
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import { navItems, isActive } from '$lib/config/navigation';
+	import type { NavItem } from '$lib/config/navigation';
 	import NavIcon from './NavIcon.svelte';
+	import type { AppUser } from '$lib/types';
 
-	let { sidebarOpen = $bindable() }: { sidebarOpen: boolean } = $props();
+	let { sidebarOpen = $bindable(), user }: { sidebarOpen: boolean; user?: AppUser } = $props();
 	let expandedMenus = $state<Record<string, boolean>>({});
 
+	// Filter out adminOnly items for non-admin users
+	const visibleNavItems = $derived<NavItem[]>(
+		navItems.map((item) => ({
+			...item,
+			subItems: item.subItems?.filter((sub) => !sub.adminOnly || user?.role === 'admin')
+		})).filter((item) => !item.adminOnly || user?.role === 'admin')
+	);
+
 	onMount(() => {
-		for (const item of navItems) {
+		for (const item of visibleNavItems) {
 			if (item.subItems?.some(sub => isActive(sub.href, page.url.pathname))) {
 				expandedMenus[item.label] = true;
 			}
@@ -30,7 +40,7 @@
 	<div class="sidebar-inner">
 		<span class="sidebar-section-label">MANAGEMENT</span>
 		<nav class="sidebar-nav">
-			{#each navItems as item (item.label)}
+			{#each visibleNavItems as item (item.label)}
 				{@const hasSubItems = item.subItems && item.subItems.length > 0}
 				{@const active = item.href ? isActive(item.href, page.url.pathname) : (item.subItems?.some(sub => isActive(sub.href, page.url.pathname)) ?? false)}
 				
