@@ -4,8 +4,17 @@ import { studClasses, studSections, studInfo, studSessionEnrollments } from '$li
 import { eq, asc, like, or, and, sql } from 'drizzle-orm';
 import * as v from 'valibot';
 
-export const getClasses = query(async () => {
-    return await db.select().from(studClasses).orderBy(asc(studClasses.id));
+export const getClasses = query(v.number(), async (sessionId: number) => {
+    return await db.select({
+        id: studClasses.id,
+        name: studClasses.name
+    })
+    .from(studClasses)
+    .innerJoin(studSections, eq(studClasses.id, studSections.classId))
+    .innerJoin(studSessionEnrollments, eq(studSections.id, studSessionEnrollments.sectionId))
+    .where(eq(studSessionEnrollments.sessionId, sessionId))
+    .groupBy(studClasses.id)
+    .orderBy(asc(studClasses.id));
 });
 
 export const getSections = query(v.number(), async (classId: number) => {
@@ -24,6 +33,7 @@ export const getFilteredStudents = query(
         page: v.number()
     }),
     async (params) => {
+        console.log("getFilteredStudents called with:", params);
         const { q, session: sessionFilter, class: classFilter, section: sectionFilter } = params;
         const limit = 80;
         let page = params.page;

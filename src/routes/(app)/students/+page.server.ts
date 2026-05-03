@@ -2,29 +2,39 @@ import { db } from '$lib/server/db';
 import { studSections, studClasses, studSessions } from '$lib/server/db/schema/marksheet';
 import type { PageServerLoad } from './$types';
 import { eq, desc, asc } from 'drizzle-orm';
-import { getFilteredStudents } from './students.remote';
+import { getFilteredStudents, getClasses } from './students.remote';
 
 export const load: PageServerLoad = async ({ url }) => {
     const query = url.searchParams.get('q') || '';
     
     // Fetch base data for defaults and dropdowns
     const dbSessions = await db.select().from(studSessions).orderBy(desc(studSessions.year));
-    const dbClasses = await db.select().from(studClasses).orderBy(asc(studClasses.id));
-
     // Resolve defaults if not in URL
     let sessionFilter = url.searchParams.get('session');
     if (!sessionFilter && dbSessions.length > 0) {
         sessionFilter = dbSessions[0].id.toString();
     }
 
-    const classFilter = url.searchParams.get('class') || '';
+    const dbClasses = await getClasses(parseInt(sessionFilter || '0'));
+
+    let classFilter = url.searchParams.get('class');
+    if (!classFilter && dbClasses.length > 0) {
+        classFilter = dbClasses[0].id.toString();
+    } else if (!classFilter) {
+        classFilter = '';
+    }
 
     // Fetch sections for the selected class to determine default section
     const dbSectionsList = classFilter 
         ? await db.select().from(studSections).where(eq(studSections.classId, parseInt(classFilter))).orderBy(asc(studSections.id))
         : [];
 
-    const sectionFilter = url.searchParams.get('section') || '';
+    let sectionFilter = url.searchParams.get('section');
+    if (!sectionFilter && dbSectionsList.length > 0) {
+        sectionFilter = dbSectionsList[0].id.toString();
+    } else if (!sectionFilter) {
+        sectionFilter = '';
+    }
     
     // pagination
     let page = parseInt(url.searchParams.get('page') || '1');

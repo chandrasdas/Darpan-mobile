@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getSections, getFilteredStudents } from './students.remote';
+	import { getClasses, getSections, getFilteredStudents } from './students.remote';
 	import { fade } from 'svelte/transition';
 	import { APP_NAME } from '$lib/config';
 	import { resolve } from '$app/paths';
@@ -14,6 +14,8 @@
 	let currentSession = $state(data.filters.session);
 	// svelte-ignore state_referenced_locally
 	let currentClass = $state(data.filters.class);
+	// svelte-ignore state_referenced_locally
+	let classes = $state(data.classes);
 	// svelte-ignore state_referenced_locally
 	let currentSection = $state(data.filters.section);
 	// svelte-ignore state_referenced_locally
@@ -31,18 +33,25 @@
 	let totalRecords = $state(data.totalRecords);
 
 	async function fetchStudents(pageToFetch = 1) {
-		const result = await getFilteredStudents({
-			q: currentQuery,
-			session: currentSession,
-			class: currentClass,
-			section: currentSection,
-			page: pageToFetch
-		});
-		students = result.students;
-		currentPage = result.page;
-		totalPages = result.totalPages;
-		hasNextPage = result.hasNextPage;
-		totalRecords = result.totalRecords;
+		console.log("Fetching students with session:", currentSession);
+		try {
+			const result = await getFilteredStudents({
+				q: currentQuery,
+				session: currentSession,
+				class: currentClass,
+				section: currentSection,
+				page: pageToFetch
+			}).run();
+			console.log("Received result:", result);
+			students = result.students;
+			currentPage = result.page;
+			totalPages = result.totalPages;
+			hasNextPage = result.hasNextPage;
+			totalRecords = result.totalRecords;
+		} catch (error) {
+			console.error("fetchStudents error:", error);
+			alert("Error fetching students: " + error);
+		}
 	}
 
 	async function handleClassChange(e: Event) {
@@ -51,7 +60,7 @@
 		currentClass = newClassId;
 		
 		if (newClassId) {
-			const fetchedSections = await getSections(parseInt(newClassId));
+			const fetchedSections = await getSections(parseInt(newClassId)).run();
 			sections = fetchedSections;
 			if (fetchedSections.length > 0) {
 				currentSection = fetchedSections[0].id.toString();
@@ -65,14 +74,32 @@
 		fetchStudents(1);
 	}
 
-	async function handleSessionChange() {
-		currentClass = '';
-		currentSection = '';
-		sections = [];
+	async function handleSessionChange(e: Event) {
+		const target = e.target as HTMLSelectElement;
+		currentSession = target.value;
+		classes = await getClasses(parseInt(currentSession)).run();
+		
+		if (classes.length > 0) {
+			currentClass = classes[0].id.toString();
+			const fetchedSections = await getSections(parseInt(currentClass)).run();
+			sections = fetchedSections;
+			if (fetchedSections.length > 0) {
+				currentSection = fetchedSections[0].id.toString();
+			} else {
+				currentSection = '';
+			}
+		} else {
+			currentClass = '';
+			sections = [];
+			currentSection = '';
+		}
+
 		fetchStudents(1);
 	}
 
-	function handleSearchInput() {
+	function handleSearchInput(e: Event) {
+		const target = e.target as HTMLInputElement;
+		currentQuery = target.value;
 		if (currentQuery.length >= 3 || currentQuery.length === 0) {
 			fetchStudents(1);
 		}
@@ -110,7 +137,7 @@
 					</div>
 					<input 
 						type="search" 
-						bind:value={currentQuery}
+						value={currentQuery}
 						oninput={handleSearchInput}
 						onkeydown={(e) => { if (e.key === 'Enter') fetchStudents(1); }}
 						placeholder="Search name or Portal ID..." 
@@ -122,29 +149,31 @@
 
 				<!-- Filters -->
 				<div class="dropdown-filters">
-					<select bind:value={currentSession} onchange={handleSessionChange} class="filter-select">
+					<select value={currentSession} onchange={handleSessionChange} class="filter-select">
 						{#each data.sessions as session (session.id)}
 							<option value={session.id.toString()}>{session.name}</option>
 						{/each}
 					</select>
 
 					<select 
-						bind:value={currentClass} 
+						value={currentClass} 
 						onchange={handleClassChange}
 						class="filter-select"
 					>
-						<option value="">Select class</option>
-						{#each data.classes as cls (cls.id)}
+						{#each classes as cls (cls.id)}
 							<option value={cls.id.toString()}>{cls.name}</option>
 						{/each}
 					</select>
 
 					<select 
-						bind:value={currentSection}
-						onchange={() => fetchStudents(1)}
+						value={currentSection}
+						onchange={(e) => {
+							const target = e.target as HTMLSelectElement;
+							currentSection = target.value;
+							fetchStudents(1);
+						}}
 						class="filter-select"
 					>
-						<option value="">Select section</option>
 						{#each sections as sec (sec.id)}
 							<option value={sec.id.toString()}>Section {sec.letter}</option>
 						{/each}
