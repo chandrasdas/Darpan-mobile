@@ -65,7 +65,7 @@
 								{@const subActive = isActive(sub.href, page.url.pathname)}
 								<a
 									href={sub.href === '#' ? '#' : resolve(sub.href as "/")}
-									class="sidebar-sublink flex items-center gap-3 py-2 px-3 rounded-md text-[14px] transition-colors duration-200 {subActive ? 'text-[var(--color-on-secondary-container)] font-medium bg-[var(--color-secondary-container)]' : 'text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] hover:bg-[var(--color-surface-high)]'}"
+									class="sidebar-sublink flex items-center gap-3 py-2 px-3 rounded-md text-[14px] transition-colors duration-200 {subActive ? 'text-(--color-on-secondary-container) font-medium bg-(--color-secondary-container)' : 'text-(--color-on-surface-variant) hover:text-(--color-on-surface) hover:bg-(--color-surface-high)'}"
 									onclick={(e) => {
 										if (sub.href === '#') {
 											e.preventDefault();
@@ -74,7 +74,7 @@
 										}
 									}}
 								>
-									<span class="sidebar-sublink-dot w-[5px] h-[5px] rounded-full {subActive ? 'bg-[var(--color-primary)]' : 'bg-current opacity-40'}"></span>
+									<span class="sidebar-sublink-dot w-[5px] h-[5px] rounded-full {subActive ? 'bg-(--color-primary)' : 'bg-current opacity-40'}"></span>
 									<span class="sidebar-sublink-text">{sub.label}</span>
 								</a>
 							{/each}
