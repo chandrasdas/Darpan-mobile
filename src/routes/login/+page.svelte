@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { authClient } from '$lib/auth-client';
 	import { resolve } from '$app/paths';
 	import { fade, slide } from 'svelte/transition';
@@ -9,6 +10,33 @@
 	let password = $state('');
 	let loading = $state(false);
 	let error = $state('');
+
+	let isDarkMode = $state(false);
+
+	function updateThemeClass() {
+		if (isDarkMode) {
+			document.documentElement.classList.add('dark');
+		} else {
+			document.documentElement.classList.remove('dark');
+		}
+	}
+
+	function setManualTheme(dark: boolean) {
+		isDarkMode = dark;
+		localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+		updateThemeClass();
+	}
+
+	onMount(() => {
+		const savedTheme = localStorage.getItem('theme');
+		if (savedTheme) {
+			isDarkMode = savedTheme === 'dark';
+		} else {
+			isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+			localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+		}
+		updateThemeClass();
+	});
 
 	async function handleLogin(e: Event) {
 		e.preventDefault();
@@ -39,12 +67,23 @@
 </svelte:head>
 
 <div class="auth-page">
+	<div class="theme-switcher" in:fade={{ duration: 600, delay: 200 }}>
+		<div class="theme-toggle-pills">
+			<button type="button" class="pill-btn" class:active={!isDarkMode} onclick={() => setManualTheme(false)} aria-label="Light mode">
+				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+			</button>
+			<button type="button" class="pill-btn" class:active={isDarkMode} onclick={() => setManualTheme(true)} aria-label="Dark mode">
+				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+			</button>
+		</div>
+	</div>
+
 	<div class="auth-container" in:fade={{ duration: 600, delay: 100 }}>
 		<div class="auth-header">
 			<div class="auth-logo-wrapper">
-				<LogoIcon class="auth-logo" />
+				<LogoIcon class="size-11 text-on-secondary-container" />
 			</div>
-			<h1 class="auth-title">Welcome to Darpan</h1>
+			<h1 class="auth-title">Darpan</h1>
 			<p class="auth-subtitle">A mirror reflecting the excellence of Vidyamandir</p>
 		</div>
 
@@ -119,6 +158,58 @@
 		font-family: var(--font-sans, system-ui, sans-serif);
 	}
 
+	.theme-switcher {
+		position: absolute;
+		top: 24px;
+		right: 24px;
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		background-color: var(--color-surface-lowest);
+		padding: 8px 16px;
+		border-radius: 100px;
+		box-shadow: var(--shadow-ambient-sm);
+		border: 1px solid var(--color-outline-variant);
+		z-index: 20;
+	}
+
+	.theme-toggle-pills {
+		display: flex;
+		background-color: var(--color-surface-container);
+		border-radius: 100px;
+		padding: 2px;
+		gap: 2px;
+	}
+
+	.pill-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 28px;
+		height: 28px;
+		border-radius: 100px;
+		border: none;
+		background: transparent;
+		color: var(--color-on-surface-variant);
+		cursor: pointer;
+		transition: all 200ms ease;
+	}
+
+	.pill-btn.active {
+		background-color: var(--color-primary);
+		color: var(--color-on-primary);
+		box-shadow: var(--shadow-ambient-sm);
+	}
+
+	@media (max-width: 600px) {
+		.theme-switcher {
+			top: 16px;
+			right: 16px;
+			padding: 6px 12px;
+			gap: 12px;
+		}
+	}
+
 	.auth-container {
 		position: relative;
 		z-index: 10;
@@ -135,20 +226,16 @@
 	.auth-logo-wrapper {
 		margin: 0 auto 24px;
 		display: flex;
-		height: 56px;
-		width: 56px;
+		height: 70px;
+		width: 70px;
 		align-items: center;
 		justify-content: center;
 		border-radius: var(--radius-xl);
-		background-color: var(--color-primary);
-		box-shadow: 0 10px 25px -5px color-mix(in srgb, var(--color-primary) 40%, transparent);
+		background-color: var(--color-secondary-container);
+		box-shadow: 0 10px 25px -5px color-mix(in srgb, var(--color-secondary-container) 40%, transparent);
 	}
 
-	:global(.auth-logo) {
-		height: 28px;
-		width: 28px;
-		color: var(--color-on-primary);
-	}
+
 
 	.auth-title {
 		font-family: var(--font-heading);
@@ -250,11 +337,11 @@
 		justify-content: center;
 		gap: 8px;
 		border-radius: var(--radius-lg);
-		background-color: var(--color-primary);
+		background-color: var(--color-secondary);
 		padding: 12px 16px;
 		font-size: 14px;
 		font-weight: 600;
-		color: var(--color-on-primary);
+		color: var(--color-on-secondary);
 		border: none;
 		cursor: pointer;
 		margin-top: 8px;
@@ -262,7 +349,7 @@
 	}
 
 	.submit-btn:hover:not(:disabled) {
-		background-color: var(--color-primary-fixed-dim);
+		background-color: color-mix(in srgb, var(--color-secondary) 85%, var(--color-on-surface));
 	}
 
 	.submit-btn:disabled {
