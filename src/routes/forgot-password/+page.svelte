@@ -100,6 +100,13 @@
 </svelte:head>
 
 <div class="auth-page">
+	<a href={resolve('/login' as "/")} class="back-link">
+		<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+		</svg>
+		Back
+	</a>
+
 	<div class="auth-container">
 		<div class="auth-header">
 			<h1 class="auth-title">Forgot Password</h1>
@@ -276,6 +283,24 @@
 		color: var(--color-on-surface);
 		position: relative;
 		font-family: var(--font-sans, system-ui, sans-serif);
+	}
+
+	.back-link {
+		position: absolute;
+		top: 24px;
+		left: 24px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 14px;
+		font-weight: 500;
+		color: var(--color-on-surface-variant);
+		text-decoration: none;
+		transition: color 200ms ease;
+	}
+
+	.back-link:hover {
+		color: var(--color-on-surface);
 	}
 
 	.auth-container {

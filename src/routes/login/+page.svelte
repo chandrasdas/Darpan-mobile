@@ -39,20 +39,13 @@
 </svelte:head>
 
 <div class="auth-page">
-	<a href={resolve('/' as "/")} class="back-link">
-		<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-		</svg>
-		Back to Home
-	</a>
-
 	<div class="auth-container" in:fade={{ duration: 600, delay: 100 }}>
 		<div class="auth-header">
 			<div class="auth-logo-wrapper">
 				<LogoIcon class="auth-logo" />
 			</div>
-			<h1 class="auth-title">Welcome back</h1>
-			<p class="auth-subtitle">Enter your credentials to access your account.</p>
+			<h1 class="auth-title">Welcome to Darpan</h1>
+			<p class="auth-subtitle">A mirror reflecting the excellence of Vidyamandir</p>
 		</div>
 
 		<div class="auth-card">
@@ -124,24 +117,6 @@
 		color: var(--color-on-surface);
 		position: relative;
 		font-family: var(--font-sans, system-ui, sans-serif);
-	}
-
-	.back-link {
-		position: absolute;
-		top: 24px;
-		left: 24px;
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		font-size: 14px;
-		font-weight: 500;
-		color: var(--color-on-surface-variant);
-		text-decoration: none;
-		transition: color 200ms ease;
-	}
-
-	.back-link:hover {
-		color: var(--color-on-surface);
 	}
 
 	.auth-container {
