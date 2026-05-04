@@ -29,6 +29,14 @@
 	// svelte-ignore state_referenced_locally
 	let displaySubjects = $state(data.subjects);
 
+	let addedToMarksheetCount = $derived(
+		displaySubjects.filter(sub => includeMarksheetInputs[sub.id]).length
+	);
+
+	let addedToTotalCount = $derived(
+		displaySubjects.filter(sub => includeMarksheetInputs[sub.id] && includeInputs[sub.id]).length
+	);
+
 	async function fetchSetups() {
 		if (!currentSession || !currentTerm || !currentClass) return;
 		
@@ -156,6 +164,20 @@
 					</select>
 
 					<select 
+						value={currentClass} 
+						onchange={(e) => {
+							const target = e.target as HTMLSelectElement;
+							currentClass = target.value;
+							fetchSetups();
+						}} 
+						class="form-select filter-select"
+					>
+						{#each classes as cls (cls.id)}
+							<option value={cls.id.toString()}>{cls.name}</option>
+						{/each}
+					</select>
+
+					<select 
 						value={currentTerm} 
 						onchange={(e) => {
 							const target = e.target as HTMLSelectElement;
@@ -169,22 +191,21 @@
 						{/each}
 					</select>
 
-					<select 
-						value={currentClass} 
-						onchange={(e) => {
-							const target = e.target as HTMLSelectElement;
-							currentClass = target.value;
-							fetchSetups();
-						}} 
-						class="form-select filter-select"
-					>
-						{#each classes as cls (cls.id)}
-							<option value={cls.id.toString()}>{cls.name}</option>
-						{/each}
-					</select>
+					
 				</div>
 			</div>
 		</div>
+
+		{#if displaySubjects.length > 0}
+			<div class="stats-row">
+				<div class="stat-item">
+					<span>Subjects added to Marksheet: <strong>{addedToMarksheetCount}</strong></span>
+				</div>
+				<div class="stat-item">
+					<span>Subjects added in Grand Total: <strong>{addedToTotalCount}</strong></span>
+				</div>
+			</div>
+		{/if}
 	</div>
 
 	<!-- Data Table -->
@@ -324,6 +345,28 @@
 		max-width: 600px;
 	}
 
+	.stats-row {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 4px;
+		margin-top: 16px;
+	}
+
+	.stat-item {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 14px;
+		font-weight: 500;
+		color: var(--color-on-surface-variant);
+	}
+
+	.stat-item strong {
+		color: var(--color-on-surface);
+		font-size: 16px;
+	}
+
 	.hero-filters {
 		width: 100%;
 	}
@@ -445,20 +488,6 @@
 		background-color: var(--color-surface-lowest);
 		outline: none;
 		box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
-	}
-
-	.form-checkbox {
-		height: 20px;
-		width: 20px;
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--color-outline);
-		background-color: var(--color-surface);
-		cursor: pointer;
-	}
-
-	.form-checkbox:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
 	}
 
 	.form-input:disabled {

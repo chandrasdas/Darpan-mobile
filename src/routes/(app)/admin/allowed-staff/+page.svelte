@@ -401,15 +401,6 @@
 		padding-top: 8px;
 	}
 
-	.form-checkbox {
-		height: 20px;
-		width: 20px;
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--color-outline);
-		background-color: var(--color-surface);
-		cursor: pointer;
-	}
-
 	.checkbox-label {
 		font-size: 14px;
 		font-weight: 500;

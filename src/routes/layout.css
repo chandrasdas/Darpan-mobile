@@ -120,77 +120,77 @@
    Dark Theme Overrides
    ────────────────────────────────────────────── */
 :root.dark {
-		/* ── Surface Palette (Dark) ── */
-		--color-surface: #191c1e;
-		--color-surface-dim: #111315;
-		--color-surface-bright: #3f4143;
-		--color-surface-lowest: #0d0f10;
-		--color-surface-low: #191c1e;
-		--color-surface-container: #1d2022;
-		--color-surface-high: #272a2c;
-		--color-surface-highest: #323537;
-		--color-on-surface: #e1e2e5;
-		--color-on-surface-variant: #c3c6cf;
-		--color-inverse-surface: #e1e2e5;
-		--color-inverse-on-surface: #2d3133;
-		--color-surface-tint: #bec6e0;
-		--color-surface-variant: #43474e;
+	/* ── Surface Palette (Dark) ── */
+	--color-surface: #191c1e;
+	--color-surface-dim: #111315;
+	--color-surface-bright: #3f4143;
+	--color-surface-lowest: #0d0f10;
+	--color-surface-low: #191c1e;
+	--color-surface-container: #1d2022;
+	--color-surface-high: #272a2c;
+	--color-surface-highest: #323537;
+	--color-on-surface: #e1e2e5;
+	--color-on-surface-variant: #c3c6cf;
+	--color-inverse-surface: #e1e2e5;
+	--color-inverse-on-surface: #2d3133;
+	--color-surface-tint: #bec6e0;
+	--color-surface-variant: #43474e;
 
-		/* ── Primary (Dark) ── */
-		--color-primary: #bec6e0;
-		--color-on-primary: #283043;
-		--color-primary-container: #3f465c;
-		--color-on-primary-container: #dae2fd;
-		--color-inverse-primary: #565e74;
-		
-		/* ── Secondary (Dark) ── */
-		--color-secondary: #b7c8e1;
-		--color-on-secondary: #223146;
-		--color-secondary-container: #38485d;
-		--color-on-secondary-container: #d3e4fe;
-		
-		/* ── Tertiary (Dark) ── */
-		--color-tertiary: #e9c349;
-		--color-on-tertiary: #3c2f00;
-		--color-tertiary-container: #574500;
-		--color-on-tertiary-container: #ffe088;
-		
-		/* ── Error (Dark) ── */
-		--color-error: #ffb4ab;
-		--color-on-error: #690005;
-		--color-error-container: #93000a;
-		--color-on-error-container: #ffdad6;
+	/* ── Primary (Dark) ── */
+	--color-primary: #bec6e0;
+	--color-on-primary: #283043;
+	--color-primary-container: #3f465c;
+	--color-on-primary-container: #dae2fd;
+	--color-inverse-primary: #565e74;
 
-		/* ── Outline (Dark) ── */
-		--color-outline: #8d9199;
-		--color-outline-variant: #43474e;
-		
-		/* ── Status Colors (Dark) ── */
-		--color-status-success: #0d3b19;
-		--color-status-success-text: #a8e6b1;
-		--color-status-warning: #4d3300;
-		--color-status-warning-text: #ffe082;
-		--color-status-info: #003673;
-		--color-status-info-text: #90caf9;
-		--color-status-danger: #5c001c;
-		--color-status-danger-text: #ffb4c6;
-		
-		/* ── Stat Card Palette (Dark) ── */
-		--color-card-green: #0d3b19;
-		--color-card-green-icon: #81c784;
-		--color-card-purple: #321966;
-		--color-card-purple-icon: #b388ff;
-		--color-card-blue: #003673;
-		--color-card-blue-icon: #82b1ff;
-		--color-card-amber: #4d3300;
-		--color-card-amber-icon: #ffd54f;
+	/* ── Secondary (Dark) ── */
+	--color-secondary: #b7c8e1;
+	--color-on-secondary: #223146;
+	--color-secondary-container: #38485d;
+	--color-on-secondary-container: #d3e4fe;
 
-		/* ── Shadows (Dark - softer and less intense) ── */
-		--shadow-ambient-sm: 0 1px 4px 0 rgba(0, 0, 0, 0.4);
-		--shadow-ambient: 0 2px 8px -1px rgba(0, 0, 0, 0.5), 0 1px 4px -1px rgba(0, 0, 0, 0.3);
-		--shadow-ambient-md: 0 4px 16px -2px rgba(0, 0, 0, 0.6), 0 2px 6px -2px rgba(0, 0, 0, 0.4);
-		--shadow-ambient-lg: 0 8px 30px -4px rgba(0, 0, 0, 0.7), 0 4px 10px -4px rgba(0, 0, 0, 0.5);
-	}
+	/* ── Tertiary (Dark) ── */
+	--color-tertiary: #e9c349;
+	--color-on-tertiary: #3c2f00;
+	--color-tertiary-container: #574500;
+	--color-on-tertiary-container: #ffe088;
+
+	/* ── Error (Dark) ── */
+	--color-error: #ffb4ab;
+	--color-on-error: #690005;
+	--color-error-container: #93000a;
+	--color-on-error-container: #ffdad6;
+
+	/* ── Outline (Dark) ── */
+	--color-outline: #8d9199;
+	--color-outline-variant: #43474e;
+
+	/* ── Status Colors (Dark) ── */
+	--color-status-success: #0d3b19;
+	--color-status-success-text: #a8e6b1;
+	--color-status-warning: #4d3300;
+	--color-status-warning-text: #ffe082;
+	--color-status-info: #003673;
+	--color-status-info-text: #90caf9;
+	--color-status-danger: #5c001c;
+	--color-status-danger-text: #ffb4c6;
+
+	/* ── Stat Card Palette (Dark) ── */
+	--color-card-green: #0d3b19;
+	--color-card-green-icon: #81c784;
+	--color-card-purple: #321966;
+	--color-card-purple-icon: #b388ff;
+	--color-card-blue: #003673;
+	--color-card-blue-icon: #82b1ff;
+	--color-card-amber: #4d3300;
+	--color-card-amber-icon: #ffd54f;
+
+	/* ── Shadows (Dark - softer and less intense) ── */
+	--shadow-ambient-sm: 0 1px 4px 0 rgba(0, 0, 0, 0.4);
+	--shadow-ambient: 0 2px 8px -1px rgba(0, 0, 0, 0.5), 0 1px 4px -1px rgba(0, 0, 0, 0.3);
+	--shadow-ambient-md: 0 4px 16px -2px rgba(0, 0, 0, 0.6), 0 2px 6px -2px rgba(0, 0, 0, 0.4);
+	--shadow-ambient-lg: 0 8px 30px -4px rgba(0, 0, 0, 0.7), 0 4px 10px -4px rgba(0, 0, 0, 0.5);
+}
 
 /* ──────────────────────────────────────────────
    Base Layer — Resets & Defaults
@@ -403,6 +403,34 @@
 		line-height: 1.1;
 		letter-spacing: -0.02em;
 		color: var(--color-on-surface);
+	}
+
+	/* ── Checkbox ── */
+	.form-checkbox {
+		appearance: none;
+		-webkit-appearance: none;
+		height: 20px;
+		width: 20px;
+		border-radius: var(--radius-sm);
+		border: 1px solid var(--color-outline);
+		background-color: var(--color-surface);
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 150ms var(--ease-smooth);
+		margin: 0;
+	}
+
+	.form-checkbox:checked {
+		background-color: var(--color-primary);
+		border-color: var(--color-primary);
+		color: var(--color-primary);
+	}
+
+	.form-checkbox:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 
 	.data-label {

@@ -655,21 +655,6 @@
 		box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
 	}
 
-	.form-checkbox {
-		height: 20px;
-		width: 20px;
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--color-outline);
-		background-color: var(--color-surface);
-		cursor: pointer;
-		display: block;
-	}
-
-	.form-checkbox:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
 	.mark-input {
 		padding: 6px 12px;
 	}
