@@ -62,15 +62,11 @@
 		if (newClassId) {
 			const fetchedSections = await getSections(parseInt(newClassId)).run();
 			sections = fetchedSections;
-			if (fetchedSections.length > 0) {
-				currentSection = fetchedSections[0].id.toString();
-			} else {
-				currentSection = '';
-			}
 		} else {
 			sections = [];
-			currentSection = '';
 		}
+		// Always reset section so all sections of the chosen class are shown initially
+		currentSection = '';
 		fetchStudents(1);
 	}
 
@@ -79,20 +75,10 @@
 		currentSession = target.value;
 		classes = await getClasses(parseInt(currentSession)).run();
 		
-		if (classes.length > 0) {
-			currentClass = classes[0].id.toString();
-			const fetchedSections = await getSections(parseInt(currentClass)).run();
-			sections = fetchedSections;
-			if (fetchedSections.length > 0) {
-				currentSection = fetchedSections[0].id.toString();
-			} else {
-				currentSection = '';
-			}
-		} else {
-			currentClass = '';
-			sections = [];
-			currentSection = '';
-		}
+		// Reset class and section so all students in the session are shown
+		currentClass = '';
+		sections = [];
+		currentSection = '';
 
 		fetchStudents(1);
 	}
@@ -160,6 +146,7 @@
 						onchange={handleClassChange}
 						class="filter-select"
 					>
+						<option value="">Select Class</option>
 						{#each classes as cls (cls.id)}
 							<option value={cls.id.toString()}>{cls.name}</option>
 						{/each}
@@ -173,7 +160,9 @@
 							fetchStudents(1);
 						}}
 						class="filter-select"
+						disabled={!currentClass}
 					>
+						<option value="">Select Section</option>
 						{#each sections as sec (sec.id)}
 							<option value={sec.id.toString()}>Section {sec.letter}</option>
 						{/each}

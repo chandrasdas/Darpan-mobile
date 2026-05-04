@@ -17,24 +17,14 @@ export const load: PageServerLoad = async ({ url }) => {
 
     const dbClasses = await getClasses(parseInt(sessionFilter || '0'));
 
-    let classFilter = url.searchParams.get('class');
-    if (!classFilter && dbClasses.length > 0) {
-        classFilter = dbClasses[0].id.toString();
-    } else if (!classFilter) {
-        classFilter = '';
-    }
+    const classFilter = url.searchParams.get('class') || '';
 
     // Fetch sections for the selected class to determine default section
     const dbSectionsList = classFilter 
         ? await db.select().from(studSections).where(eq(studSections.classId, parseInt(classFilter))).orderBy(asc(studSections.id))
         : [];
 
-    let sectionFilter = url.searchParams.get('section');
-    if (!sectionFilter && dbSectionsList.length > 0) {
-        sectionFilter = dbSectionsList[0].id.toString();
-    } else if (!sectionFilter) {
-        sectionFilter = '';
-    }
+    const sectionFilter = url.searchParams.get('section') || '';
     
     // pagination
     let page = parseInt(url.searchParams.get('page') || '1');

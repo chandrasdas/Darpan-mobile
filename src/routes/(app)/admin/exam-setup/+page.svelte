@@ -7,7 +7,9 @@
 
 	let { data }: { data: PageData } = $props();
 
-	// Reactive state for filters
+	import { ALLOWED_TERM_IDS } from '$lib/config/exam-rules';
+
+	// Reactive filter state — stored as numbers to avoid scattered parseInt() calls
 	// svelte-ignore state_referenced_locally
 	let currentSession = $state(data.defaults.session);
 	// svelte-ignore state_referenced_locally
@@ -16,6 +18,22 @@
 	let currentClass = $state(data.defaults.class);
 	// svelte-ignore state_referenced_locally
 	let classes = $state(data.classes);
+
+	// Filter exam terms based on the selected class
+	let filteredTerms = $derived(() => {
+		const allowed = ALLOWED_TERM_IDS[currentClass];
+		if (!allowed) return data.examTerms;
+		return data.examTerms.filter(t => allowed.includes(t.id));
+	});
+
+	// Synchronously ensure currentTerm is valid for the current class.
+	function ensureValidTerm() {
+		const terms = filteredTerms();
+		const isValid = terms.some(t => t.id === currentTerm);
+		if (!isValid && terms.length > 0) {
+			currentTerm = terms[0].id;
+		}
+	}
 
 	// Reactive state for marks inputs
 	let markInputs = $state<Record<number, number | null>>({});
@@ -43,10 +61,10 @@
 		saveMessage = '';
 		saveError = false;
 		const setups = await getExistingSetups({
-			sessionId: parseInt(currentSession),
-			examTermId: parseInt(currentTerm),
-			classId: parseInt(currentClass)
-		});
+			sessionId: currentSession,
+			examTermId: currentTerm,
+			classId: currentClass
+		}).run();
 
 		// Reset inputs
 		const newInputs: Record<number, number | null> = {};
@@ -88,13 +106,14 @@
 
 	async function handleSessionChange(e: Event) {
 		const target = e.target as HTMLSelectElement;
-		currentSession = target.value;
-		classes = await getClasses(parseInt(currentSession)).run();
+		currentSession = Number(target.value);
+		classes = await getClasses(currentSession).run();
 		if (classes.length > 0) {
-			currentClass = classes[0].id.toString();
+			currentClass = classes[0].id;
 		} else {
-			currentClass = '';
+			currentClass = 0;
 		}
+		ensureValidTerm();
 		fetchSetups();
 	}
 
@@ -114,22 +133,22 @@
 				const includeInTotal = includeInputs[sub.id];
 				setupsToSave.push({
 					subjectId: sub.id,
-					fullMark: mark !== null && mark !== undefined && mark.toString() !== '' ? (typeof mark === 'string' ? parseFloat(mark) : mark) : 0,
-					passMark: passMark !== null && passMark !== undefined && passMark.toString() !== '' ? (typeof passMark === 'string' ? parseFloat(passMark) : passMark) : 0,
-					sortIndex: sort !== null && sort !== undefined && sort.toString() !== '' ? (typeof sort === 'string' ? parseInt(sort) : sort) : 0,
+					fullMark: mark ?? 0,
+					passMark: passMark ?? 0,
+					sortIndex: sort ?? 0,
 					includeInMarksheet: true,
-					includeInTotal: includeInTotal !== undefined ? includeInTotal : true
+					includeInTotal: includeInTotal ?? true
 				});
 			}
 		}
 
 		try {
 			await saveExamSetups({
-				sessionId: parseInt(currentSession),
-				examTermId: parseInt(currentTerm),
-				classId: parseInt(currentClass),
+				sessionId: currentSession,
+				examTermId: currentTerm,
+				classId: currentClass,
 				setups: setupsToSave
-			});
+			}).run();
 			saveMessage = 'Configuration saved successfully!';
 			saveError = false;
 			setTimeout(() => saveMessage = '', 3000);
@@ -167,17 +186,18 @@
 			
 			<div class="hero-filters">
 				<div class="filter-group">
-					<select value={currentSession} onchange={handleSessionChange} class="form-select filter-select">
+					<select value={currentSession.toString()} onchange={handleSessionChange} class="form-select filter-select">
 						{#each data.sessions as session (session.id)}
 							<option value={session.id.toString()}>{session.name}</option>
 						{/each}
 					</select>
 
 					<select 
-						value={currentClass} 
+						value={currentClass.toString()} 
 						onchange={(e) => {
 							const target = e.target as HTMLSelectElement;
-							currentClass = target.value;
+							currentClass = Number(target.value);
+							ensureValidTerm();
 							fetchSetups();
 						}} 
 						class="form-select filter-select"
@@ -188,15 +208,15 @@
 					</select>
 
 					<select 
-						value={currentTerm} 
+						value={currentTerm.toString()} 
 						onchange={(e) => {
 							const target = e.target as HTMLSelectElement;
-							currentTerm = target.value;
+							currentTerm = Number(target.value);
 							fetchSetups();
 						}} 
 						class="form-select filter-select"
 					>
-						{#each data.examTerms as term (term.id)}
+						{#each filteredTerms() as term (term.id)}
 							<option value={term.id.toString()}>{term.name}</option>
 						{/each}
 					</select>

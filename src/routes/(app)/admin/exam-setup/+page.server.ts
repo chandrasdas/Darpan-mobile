@@ -12,13 +12,13 @@ export const load: PageServerLoad = async () => {
     // Fetch all subjects for the table
     const dbSubjects = await db.select().from(studSubjects).orderBy(asc(studSubjects.id));
 
-    // Resolve defaults
-    const defaultSession = dbSessions.length > 0 ? dbSessions[0].id.toString() : '';
-    const defaultTerm = dbTerms.length > 0 ? dbTerms[0].id.toString() : '';
+    // Resolve defaults as numbers
+    const defaultSession = dbSessions.length > 0 ? dbSessions[0].id : 0;
+    const defaultTerm = dbTerms.length > 0 ? dbTerms[0].id : 0;
     
     // Fetch classes dynamically for the default session
-    const dbClasses = await getClasses(parseInt(defaultSession || '0'));
-    const defaultClass = dbClasses.length > 0 ? dbClasses[0].id.toString() : '';
+    const dbClasses = await getClasses(defaultSession);
+    const defaultClass = dbClasses.length > 0 ? dbClasses[0].id : 0;
 
     return {
         sessions: dbSessions,

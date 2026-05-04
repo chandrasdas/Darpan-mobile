@@ -5,8 +5,7 @@ import {
     studSubjects,
     studSessionEnrollments,
     studInfo,
-    studMarksEntries,
-    studSections
+    studMarksEntries
 } from '$lib/server/db/schema/marksheet';
 import { eq, and, asc, sql } from 'drizzle-orm';
 import * as v from 'valibot';
@@ -85,18 +84,6 @@ export const getStudentsForMarks = query(
     }
 );
 
-/**
- * Fetches sections for a given class (reused from students.remote pattern).
- */
-export const getSectionsForClass = query(
-    v.number(),
-    async (classId: number) => {
-        return await db.select()
-            .from(studSections)
-            .where(eq(studSections.classId, classId))
-            .orderBy(asc(studSections.id));
-    }
-);
 
 /**
  * Upserts a single mark entry.

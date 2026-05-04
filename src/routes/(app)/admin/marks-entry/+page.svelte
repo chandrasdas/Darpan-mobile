@@ -1,12 +1,15 @@
 <script lang="ts">
-	import { getSubjectsForExam, getStudentsForMarks, getSectionsForClass, saveSingleMark } from './marks-entry.remote';
+	import { getSubjectsForExam, getStudentsForMarks, saveSingleMark } from './marks-entry.remote';
+	import { getSections } from '../../students/students.remote';
 	import { fade } from 'svelte/transition';
 	import { APP_NAME } from '$lib/config';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
-	// --- Filter state ---
+	import { ALLOWED_TERM_IDS } from '$lib/config/exam-rules';
+
+	// --- Filter state — stored as numbers to avoid scattered parseInt() calls ---
 	// svelte-ignore state_referenced_locally
 	let currentSession = $state(data.defaults.session);
 	// svelte-ignore state_referenced_locally
@@ -23,6 +26,24 @@
 	let sections = $state(data.initialSections);
 	// svelte-ignore state_referenced_locally
 	let subjects = $state(data.initialSubjects);
+
+	// Filter exam terms based on the selected class
+	let filteredTerms = $derived(() => {
+		const allowed = ALLOWED_TERM_IDS[currentClass];
+		if (!allowed) return data.examTerms;
+		return data.examTerms.filter(t => allowed.includes(t.id));
+	});
+
+	// Synchronously ensure currentTerm is valid for the current class.
+	// Must be called explicitly before fetching subjects (not via $effect,
+	// which runs too late — after fetchSubjects already fired).
+	function ensureValidTerm() {
+		const terms = filteredTerms();
+		const isValid = terms.some(t => t.id === currentTerm);
+		if (!isValid && terms.length > 0) {
+			currentTerm = terms[0].id;
+		}
+	}
 
 	// --- Student & marks state (pre-filled from server) ---
 	type StudentRow = {
@@ -61,36 +82,36 @@
 	async function fetchSections() {
 		if (!currentClass) {
 			sections = [];
-			currentSection = '';
+			currentSection = 0;
 			return;
 		}
-		const fetched = await getSectionsForClass(parseInt(currentClass));
+		const fetched = await getSections(currentClass).run();
 		sections = fetched;
 		if (fetched.length > 0) {
-			currentSection = fetched[0].id.toString();
+			currentSection = fetched[0].id;
 		} else {
-			currentSection = '';
+			currentSection = 0;
 		}
 	}
 
 	async function fetchSubjects() {
 		if (!currentSession || !currentClass || !currentTerm) {
 			subjects = [];
-			currentSubject = '';
+			currentSubject = 0;
 			return;
 		}
 		const fetched = await getSubjectsForExam({
-			sessionId: parseInt(currentSession),
-			classId: parseInt(currentClass),
-			examTermId: parseInt(currentTerm)
-		});
+			sessionId: currentSession,
+			classId: currentClass,
+			examTermId: currentTerm
+		}).run();
 		subjects = fetched;
 		if (fetched.length > 0) {
-			currentSubject = fetched[0].setupId.toString();
+			currentSubject = fetched[0].setupId;
 			currentFullMark = fetched[0].fullMark;
 			currentPassMark = fetched[0].passMark;
 		} else {
-			currentSubject = '';
+			currentSubject = 0;
 			currentFullMark = 0;
 			currentPassMark = 0;
 		}
@@ -104,10 +125,10 @@
 		isLoadingStudents = true;
 		try {
 			const fetched = await getStudentsForMarks({
-				sessionId: parseInt(currentSession),
-				sectionId: parseInt(currentSection),
-				examSetupId: parseInt(currentSubject)
-			});
+				sessionId: currentSession,
+				sectionId: currentSection,
+				examSetupId: currentSubject
+			}).run();
 			// Map nulls from left-join to sensible defaults
 			students = fetched.map(s => ({
 				...s,
@@ -128,17 +149,20 @@
 	// --- Handlers for dropdown changes ---
 
 	async function handleClassChange() {
-		currentSection = '';
-		currentSubject = '';
+		currentSection = 0;
+		currentSubject = 0;
 		subjects = [];
 		students = [];
 		await fetchSections();
+		// Correct the term synchronously before fetching subjects,
+		// e.g. switching from Class X (Pre-Test) to Class V (no Pre-Test)
+		ensureValidTerm();
 		await fetchSubjects();
 		await fetchStudents();
 	}
 
 	async function handleSessionOrTermChange() {
-		currentSubject = '';
+		currentSubject = 0;
 		students = [];
 		await fetchSubjects();
 		await fetchStudents();
@@ -151,7 +175,7 @@
 
 	async function handleSubjectChange() {
 		// Update fullMark from the selected subject
-		const selected = subjects.find(s => s.setupId.toString() === currentSubject);
+		const selected = subjects.find(s => s.setupId === currentSubject);
 		currentFullMark = selected?.fullMark ?? 0;
 		currentPassMark = selected?.passMark ?? 0;
 		students = [];
@@ -193,10 +217,10 @@
 		try {
 			await saveSingleMark({
 				sessionEnrollId: student.seid,
-				examSetupId: parseInt(currentSubject),
+				examSetupId: currentSubject,
 				marksObtained: student.marksObtained,
 				isPresent: student.isPresent
-			});
+			}).run();
 			saveStatus[student.seid] = 'saved';
 			setTimeout(() => {
 				if (saveStatus[student.seid] === 'saved') {
@@ -268,41 +292,42 @@
 				<div class="filter-columns">
 					<!-- Row 1: Session, Term, Class -->
 					<div class="filter-group">
-						<select bind:value={currentSession} onchange={handleSessionOrTermChange} class="form-select filter-select">
+						<select value={currentSession.toString()} onchange={(e) => { currentSession = Number((e.target as HTMLSelectElement).value); handleSessionOrTermChange(); }} class="form-select filter-select">
 							{#each data.sessions as session (session.id)}
 								<option value={session.id.toString()}>{session.name}</option>
 							{/each}
 						</select>
 
-						<select bind:value={currentTerm} onchange={handleSessionOrTermChange} class="form-select filter-select">
-							{#each data.examTerms as term (term.id)}
-								<option value={term.id.toString()}>{term.name}</option>
-							{/each}
-						</select>
-
-						<select bind:value={currentClass} onchange={handleClassChange} class="form-select filter-select">
+						<select value={currentClass.toString()} onchange={(e) => { currentClass = Number((e.target as HTMLSelectElement).value); handleClassChange(); }} class="form-select filter-select">
 							{#each data.classes as cls (cls.id)}
 								<option value={cls.id.toString()}>{cls.name}</option>
 							{/each}
 						</select>
+						<select value={currentTerm.toString()} onchange={(e) => { currentTerm = Number((e.target as HTMLSelectElement).value); handleSessionOrTermChange(); }} class="form-select filter-select">
+							{#each filteredTerms() as term (term.id)}
+								<option value={term.id.toString()}>{term.name}</option>
+							{/each}
+						</select>
+
+						
 					</div>
 
 					<div class="filter-divider"></div>
 
 					<!-- Row 2: Section, Subject -->
 					<div class="filter-group">
-						<select bind:value={currentSection} onchange={handleSectionChange} class="form-select filter-select">
+						<select value={currentSection.toString()} onchange={(e) => { currentSection = Number((e.target as HTMLSelectElement).value); handleSectionChange(); }} class="form-select filter-select">
 							{#if sections.length === 0}
-								<option value="">No sections</option>
+								<option value="0">No sections</option>
 							{/if}
 							{#each sections as sec (sec.id)}
 								<option value={sec.id.toString()}>Section {sec.letter}</option>
 							{/each}
 						</select>
 
-						<select bind:value={currentSubject} onchange={handleSubjectChange} class="form-select filter-select primary-select">
+						<select value={currentSubject.toString()} onchange={(e) => { currentSubject = Number((e.target as HTMLSelectElement).value); handleSubjectChange(); }} class="form-select filter-select primary-select">
 							{#if subjects.length === 0}
-								<option value="">No subjects configured</option>
+								<option value="0">No subjects configured</option>
 							{/if}
 							{#each subjects as sub (sub.setupId)}
 								<option value={sub.setupId.toString()}>{sub.subjectName}</option>
