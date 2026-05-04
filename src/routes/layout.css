@@ -32,13 +32,13 @@
 	--color-surface: #f7f9fb;
 	--color-surface-dim: #d8dadc;
 	--color-surface-bright: #f7f9fb;
-	--color-surface-lowest: #ffffff;
+	--color-surface-lowest: #ebf1f6; /* More distinct light slate tint */
 	--color-surface-low: #f2f4f6;
 	--color-surface-container: #eceef0;
 	--color-surface-high: #e6e8ea;
 	--color-surface-highest: #e0e3e5;
-	--color-on-surface: #191c1e;
-	--color-on-surface-variant: #45464d;
+	--color-on-surface: #282d33; /* Softer dark text for better reading */
+	--color-on-surface-variant: #525760;
 	--color-inverse-surface: #2d3133;
 	--color-inverse-on-surface: #eff1f3;
 	--color-surface-tint: #565e74;
@@ -124,13 +124,13 @@
 	--color-surface: #191c1e;
 	--color-surface-dim: #111315;
 	--color-surface-bright: #3f4143;
-	--color-surface-lowest: #0d0f10;
+	--color-surface-lowest: #12161c; /* Adjusted to have a subtle theme tint instead of near-black */
 	--color-surface-low: #191c1e;
 	--color-surface-container: #1d2022;
 	--color-surface-high: #272a2c;
 	--color-surface-highest: #323537;
-	--color-on-surface: #e1e2e5;
-	--color-on-surface-variant: #c3c6cf;
+	--color-on-surface: #ced4df; /* Softer light text for better reading */
+	--color-on-surface-variant: #aab0bc;
 	--color-inverse-surface: #e1e2e5;
 	--color-inverse-on-surface: #2d3133;
 	--color-surface-tint: #bec6e0;
