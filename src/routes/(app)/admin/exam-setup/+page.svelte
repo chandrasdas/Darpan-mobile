@@ -149,10 +149,20 @@
 <div class="page-shell" in:fade={{ duration: 400 }}>
 	<!-- Header Section -->
 	<div class="page-hero">
-		<div class="hero-content-row">
+		<div class="hero-content">
 			<div class="hero-text">
 				<h1 class="page-title">Exam Setup</h1>
 				<p class="page-subtitle">Configure full marks for each subject. Check 'Include in Marksheet' to add a subject to the exam.</p>
+				{#if displaySubjects.length > 0}
+					<div class="stats-row">
+						<div class="stat-item">
+							<span>Subjects added to Marksheet: <strong>{addedToMarksheetCount}</strong></span>
+						</div>
+						<div class="stat-item">
+							<span>Subjects added in Grand Total: <strong>{addedToTotalCount}</strong></span>
+						</div>
+					</div>
+				{/if}
 			</div>
 			
 			<div class="hero-filters">
@@ -195,17 +205,6 @@
 				</div>
 			</div>
 		</div>
-
-		{#if displaySubjects.length > 0}
-			<div class="stats-row">
-				<div class="stat-item">
-					<span>Subjects added to Marksheet: <strong>{addedToMarksheetCount}</strong></span>
-				</div>
-				<div class="stat-item">
-					<span>Subjects added in Grand Total: <strong>{addedToTotalCount}</strong></span>
-				</div>
-			</div>
-		{/if}
 	</div>
 
 	<!-- Data Table -->
@@ -310,14 +309,19 @@
 		padding: 24px 0 0;
 	}
 
-	.hero-content-row {
+	.hero-content {
 		display: flex;
 		flex-direction: column;
 		gap: 24px;
+		background-color: var(--color-surface-lowest);
+		padding: 24px;
+		border-radius: var(--radius-2xl);
+		border: 1px solid var(--color-outline-variant);
+		box-shadow: var(--shadow-ambient-md);
 	}
 
 	@media (min-width: 768px) {
-		.hero-content-row {
+		.hero-content {
 			flex-direction: row;
 			justify-content: space-between;
 			align-items: flex-end;

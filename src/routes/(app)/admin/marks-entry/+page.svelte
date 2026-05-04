@@ -240,7 +240,7 @@
 <div class="page-shell" in:fade={{ duration: 400 }}>
 	<!-- Header Section -->
 	<div class="page-hero">
-		<div class="hero-content-row">
+		<div class="hero-content">
 			<div class="hero-text">
 				<h1 class="page-title">Marks Entry</h1>
 				<p class="page-subtitle">Enter marks for each student. Changes save automatically when you move to the next field.</p>
@@ -418,14 +418,19 @@
 		padding: 24px 0 0;
 	}
 
-	.hero-content-row {
+	.hero-content {
 		display: flex;
 		flex-direction: column;
 		gap: 24px;
+		background-color: var(--color-surface-lowest);
+		padding: 24px;
+		border-radius: var(--radius-2xl);
+		border: 1px solid var(--color-outline-variant);
+		box-shadow: var(--shadow-ambient-md);
 	}
 
 	@media (min-width: 1024px) {
-		.hero-content-row {
+		.hero-content {
 			flex-direction: row;
 			justify-content: space-between;
 			align-items: flex-end;
