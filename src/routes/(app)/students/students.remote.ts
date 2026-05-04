@@ -33,7 +33,7 @@ export const getFilteredStudents = query(
         page: v.number()
     }),
     async (params) => {
-        console.log("getFilteredStudents called with:", params);
+        // console.log("getFilteredStudents called with:", params);
         const { q, session: sessionFilter, class: classFilter, section: sectionFilter } = params;
         const limit = 80;
         let page = params.page;

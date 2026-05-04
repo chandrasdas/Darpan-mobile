@@ -33,7 +33,7 @@
 	let totalRecords = $state(data.totalRecords);
 
 	async function fetchStudents(pageToFetch = 1) {
-		console.log("Fetching students with session:", currentSession);
+		// console.log("Fetching students with session:", currentSession);
 		try {
 			const result = await getFilteredStudents({
 				q: currentQuery,
@@ -42,7 +42,7 @@
 				section: currentSection,
 				page: pageToFetch
 			}).run();
-			console.log("Received result:", result);
+			// console.log("Received result:", result);
 			students = result.students;
 			currentPage = result.page;
 			totalPages = result.totalPages;
