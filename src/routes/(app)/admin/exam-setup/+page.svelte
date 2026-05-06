@@ -191,23 +191,21 @@
 	<!-- Header Section -->
 	<div class="page-hero">
 		<div class="hero-content">
-			<div class="hero-text">
+			<div class="hero-header">
 				<h1 class="page-title">Exam Setup</h1>
 				<p class="page-subtitle">Configure full marks for each subject. Check 'Include in Marksheet' to add a subject to the exam.</p>
+			</div>
+
+			<div class="hero-bottom">
 				{#if displaySubjects.length > 0}
 					<div class="stats-row">
-						<div class="stat-item">
-							<span>Subjects added to Marksheet: <strong>{addedToMarksheetCount}</strong></span>
-						</div>
-						<div class="stat-item">
-							<span>Subjects added in Grand Total: <strong>{addedToTotalCount}</strong></span>
-						</div>
+						<span class="stat-item">Subjects added to Marksheet: <strong>{addedToMarksheetCount}</strong></span>
+						<span class="stat-item">Subjects added in Grand Total: <strong>{addedToTotalCount}</strong></span>
 					</div>
 				{/if}
-			</div>
-			
-			<div class="hero-filters">
-				<div class="filter-group">
+
+				<div class="hero-filters">
+					<div class="filter-group">
 					<select value={currentSession.toString()} onchange={handleSessionChange} class="form-select filter-select">
 						{#each data.sessions as session (session.id)}
 							<option value={session.id.toString()}>{session.name}</option>
@@ -244,6 +242,7 @@
 					</select>
 
 					
+					</div>
 				</div>
 			</div>
 		</div>
@@ -354,7 +353,7 @@
 	.hero-content {
 		display: flex;
 		flex-direction: column;
-		gap: 24px;
+		gap: 16px;
 		background-color: var(--color-surface-lowest);
 		padding: 24px;
 		border-radius: var(--radius-2xl);
@@ -362,16 +361,8 @@
 		box-shadow: var(--shadow-ambient-md);
 	}
 
-	@media (min-width: 768px) {
-		.hero-content {
-			flex-direction: row;
-			justify-content: space-between;
-			align-items: flex-end;
-		}
-	}
-
-	.hero-text {
-		flex: 1;
+	.hero-header {
+		width: 100%;
 	}
 
 	.page-title {
@@ -385,32 +376,42 @@
 
 	.page-subtitle {
 		font-family: var(--font-body);
-		font-size: 16px;
+		font-size: 14px;
 		color: var(--color-on-surface-variant);
-		margin-top: 8px;
-		max-width: 600px;
+		margin-top: 6px;
+		line-height: 1.5;
+	}
+
+	.hero-bottom {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		width: 100%;
+	}
+
+	@media (min-width: 768px) {
+		.hero-bottom {
+			flex-direction: row;
+			align-items: flex-end;
+			justify-content: space-between;
+		}
 	}
 
 	.stats-row {
 		display: flex;
 		flex-direction: column;
-		align-items: flex-start;
-		gap: 4px;
-		margin-top: 16px;
+		gap: 2px;
 	}
 
 	.stat-item {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		font-size: 14px;
+		font-size: 13px;
 		font-weight: 500;
 		color: var(--color-on-surface-variant);
+		line-height: 1.6;
 	}
 
 	.stat-item strong {
 		color: var(--color-on-surface);
-		font-size: 16px;
 	}
 
 	.hero-filters {
@@ -420,6 +421,7 @@
 	@media (min-width: 768px) {
 		.hero-filters {
 			width: auto;
+			flex-shrink: 0;
 		}
 	}
 

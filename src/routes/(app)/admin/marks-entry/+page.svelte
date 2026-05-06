@@ -129,12 +129,13 @@
 				sectionId: currentSection,
 				examSetupId: currentSubject
 			}).run();
-			// Map nulls from left-join to sensible defaults
 			students = fetched.map(s => ({
 				...s,
 				isPresent: s.isPresent ?? true,
 				marksObtained: s.marksObtained ?? 0
 			}));
+			// Derive "All Present" from the fetched data
+			allPresentMode = students.length > 0 && students.every(s => s.isPresent);
 			// Reset save statuses
 			const newStatus: Record<number, string> = {};
 			for (const s of students) {
@@ -232,16 +233,22 @@
 		}
 	}
 
-	// --- Mark All Present toggle ---
-	let allPresent = $derived(students.length > 0 && students.every(s => s.isPresent));
+	// --- "All Present" mode: hides Present column, marks everyone present ---
+	// Initialized from the server data — true only when every student is present
+	// svelte-ignore state_referenced_locally
+	let allPresentMode = $state(
+		data.initialStudents.length > 0 && data.initialStudents.every(s => (s.isPresent ?? true))
+	);
 
-	async function toggleAllPresent() {
-		const newVal = !allPresent;
-		for (const s of students) {
-			s.isPresent = newVal;
+	async function handleAllPresentToggle() {
+		if (allPresentMode) {
+			// Just turned ON — mark every student present and save
+			for (const s of students) {
+				s.isPresent = true;
+			}
+			await Promise.all(students.map(s => doSave(s)));
 		}
-		// Save all in parallel
-		await Promise.all(students.map(s => doSave(s)));
+		// When turned OFF, user can individually toggle in the now-visible column
 	}
 
 	// Student count & stats
@@ -265,10 +272,13 @@
 	<!-- Header Section -->
 	<div class="page-hero">
 		<div class="hero-content">
-			<div class="hero-text">
+			<div class="hero-header">
 				<h1 class="page-title">Marks Entry</h1>
 				<p class="page-subtitle">Enter marks for each student. Changes save automatically when you move to the next field.</p>
-				{#if students.length > 0}
+			</div>
+
+			<div class="hero-bottom">
+				<!-- {#if students.length > 0} -->
 					<div class="stats-row">
 						<div class="stat-item">
 							<span class="pulse-dot"></span>
@@ -285,54 +295,63 @@
 							</div>
 						{/if}
 					</div>
-				{/if}
-			</div>
-			
-			<div class="hero-filters">
-				<div class="filter-columns">
-					<!-- Row 1: Session, Term, Class -->
-					<div class="filter-group">
-						<select value={currentSession.toString()} onchange={(e) => { currentSession = Number((e.target as HTMLSelectElement).value); handleSessionOrTermChange(); }} class="form-select filter-select">
-							{#each data.sessions as session (session.id)}
-								<option value={session.id.toString()}>{session.name}</option>
-							{/each}
-						</select>
+				<!-- {/if} -->
 
-						<select value={currentClass.toString()} onchange={(e) => { currentClass = Number((e.target as HTMLSelectElement).value); handleClassChange(); }} class="form-select filter-select">
-							{#each data.classes as cls (cls.id)}
-								<option value={cls.id.toString()}>{cls.name}</option>
-							{/each}
-						</select>
-						<select value={currentTerm.toString()} onchange={(e) => { currentTerm = Number((e.target as HTMLSelectElement).value); handleSessionOrTermChange(); }} class="form-select filter-select">
-							{#each filteredTerms() as term (term.id)}
-								<option value={term.id.toString()}>{term.name}</option>
-							{/each}
-						</select>
+				<div class="hero-filters">
+					<div class="filter-columns">
+						<!-- Row 1: Session, Class, Section -->
+						<div class="filter-group">
+							<select value={currentSession.toString()} onchange={(e) => { currentSession = Number((e.target as HTMLSelectElement).value); handleSessionOrTermChange(); }} class="form-select filter-select">
+								{#each data.sessions as session (session.id)}
+									<option value={session.id.toString()}>{session.name}</option>
+								{/each}
+							</select>
 
-						
-					</div>
+							<select value={currentClass.toString()} onchange={(e) => { currentClass = Number((e.target as HTMLSelectElement).value); handleClassChange(); }} class="form-select filter-select">
+								{#each data.classes as cls (cls.id)}
+									<option value={cls.id.toString()}>{cls.name}</option>
+								{/each}
+							</select>
 
-					<div class="filter-divider"></div>
+							<select value={currentSection.toString()} onchange={(e) => { currentSection = Number((e.target as HTMLSelectElement).value); handleSectionChange(); }} class="form-select filter-select">
+								{#if sections.length === 0}
+									<option value="0">No sections</option>
+								{/if}
+								{#each sections as sec (sec.id)}
+									<option value={sec.id.toString()}>Section {sec.letter}</option>
+								{/each}
+							</select>
+						</div>
 
-					<!-- Row 2: Section, Subject -->
-					<div class="filter-group">
-						<select value={currentSection.toString()} onchange={(e) => { currentSection = Number((e.target as HTMLSelectElement).value); handleSectionChange(); }} class="form-select filter-select">
-							{#if sections.length === 0}
-								<option value="0">No sections</option>
-							{/if}
-							{#each sections as sec (sec.id)}
-								<option value={sec.id.toString()}>Section {sec.letter}</option>
-							{/each}
-						</select>
+						<div class="filter-divider"></div>
 
-						<select value={currentSubject.toString()} onchange={(e) => { currentSubject = Number((e.target as HTMLSelectElement).value); handleSubjectChange(); }} class="form-select filter-select primary-select">
-							{#if subjects.length === 0}
-								<option value="0">No subjects configured</option>
-							{/if}
-							{#each subjects as sub (sub.setupId)}
-								<option value={sub.setupId.toString()}>{sub.subjectName}</option>
-							{/each}
-						</select>
+						<!-- Row 2: All Present toggle, Term, Subject -->
+						<div class="filter-group">
+							<label class="all-present-label">
+								<input
+									type="checkbox"
+									bind:checked={allPresentMode}
+									onchange={handleAllPresentToggle}
+									class="form-checkbox"
+								>
+								<span>All Present</span>
+							</label>
+
+							<select value={currentTerm.toString()} onchange={(e) => { currentTerm = Number((e.target as HTMLSelectElement).value); handleSessionOrTermChange(); }} class="form-select filter-select">
+								{#each filteredTerms() as term (term.id)}
+									<option value={term.id.toString()}>{term.name}</option>
+								{/each}
+							</select>
+
+							<select value={currentSubject.toString()} onchange={(e) => { currentSubject = Number((e.target as HTMLSelectElement).value); handleSubjectChange(); }} class="form-select filter-select primary-select">
+								{#if subjects.length === 0}
+									<option value="0">No subjects configured</option>
+								{/if}
+								{#each subjects as sub (sub.setupId)}
+									<option value={sub.setupId.toString()}>{sub.subjectName}</option>
+								{/each}
+							</select>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -347,18 +366,9 @@
 					<tr>
 						<th class="w-20">Roll</th>
 						<th>Student Name</th>
-						<th class="text-center w-28">
-							<div class="flex-center gap-2">
-								<input 
-									type="checkbox"
-									checked={allPresent}
-									onchange={toggleAllPresent}
-									title="Mark all present / absent"
-									class="form-checkbox"
-								>
-								<span>Present</span>
-							</div>
-						</th>
+						{#if !allPresentMode}
+							<th class="text-center w-28">Present</th>
+						{/if}
 						<th class="w-36">
 							Marks {#if currentFullMark > 0} <span class="font-normal text-muted">({currentFullMark})</span>{/if}
 						</th>
@@ -374,22 +384,25 @@
 							<td class="font-medium">
 								{student.studentName}
 							</td>
-							<td class="text-center">
-								<input 
-									type="checkbox"
-									bind:checked={student.isPresent}
-									onchange={() => handlePresentToggle(student)}
-									tabindex="-1"
-									class="form-checkbox mx-auto"
-								>
-							</td>
+							{#if !allPresentMode}
+								<td class="text-center">
+									<input 
+										type="checkbox"
+										bind:checked={student.isPresent}
+										onchange={() => handlePresentToggle(student)}
+										tabindex="-1"
+										class="form-checkbox mx-auto"
+									>
+								</td>
+							{/if}
 							<td>
 								<input 
 									type="number"
 									min="0"
 									bind:value={student.marksObtained}
 									onblur={() => handleMarkBlur(student)}
-									disabled={!student.isPresent}
+									onfocus={(e) => (e.target as HTMLInputElement).select()}
+									disabled={!allPresentMode && !student.isPresent}
 									placeholder="0"
 									class="form-input mark-input {saveStatus[student.seid] === 'warning' ? 'input-warning' : isFailed(student) ? 'input-failed' : ''}"
 								>
@@ -408,7 +421,7 @@
 
 					{#if students.length === 0 && !isLoadingStudents}
 						<tr>
-							<td colspan="5" class="empty-state">
+							<td colspan={allPresentMode ? 4 : 5} class="empty-state">
 								<div class="empty-icon">
 									<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
@@ -446,7 +459,7 @@
 	.hero-content {
 		display: flex;
 		flex-direction: column;
-		gap: 24px;
+		gap: 16px;
 		background-color: var(--color-surface-lowest);
 		padding: 24px;
 		border-radius: var(--radius-2xl);
@@ -454,16 +467,8 @@
 		box-shadow: var(--shadow-ambient-md);
 	}
 
-	@media (min-width: 1024px) {
-		.hero-content {
-			flex-direction: row;
-			justify-content: space-between;
-			align-items: flex-end;
-		}
-	}
-
-	.hero-text {
-		flex: 1;
+	.hero-header {
+		width: 100%;
 	}
 
 	.page-title {
@@ -477,10 +482,25 @@
 
 	.page-subtitle {
 		font-family: var(--font-body);
-		font-size: 16px;
+		font-size: 14px;
 		color: var(--color-on-surface-variant);
-		margin-top: 8px;
-		max-width: 600px;
+		margin-top: 6px;
+		line-height: 1.5;
+	}
+
+	.hero-bottom {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		width: 100%;
+	}
+
+	@media (min-width: 1024px) {
+		.hero-bottom {
+			flex-direction: row;
+			align-items: flex-end;
+			justify-content: space-between;
+		}
 	}
 
 	.stats-row {
@@ -488,21 +508,19 @@
 		flex-wrap: wrap;
 		align-items: center;
 		gap: 8px;
-		margin-top: 16px;
 	}
 
 	.stat-item {
 		display: flex;
 		align-items: center;
 		gap: 8px;
-		font-size: 14px;
+		font-size: 13px;
 		font-weight: 500;
 		color: var(--color-on-surface-variant);
 	}
 
 	.stat-item strong {
 		color: var(--color-on-surface);
-		font-size: 16px;
 	}
 
 	.pulse-dot {
@@ -539,6 +557,7 @@
 	@media (min-width: 1024px) {
 		.hero-filters {
 			width: auto;
+			flex-shrink: 0;
 		}
 	}
 
@@ -585,11 +604,27 @@
 		box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
 	}
 
+	.all-present-label {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 13px;
+		font-weight: 500;
+		color: var(--color-on-surface);
+		cursor: pointer;
+		white-space: nowrap;
+		padding: 0 8px;
+		min-height: 40px;
+		border: 1px solid var(--color-outline-variant);
+		border-radius: var(--radius-lg);
+		background-color: var(--color-surface);
+		user-select: none;
+	}
+
 	.card {
 		background-color: var(--color-surface-lowest);
-		border-radius: var(--radius-2xl);
+		border-radius: var(--radius-sm);
 		border: 1px solid var(--color-outline-variant);
-		box-shadow: var(--shadow-ambient-md);
 		overflow: hidden;
 	}
 
@@ -599,27 +634,39 @@
 
 	.data-table {
 		width: 100%;
-		min-width: 800px;
+		min-width: 360px;
 		border-collapse: collapse;
 		text-align: left;
+		font-size: 13px;
+		table-layout: fixed;
 	}
 
 	.data-table th {
-		padding: 16px;
-		font-size: 12px;
+		padding: 5px 6px;
+		font-size: 11px;
 		font-weight: 600;
 		text-transform: uppercase;
+		letter-spacing: 0.03em;
 		color: var(--color-on-surface-variant);
-		background-color: var(--color-surface);
-		border-bottom: 1px solid var(--color-outline-variant);
+		background-color: var(--color-surface-high);
+		border-bottom: 2px solid var(--color-outline-variant);
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		white-space: nowrap;
+		overflow: hidden;
 	}
 
 	.data-table td {
-		padding: 12px 16px;
-		font-size: 14px;
+		padding: 3px 6px;
+		font-size: 13px;
 		border-bottom: 1px solid var(--color-outline-variant);
 		color: var(--color-on-surface);
 		vertical-align: middle;
+		height: 32px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.data-table tbody tr:last-child td {
@@ -627,15 +674,15 @@
 	}
 
 	.data-table tbody tr {
-		transition: background-color 150ms ease;
+		transition: background-color 100ms ease;
 	}
 
 	.data-table tbody tr:hover {
-		background-color: color-mix(in srgb, var(--color-primary) 4%, transparent);
+		background-color: color-mix(in srgb, var(--color-primary) 3%, transparent);
 	}
 
 	.data-table tbody tr:nth-child(even) {
-		background-color: color-mix(in srgb, var(--color-surface) 30%, transparent);
+		background-color: color-mix(in srgb, var(--color-surface-high) 40%, transparent);
 	}
 
 	.text-center { text-align: center; }
@@ -645,18 +692,20 @@
 	.tabular-nums { font-variant-numeric: tabular-nums; }
 	.mx-auto { margin-left: auto; margin-right: auto; }
 
-	.w-16 { width: 64px; }
-	.w-20 { width: 80px; }
-	.w-28 { width: 112px; }
-	.w-36 { width: 144px; }
+	.w-10 { width: 32px; }
+	.w-16 { width: 40px; }
+	.w-20 { width: 42px; }
+	.w-28 { width: 60px; }
+	.w-36 { width: 80px; }
 
-	.flex-center {
-		display: flex;
-		align-items: center;
-		justify-content: center;
+
+
+	/* Compact checkbox for grid rows */
+	.data-table .form-checkbox {
+		height: 16px;
+		width: 16px;
+		border-radius: 2px;
 	}
-
-	.gap-2 { gap: 8px; }
 
 	.form-select, .form-input {
 		border-radius: var(--radius-lg);
@@ -686,7 +735,21 @@
 	}
 
 	.mark-input {
-		padding: 6px 12px;
+		padding: 3px 6px;
+		border-radius: 2px;
+		border: 1px solid var(--color-outline-variant);
+		background-color: transparent;
+		font-size: 13px;
+		font-variant-numeric: tabular-nums;
+		width: 100%;
+		text-align: right;
+	}
+
+	.mark-input:focus {
+		border-color: var(--color-primary);
+		outline: none;
+		box-shadow: inset 0 0 0 1px var(--color-primary);
+		background-color: var(--color-surface-lowest);
 	}
 
 	.mark-input:disabled {
@@ -722,7 +785,7 @@
 	}
 
 	.success-icon {
-		color: var(--color-status-success);
+		color: var(--color-status-success-text);
 		font-size: 16px;
 	}
 
