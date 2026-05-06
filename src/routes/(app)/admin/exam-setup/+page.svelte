@@ -35,12 +35,39 @@
 		}
 	}
 
-	// Reactive state for marks inputs
-	let markInputs = $state<Record<number, number | null>>({});
-	let passMarkInputs = $state<Record<number, number | null>>({});
-	let sortInputs = $state<Record<number, number | null>>({});
-	let includeMarksheetInputs = $state<Record<number, boolean>>({});
-	let includeInputs = $state<Record<number, boolean>>({});
+	// Build initial state maps from server-provided data (before $state declarations)
+	function buildInitialState() {
+		const marks: Record<number, number | null> = {};
+		const passMarks: Record<number, number | null> = {};
+		const sorts: Record<number, number | null> = {};
+		const includeMarksheet: Record<number, boolean> = {};
+		const includes: Record<number, boolean> = {};
+		let sortIndex = 1;
+		for (const sub of data.subjects) {
+			marks[sub.id] = null;
+			passMarks[sub.id] = null;
+			sorts[sub.id] = sortIndex++;
+			includeMarksheet[sub.id] = false;
+			includes[sub.id] = true;
+		}
+		for (const setup of data.initialSetups) {
+			marks[setup.subjectId] = setup.fullMark;
+			passMarks[setup.subjectId] = setup.passMark;
+			sorts[setup.subjectId] = setup.sortIndex;
+			includeMarksheet[setup.subjectId] = setup.includeInMarksheet;
+			includes[setup.subjectId] = setup.includeInTotal;
+		}
+		return { marks, passMarks, sorts, includeMarksheet, includes };
+	}
+
+	const initial = buildInitialState();
+
+	// Reactive state for marks inputs — initialized with server data
+	let markInputs = $state<Record<number, number | null>>(initial.marks);
+	let passMarkInputs = $state<Record<number, number | null>>(initial.passMarks);
+	let sortInputs = $state<Record<number, number | null>>(initial.sorts);
+	let includeMarksheetInputs = $state<Record<number, boolean>>(initial.includeMarksheet);
+	let includeInputs = $state<Record<number, boolean>>(initial.includes);
 	let isSaving = $state(false);
 	let saveMessage = $state('');
 	let saveError = $state(false);
@@ -98,11 +125,6 @@
 		// Use database order (no sorting)
 		displaySubjects = [...data.subjects];
 	}
-
-	// Fetch initial setups when page loads
-	$effect(() => {
-		fetchSetups();
-	});
 
 	async function handleSessionChange(e: Event) {
 		const target = e.target as HTMLSelectElement;
