@@ -181,7 +181,7 @@
 						<th>Class</th>
 						<th>Section</th>
 						<th>Roll</th>
-						<th>DOB</th>
+						<th class="col-dob">DOB</th>
 						<th>Father's Name</th>
 						<th>Actions</th>
 					</tr>
@@ -197,7 +197,7 @@
 						<td class="text-secondary">{student.className || '-'}</td>
 						<td class="text-secondary">{student.sectionLetter || '-'}</td>
 						<td class="text-secondary">{student.rollNo || '-'}</td>
-						<td class="text-secondary">{student.dob}</td>
+						<td class="text-secondary col-dob">{student.dob}</td>
 						<td class="text-secondary">{student.fname}</td>
 						<td>
 							<a href={resolve(`/students/${student.sid}` as "/")} class="action-link">
@@ -511,6 +511,11 @@
 
 	.text-secondary {
 		color: var(--color-on-surface-variant);
+	}
+
+	.col-dob {
+		min-width: 110px;
+		white-space: nowrap;
 	}
 
 	.badge {

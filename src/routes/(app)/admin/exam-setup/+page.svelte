@@ -277,6 +277,7 @@
 								type="checkbox"
 								bind:checked={includeMarksheetInputs[subject.id]}
 								class="form-checkbox mx-auto"
+								tabindex="-1"
 							>
 						</td>
 						<td class="text-center">
@@ -285,6 +286,7 @@
 								bind:checked={includeInputs[subject.id]}
 								disabled={!includeMarksheetInputs[subject.id]}
 								class="form-checkbox mx-auto"
+								tabindex="-1"
 							>
 						</td>
 						<td>
@@ -295,6 +297,7 @@
 								placeholder="0"
 								disabled={!includeMarksheetInputs[subject.id]}
 								class="form-input small-input"
+								tabindex="-1"
 							>
 						</td>
 						<td>
