@@ -369,7 +369,7 @@
 						{#if !allPresentMode}
 							<th class="text-center w-28">Present</th>
 						{/if}
-						<th class="w-36">
+						<th class="w-18">
 							Marks {#if currentFullMark > 0} <span class="font-normal text-muted">({currentFullMark})</span>{/if}
 						</th>
 						<th class="text-center w-16"></th>
@@ -446,10 +446,17 @@
 
 <style>
 	.page-shell {
-		padding: 0 20px 32px;
+		padding: 0 12px 32px;
 		display: flex;
 		flex-direction: column;
-		gap: 24px;
+		gap: 16px;
+	}
+
+	@media (min-width: 640px) {
+		.page-shell {
+			padding: 0 20px 32px;
+			gap: 24px;
+		}
 	}
 
 	.page-hero {
@@ -461,10 +468,17 @@
 		flex-direction: column;
 		gap: 16px;
 		background-color: var(--color-surface-lowest);
-		padding: 24px;
-		border-radius: var(--radius-2xl);
+		padding: 16px;
+		border-radius: var(--radius-xl);
 		border: 1px solid var(--color-outline-variant);
 		box-shadow: var(--shadow-ambient-md);
+	}
+
+	@media (min-width: 640px) {
+		.hero-content {
+			padding: 24px;
+			border-radius: var(--radius-2xl);
+		}
 	}
 
 	.hero-header {
@@ -626,6 +640,7 @@
 		border-radius: var(--radius-sm);
 		border: 1px solid var(--color-outline-variant);
 		overflow: hidden;
+		/* padding: 0; */
 	}
 
 	.table-scroll {
@@ -634,7 +649,7 @@
 
 	.data-table {
 		width: 100%;
-		min-width: 360px;
+		min-width: 320px;
 		border-collapse: collapse;
 		text-align: left;
 		font-size: 13px;
@@ -642,7 +657,7 @@
 	}
 
 	.data-table th {
-		padding: 5px 6px;
+		padding: 4px;
 		font-size: 11px;
 		font-weight: 600;
 		text-transform: uppercase;
@@ -658,7 +673,7 @@
 	}
 
 	.data-table td {
-		padding: 3px 6px;
+		padding: 2px 4px;
 		font-size: 13px;
 		border-bottom: 1px solid var(--color-outline-variant);
 		color: var(--color-on-surface);
@@ -693,10 +708,10 @@
 	.mx-auto { margin-left: auto; margin-right: auto; }
 
 	.w-10 { width: 32px; }
-	.w-16 { width: 40px; }
-	.w-20 { width: 42px; }
-	.w-28 { width: 60px; }
-	.w-36 { width: 80px; }
+	.w-16 { width: 36px; }
+	.w-20 { width: 36px; }
+	.w-28 { width: 48px; }
+	.w-36 { width: 64px; }
 
 
 

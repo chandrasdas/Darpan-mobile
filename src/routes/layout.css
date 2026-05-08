@@ -379,7 +379,7 @@
 		background-color: var(--color-surface-lowest);
 		border-radius: var(--radius-lg);
 		box-shadow: var(--shadow-ambient);
-		padding: var(--spacing-md);
+		padding: var(--spacing-sm);
 		transition: box-shadow 300ms var(--ease-smooth);
 	}
 
