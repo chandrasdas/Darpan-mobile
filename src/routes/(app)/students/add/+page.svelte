@@ -1,18 +1,21 @@
 <svelte:head>
-	<title>Reports — Darpan</title>
+	<title>Add Student — Darpan</title>
 </svelte:head>
 
 <div class="page-shell">
 	<section class="page-hero">
-		<h1 class="page-title">Reports</h1>
-		<p class="page-subtitle">View and generate analytics, attendance, and exam reports.</p>
+		<h1 class="page-title">Add Student</h1>
+		<p class="page-subtitle">Register a new student into the system.</p>
 	</section>
 
 	<div class="placeholder-card">
 		<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.3">
-			<path d="M18 20V10M12 20V4M6 20v-6" stroke-linecap="round" stroke-linejoin="round"/>
+			<path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke-linecap="round" stroke-linejoin="round"/>
+			<circle cx="8.5" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round"/>
+			<line x1="20" y1="8" x2="20" y2="14" stroke-linecap="round" stroke-linejoin="round"/>
+			<line x1="23" y1="11" x2="17" y2="11" stroke-linecap="round" stroke-linejoin="round"/>
 		</svg>
-		<span class="placeholder-text">Reporting module coming soon</span>
+		<span class="placeholder-text">Student registration form coming soon</span>
 	</div>
 </div>
 

@@ -711,7 +711,7 @@
 	.w-16 { width: 36px; }
 	.w-20 { width: 36px; }
 	.w-28 { width: 48px; }
-	.w-36 { width: 64px; }
+	/* .w-36 { width: 64px; } */
 
 
 

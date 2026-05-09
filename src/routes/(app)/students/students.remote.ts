@@ -80,6 +80,7 @@ export const getFilteredStudents = query(
             name: studInfo.name,
             dob: studInfo.dob,
             fname: studInfo.fname,
+            guardianNo: studInfo.guardianNo,
             className: studClasses.name,
             sectionLetter: studSections.letter,
             rollNo: studSessionEnrollments.rollNo,

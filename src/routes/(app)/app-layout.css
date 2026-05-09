@@ -12,7 +12,8 @@
 
 	/* ── Sidebar (Mobile/Tablet Overlay) ── */
 	.sidebar {
-		display: block;
+		display: flex;
+		flex-direction: column;
 		position: fixed;
 		top: 0;
 		left: 0;
@@ -394,6 +395,8 @@
 		flex-direction: column;
 		padding: 24px 12px;
 		gap: 4px;
+		flex: 1;
+		overflow-y: auto;
 	}
 
 	/* ═══════════════════════════════════════════
@@ -440,7 +443,8 @@
 
 		/* Persistent sidebar */
 		.sidebar {
-			display: block;
+			display: flex;
+			flex-direction: column;
 			position: fixed;
 			top: 0;
 			left: 0;

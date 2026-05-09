@@ -45,7 +45,7 @@
 	--color-surface-variant: #e0e3e5;
 
 	/* ── Primary — "Midnight Ink" ── */
-	--color-primary: #000000;
+	--color-primary: #2563eb;
 	--color-on-primary: #ffffff;
 	--color-primary-container: #131b2e;
 	--color-on-primary-container: #7c839b;
@@ -259,6 +259,45 @@
 		outline-offset: 2px;
 		border-radius: var(--radius-sm);
 	}
+
+	/* Global Scrollbar styling (invisible by default, visible on hover) */
+	* {
+		scrollbar-width: thin;
+		scrollbar-color: transparent transparent;
+	}
+
+	*:hover {
+		scrollbar-color: var(--color-outline-variant) transparent;
+	}
+
+	::-webkit-scrollbar {
+		width: 6px;
+		height: 6px;
+	}
+
+	::-webkit-scrollbar-track {
+		background-color: transparent;
+	}
+
+	::-webkit-scrollbar-thumb {
+		background-color: transparent;
+		border-radius: 6px;
+	}
+
+	*:hover::-webkit-scrollbar-thumb {
+		background-color: var(--color-outline-variant);
+	}
+
+	/* Hide number input spinners globally */
+	input[type='number']::-webkit-inner-spin-button,
+	input[type='number']::-webkit-outer-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+
+	input[type='number'] {
+		-moz-appearance: textfield;
+	}
 }
 
 /* ──────────────────────────────────────────────
@@ -287,7 +326,7 @@
 	}
 
 	.btn-primary:hover {
-		background-color: var(--color-on-primary-fixed-variant);
+		filter: brightness(1.1);
 	}
 
 	.btn-primary:active {

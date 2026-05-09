@@ -44,7 +44,7 @@
 	/* ── Quick Actions ── */
 	const quickActions = [
 		{ label: 'Add Student', icon: 'person_add', href: '/students/add' },
-		{ label: 'Mark Entry', icon: 'edit_note', href: '/marks-entry' },
+		{ label: 'Mark Entry', icon: 'edit_note', href: '/admin/marks-entry' },
 		{ label: 'Fee Record', icon: 'receipt', href: '/fees/record' },
 		{ label: 'Reports', icon: 'analytics', href: '/reports' }
 	];
@@ -565,7 +565,7 @@
 		}
 
 		.hero-cta:hover {
-			background-color: var(--color-on-primary-fixed-variant);
+			filter: brightness(1.1);
 		}
 
 		.hero-title {

@@ -176,13 +176,11 @@
 				<thead>
 					<tr>
 						<th>SL</th>
-						<th>Portal ID</th>
 						<th>Name</th>
 						<th>Class</th>
 						<th>Section</th>
 						<th>Roll</th>
-						<th class="col-dob">DOB</th>
-						<th>Father's Name</th>
+						<th>Guardian No.</th>
 						<th>Actions</th>
 					</tr>
 				</thead>
@@ -190,15 +188,11 @@
 					{#each students as student, i (student.sid)}
 					<tr>
 						<td>{((currentPage - 1) * 80) + (i + 1)}</td>
-						<td>
-							<span class="badge">{student.portalId}</span>
-						</td>
 						<td class="font-medium">{student.name}</td>
 						<td class="text-secondary">{student.className || '-'}</td>
 						<td class="text-secondary">{student.sectionLetter || '-'}</td>
 						<td class="text-secondary">{student.rollNo || '-'}</td>
-						<td class="text-secondary col-dob">{student.dob}</td>
-						<td class="text-secondary">{student.fname}</td>
+						<td class="text-secondary">{student.guardianNo}</td>
 						<td>
 							<a href={resolve(`/students/${student.sid}` as "/")} class="action-link">
 								View Details
@@ -208,7 +202,7 @@
 					{/each}
 					{#if students.length === 0}
 					<tr>
-						<td colspan="9" class="empty-state">
+						<td colspan="7" class="empty-state">
 							<div class="empty-icon-wrapper">
 								<svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
@@ -472,25 +466,35 @@
 
 	.data-table {
 		width: 100%;
-		min-width: 800px;
 		border-collapse: collapse;
 		text-align: left;
+		font-size: 13px;
 	}
 
 	.data-table th {
-		padding: 16px;
-		font-size: 14px;
+		padding: 8px 4px;
+		font-size: 12px;
 		font-weight: 600;
 		color: var(--color-on-surface);
 		background-color: var(--color-surface);
 		border-bottom: 1px solid var(--color-outline-variant);
+		white-space: nowrap;
 	}
 
 	.data-table td {
-		padding: 16px;
-		font-size: 14px;
+		padding: 8px 4px;
 		border-bottom: 1px solid var(--color-outline-variant);
 		color: var(--color-on-surface);
+	}
+
+	@media (min-width: 768px) {
+		.data-table {
+			font-size: 14px;
+		}
+		.data-table th, .data-table td {
+			padding: 16px;
+			font-size: 14px;
+		}
 	}
 
 	.data-table tbody tr:last-child td {
@@ -513,12 +517,12 @@
 		color: var(--color-on-surface-variant);
 	}
 
-	.col-dob {
+	/* .col-dob {
 		min-width: 110px;
 		white-space: nowrap;
-	}
+	} */
 
-	.badge {
+	/* .badge {
 		display: inline-flex;
 		align-items: center;
 		border-radius: var(--radius-sm);
@@ -528,7 +532,7 @@
 		font-weight: 500;
 		color: var(--color-primary);
 		border: 1px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
-	}
+	} */
 
 	.action-link {
 		font-weight: 500;

@@ -8,6 +8,7 @@ export const navItems: NavItem[] = [
 		icon: 'person',
 		subItems: [
 			{ label: 'Student List', href: '/students' },
+			{ label: 'Add Student', href: '/students/add' },
 			{ label: 'Student Details', href: '#' },
 			{ label: 'Attendance', href: '#' },
 			{ label: 'Promotion', href: '#' }
@@ -35,7 +36,8 @@ export const navItems: NavItem[] = [
 		label: 'Reports & Marksheets', 
 		icon: 'reports',
 		subItems: [
-			{ label: 'Generate Marksheets', href: '/reports' },
+			{ label: 'Reports', href: '/reports' },
+			{ label: 'Generate Report', href: '/reports/generate' },
 			{ label: 'Student Report Cards', href: '#' },
 			{ label: 'Class Result Analysis', href: '#' }
 		]
@@ -45,6 +47,7 @@ export const navItems: NavItem[] = [
 		icon: 'receipt_long',
 		subItems: [
 			{ label: 'Fee Collection', href: '/fees' },
+			{ label: 'Fee Record', href: '/fees/record' },
 			{ label: 'Invoices & Receipts', href: '#' },
 			{ label: 'Expenses', href: '#' }
 		]

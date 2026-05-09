@@ -441,7 +441,7 @@
 
 	.card {
 		background-color: var(--color-surface-lowest);
-		border-radius: var(--radius-2xl);
+		border-radius: var(--radius-sm);
 		border: 1px solid var(--color-outline-variant);
 		box-shadow: var(--shadow-ambient-md);
 		overflow: hidden;
@@ -453,27 +453,40 @@
 
 	.data-table {
 		width: 100%;
-		min-width: 800px;
+		min-width: 600px;
 		border-collapse: collapse;
 		text-align: left;
+		font-size: 13px;
+		table-layout: fixed;
 	}
 
 	.data-table th {
-		padding: 16px;
-		font-size: 12px;
+		padding: 4px;
+		font-size: 11px;
 		font-weight: 600;
 		text-transform: uppercase;
+		letter-spacing: 0.03em;
 		color: var(--color-on-surface-variant);
-		background-color: var(--color-surface);
-		border-bottom: 1px solid var(--color-outline-variant);
+		background-color: var(--color-surface-high);
+		border-bottom: 2px solid var(--color-outline-variant);
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		white-space: normal;
+		vertical-align: bottom;
+		line-height: 1.2;
 	}
 
 	.data-table td {
-		padding: 12px 16px;
-		font-size: 14px;
+		padding: 2px 4px;
+		font-size: 13px;
 		border-bottom: 1px solid var(--color-outline-variant);
 		color: var(--color-on-surface);
 		vertical-align: middle;
+		height: 36px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.data-table tbody tr:last-child td {
@@ -481,15 +494,15 @@
 	}
 
 	.data-table tbody tr {
-		transition: background-color 150ms ease;
+		transition: background-color 100ms ease;
 	}
 
 	.data-table tbody tr:hover {
-		background-color: color-mix(in srgb, var(--color-primary) 4%, transparent);
+		background-color: color-mix(in srgb, var(--color-primary) 3%, transparent);
 	}
 
 	.data-table tbody tr:nth-child(even) {
-		background-color: color-mix(in srgb, var(--color-surface) 30%, transparent);
+		background-color: color-mix(in srgb, var(--color-surface-high) 40%, transparent);
 	}
 
 	.text-center {
@@ -504,14 +517,20 @@
 		color: var(--color-on-surface-variant);
 	}
 
-	.w-16 { width: 64px; }
-	.w-32 { width: 128px; }
-	.w-48 { width: 192px; }
+	.w-16 { width: 32px; }
+	.w-32 { width: 64px; }
+	.w-48 { width: 64px; }
 
 	.mx-auto {
 		margin-left: auto;
 		margin-right: auto;
 		display: block;
+	}
+
+	.data-table .form-checkbox {
+		height: 16px;
+		width: 16px;
+		border-radius: 2px;
 	}
 
 	.form-select, .form-input {
@@ -548,7 +567,21 @@
 	}
 
 	.small-input {
-		padding: 8px 12px;
+		padding: 3px 6px;
+		border-radius: 2px;
+		border: 1px solid var(--color-outline-variant);
+		background-color: var(--color-surface);
+		font-size: 13px;
+		font-variant-numeric: tabular-nums;
+		width: 100%;
+		text-align: right;
+	}
+
+	.small-input:focus {
+		border-color: var(--color-primary);
+		outline: none;
+		box-shadow: inset 0 0 0 1px var(--color-primary);
+		background-color: var(--color-surface);
 	}
 
 	.action-bar {
