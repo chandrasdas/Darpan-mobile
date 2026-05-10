@@ -91,6 +91,7 @@ export const getFilteredStudents = query(
         .leftJoin(studClasses, eq(studSections.classId, studClasses.id))
         .where(finalCondition)
         .groupBy(studInfo.sid)
+        .orderBy(asc(studSessionEnrollments.rollNo),asc(studClasses.id),asc(studSections.id))
         .limit(limit)
         .offset((page - 1) * limit);
 

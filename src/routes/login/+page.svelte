@@ -68,14 +68,15 @@
 
 <div class="auth-page">
 	<div class="theme-switcher" in:fade={{ duration: 600, delay: 200 }}>
-		<div class="theme-toggle-pills">
-			<button type="button" class="pill-btn" class:active={!isDarkMode} onclick={() => setManualTheme(false)} aria-label="Light mode">
-				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-			</button>
-			<button type="button" class="pill-btn" class:active={isDarkMode} onclick={() => setManualTheme(true)} aria-label="Dark mode">
-				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-			</button>
-		</div>
+		<button type="button" class="theme-slide-toggle" class:dark={isDarkMode} onclick={() => setManualTheme(!isDarkMode)} aria-label="Toggle dark mode">
+			<span class="slide-thumb">
+				{#if isDarkMode}
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+				{:else}
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+				{/if}
+			</span>
+		</button>
 	</div>
 
 	<div class="auth-container" in:fade={{ duration: 600, delay: 100 }}>
@@ -173,32 +174,44 @@
 		z-index: 20;
 	}
 
-	.theme-toggle-pills {
+	.theme-slide-toggle {
+		position: relative;
 		display: flex;
+		align-items: center;
+		width: 56px;
+		height: 32px;
 		background-color: var(--color-surface-container);
 		border-radius: 100px;
+		border: 1px solid var(--color-outline-variant);
+		cursor: pointer;
 		padding: 2px;
-		gap: 2px;
+		transition: background-color 300ms ease, border-color 300ms ease;
 	}
 
-	.pill-btn {
+	.theme-slide-toggle.dark {
+		background-color: var(--color-primary);
+		border-color: var(--color-primary);
+	}
+
+	.slide-thumb {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 28px;
-		height: 28px;
-		border-radius: 100px;
-		border: none;
-		background: transparent;
-		color: var(--color-on-surface-variant);
-		cursor: pointer;
-		transition: all 200ms ease;
+		width: 26px;
+		height: 26px;
+		background-color: var(--color-surface-lowest);
+		border-radius: 50%;
+		box-shadow: var(--shadow-ambient-md), 0 1px 3px rgba(0,0,0,0.1);
+		border: 1px solid var(--color-outline);
+		color: var(--color-on-surface);
+		transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1), border-color 300ms ease;
+		transform: translateX(0);
 	}
 
-	.pill-btn.active {
-		background-color: var(--color-primary);
-		color: var(--color-on-primary);
-		box-shadow: var(--shadow-ambient-sm);
+	.theme-slide-toggle.dark .slide-thumb {
+		transform: translateX(24px);
+		color: var(--color-primary);
+		border-color: transparent;
 	}
 
 	@media (max-width: 600px) {
