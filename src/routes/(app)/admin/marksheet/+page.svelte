@@ -3,7 +3,7 @@
     import { SvelteMap } from 'svelte/reactivity';
     import { APP_NAME } from '$lib/config';
     import type { PageData } from './$types';
-    import { getSections } from '../../students/students.remote';
+    import { getSections, getClasses } from '../../students/students.remote';
     import { getStudentsList, getMarksheetData } from './marksheet.remote';
 
     let { data }: { data: PageData } = $props();
@@ -25,6 +25,8 @@
     let setups = $state(data.initialMarksheetData.setups);
     // svelte-ignore state_referenced_locally
     let marks = $state(data.initialMarksheetData.marks);
+    // svelte-ignore state_referenced_locally
+    let classes = $state(data.classes);
 
     let isLoading = $state(false);
 
@@ -78,6 +80,25 @@
             marks = fetched.marks;
         } finally {
             isLoading = false;
+        }
+    }
+
+    async function handleSessionChange() {
+        currentClass = 0;
+        currentSection = 0;
+        currentEnrollId = 0;
+        sections = [];
+        students = [];
+        setups = [];
+        marks = [];
+
+        const fetchedClasses = await getClasses(currentSession).run();
+        classes = fetchedClasses;
+        if (fetchedClasses.length > 0) {
+            currentClass = fetchedClasses[0].id;
+            await fetchSections();
+            await fetchStudents();
+            await fetchMarksheetData();
         }
     }
 
@@ -152,14 +173,17 @@
                 <div class="hero-filters">
                     <div class="filter-columns">
                         <div class="filter-group">
-                            <select value={currentSession.toString()} onchange={(e) => { currentSession = Number((e.target as HTMLSelectElement).value); handleSectionChange(); }} class="form-select filter-select">
+                            <select value={currentSession.toString()} onchange={(e) => { currentSession = Number((e.target as HTMLSelectElement).value); handleSessionChange(); }} class="form-select filter-select">
                                 {#each data.sessions as session (session.id)}
                                     <option value={session.id.toString()}>{session.name}</option>
                                 {/each}
                             </select>
 
                             <select value={currentClass.toString()} onchange={(e) => { currentClass = Number((e.target as HTMLSelectElement).value); handleClassChange(); }} class="form-select filter-select">
-                                {#each data.classes as cls (cls.id)}
+                                {#if classes.length === 0}
+                                    <option value="0">No Class</option>
+                                {/if}
+                                {#each classes as cls (cls.id)}
                                     <option value={cls.id.toString()}>{cls.name}</option>
                                 {/each}
                             </select>

@@ -2,14 +2,14 @@ import { db } from '$lib/server/db';
 import { studSessions, studClasses } from '$lib/server/db/schema/marksheet';
 import type { PageServerLoad } from './$types';
 import { desc, asc } from 'drizzle-orm';
-import { getSections } from '../../students/students.remote';
+import { getSections, getClasses } from '../../students/students.remote';
 import { getStudentsList, getMarksheetData } from './marksheet.remote';
 
 export const load: PageServerLoad = async () => {
     const dbSessions = await db.select().from(studSessions).orderBy(desc(studSessions.year));
-    const dbClasses = await db.select().from(studClasses).orderBy(asc(studClasses.id));
-
+    
     const defaultSession = dbSessions.length > 0 ? dbSessions[0].id : 0;
+    const dbClasses = defaultSession ? await getClasses(defaultSession) : [];
     const defaultClass = dbClasses.length > 0 ? dbClasses[0].id : 0;
 
     const dbSectionsForClass = defaultClass

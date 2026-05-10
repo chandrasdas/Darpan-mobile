@@ -2,7 +2,7 @@
 	import { fade } from 'svelte/transition';
 	import { APP_NAME } from '$lib/config';
 	import type { PageData } from './$types';
-	import { getSections } from '../../students/students.remote';
+	import { getSections, getClasses } from '../../students/students.remote';
 	import { getTabulationData } from './tabulation.remote';
 	import { ALLOWED_TERM_IDS } from '$lib/config/exam-rules';
 
@@ -16,7 +16,10 @@
 	// svelte-ignore state_referenced_locally
 	let currentClass = $state(data.defaults.class);
 	// svelte-ignore state_referenced_locally
+	// svelte-ignore state_referenced_locally
 	let currentSection = $state(data.defaults.section);
+	// svelte-ignore state_referenced_locally
+	let classes = $state(data.classes);
 
 	// --- Dropdown data ---
 	// svelte-ignore state_referenced_locally
@@ -94,6 +97,23 @@
 		await fetchTabulationData();
 	}
 
+	async function handleSessionChange() {
+		currentClass = 0;
+		currentSection = 0;
+		subjects = [];
+		students = [];
+		marks = [];
+
+		const fetchedClasses = await getClasses(currentSession).run();
+		classes = fetchedClasses;
+		if (fetchedClasses.length > 0) {
+			currentClass = fetchedClasses[0].id;
+			await fetchSections();
+			ensureValidTerm();
+			await fetchTabulationData();
+		}
+	}
+
 	async function handleOtherChange() {
 		subjects = [];
 		students = [];
@@ -153,14 +173,17 @@
 				<div class="hero-filters">
 					<div class="filter-columns">
 						<div class="filter-group">
-							<select value={currentSession.toString()} onchange={(e) => { currentSession = Number((e.target as HTMLSelectElement).value); handleOtherChange(); }} class="form-select filter-select">
+							<select value={currentSession.toString()} onchange={(e) => { currentSession = Number((e.target as HTMLSelectElement).value); handleSessionChange(); }} class="form-select filter-select">
 								{#each data.sessions as session (session.id)}
 									<option value={session.id.toString()}>{session.name}</option>
 								{/each}
 							</select>
 
 							<select value={currentClass.toString()} onchange={(e) => { currentClass = Number((e.target as HTMLSelectElement).value); handleClassChange(); }} class="form-select filter-select">
-								{#each data.classes as cls (cls.id)}
+								{#if classes.length === 0}
+									<option value="0">No Class</option>
+								{/if}
+								{#each classes as cls (cls.id)}
 									<option value={cls.id.toString()}>{cls.name}</option>
 								{/each}
 							</select>

@@ -222,6 +222,9 @@
 						}} 
 						class="form-select filter-select"
 					>
+						{#if classes.length === 0}
+							<option value="0">No Class</option>
+						{/if}
 						{#each classes as cls (cls.id)}
 							<option value={cls.id.toString()}>{cls.name}</option>
 						{/each}

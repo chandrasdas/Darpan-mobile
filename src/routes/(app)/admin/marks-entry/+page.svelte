@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getSubjectsForExam, getStudentsForMarks, saveSingleMark } from './marks-entry.remote';
-	import { getSections } from '../../students/students.remote';
+	import { getSections, getClasses } from '../../students/students.remote';
 	import { fade } from 'svelte/transition';
 	import { APP_NAME } from '$lib/config';
 	import type { PageData } from './$types';
@@ -20,6 +20,8 @@
 	let currentSection = $state(data.defaults.section);
 	// svelte-ignore state_referenced_locally
 	let currentSubject = $state(data.defaults.subject);
+	// svelte-ignore state_referenced_locally
+	let classes = $state(data.classes);
 
 	// --- Dropdown data (pre-filled from server) ---
 	// svelte-ignore state_referenced_locally
@@ -162,7 +164,25 @@
 		await fetchStudents();
 	}
 
-	async function handleSessionOrTermChange() {
+	async function handleSessionChange() {
+		currentClass = 0;
+		currentSection = 0;
+		currentSubject = 0;
+		subjects = [];
+		students = [];
+		
+		const fetchedClasses = await getClasses(currentSession).run();
+		classes = fetchedClasses;
+		if (fetchedClasses.length > 0) {
+			currentClass = fetchedClasses[0].id;
+			await fetchSections();
+			ensureValidTerm();
+			await fetchSubjects();
+			await fetchStudents();
+		}
+	}
+
+	async function handleTermChange() {
 		currentSubject = 0;
 		students = [];
 		await fetchSubjects();
@@ -301,14 +321,17 @@
 					<div class="filter-columns">
 						<!-- Row 1: Session, Class, Section -->
 						<div class="filter-group">
-							<select value={currentSession.toString()} onchange={(e) => { currentSession = Number((e.target as HTMLSelectElement).value); handleSessionOrTermChange(); }} class="form-select filter-select">
+							<select value={currentSession.toString()} onchange={(e) => { currentSession = Number((e.target as HTMLSelectElement).value); handleSessionChange(); }} class="form-select filter-select">
 								{#each data.sessions as session (session.id)}
 									<option value={session.id.toString()}>{session.name}</option>
 								{/each}
 							</select>
 
 							<select value={currentClass.toString()} onchange={(e) => { currentClass = Number((e.target as HTMLSelectElement).value); handleClassChange(); }} class="form-select filter-select">
-								{#each data.classes as cls (cls.id)}
+								{#if classes.length === 0}
+									<option value="0">No Class</option>
+								{/if}
+								{#each classes as cls (cls.id)}
 									<option value={cls.id.toString()}>{cls.name}</option>
 								{/each}
 							</select>
@@ -337,7 +360,7 @@
 								<span>All Present</span>
 							</label>
 
-							<select value={currentTerm.toString()} onchange={(e) => { currentTerm = Number((e.target as HTMLSelectElement).value); handleSessionOrTermChange(); }} class="form-select filter-select">
+							<select value={currentTerm.toString()} onchange={(e) => { currentTerm = Number((e.target as HTMLSelectElement).value); handleTermChange(); }} class="form-select filter-select">
 								{#each filteredTerms() as term (term.id)}
 									<option value={term.id.toString()}>{term.name}</option>
 								{/each}
