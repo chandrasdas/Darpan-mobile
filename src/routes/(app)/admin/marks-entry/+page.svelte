@@ -400,7 +400,7 @@
 									type="number"
 									min="0"
 									bind:value={student.marksObtained}
-									onblur={() => handleMarkBlur(student)}
+									onchange={() => handleMarkBlur(student)}
 									onfocus={(e) => (e.target as HTMLInputElement).select()}
 									disabled={!allPresentMode && !student.isPresent}
 									placeholder="0"
@@ -753,7 +753,7 @@
 		padding: 3px 6px;
 		border-radius: 2px;
 		border: 1px solid var(--color-outline-variant);
-		background-color: transparent;
+		background-color: var(--color-surface);
 		font-size: 13px;
 		font-variant-numeric: tabular-nums;
 		width: 100%;

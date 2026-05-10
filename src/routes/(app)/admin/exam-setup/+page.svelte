@@ -453,7 +453,7 @@
 
 	.data-table {
 		width: 100%;
-		min-width: 600px;
+		min-width: 460px;
 		border-collapse: collapse;
 		text-align: left;
 		font-size: 13px;
@@ -473,6 +473,7 @@
 		top: 0;
 		z-index: 1;
 		white-space: normal;
+		text-align: center;
 		vertical-align: bottom;
 		line-height: 1.2;
 	}

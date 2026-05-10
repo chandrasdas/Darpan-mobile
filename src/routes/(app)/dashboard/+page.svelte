@@ -46,7 +46,7 @@
 		{ label: 'Add Student', icon: 'person_add', href: '/students/add' },
 		{ label: 'Mark Entry', icon: 'edit_note', href: '/admin/marks-entry' },
 		{ label: 'Fee Record', icon: 'receipt', href: '/fees/record' },
-		{ label: 'Reports', icon: 'analytics', href: '/reports' }
+		{ label: 'Tabulation Sheet', icon: 'analytics', href: '/admin/tabulation-sheet' }
 	];
 
 	/* ── Recent Activity ── */

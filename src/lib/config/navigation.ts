@@ -36,9 +36,9 @@ export const navItems: NavItem[] = [
 		label: 'Reports & Marksheets', 
 		icon: 'reports',
 		subItems: [
-			{ label: 'Reports', href: '/reports' },
+			{ label: 'Tabulation Sheet', href: '/admin/tabulation-sheet' },
 			{ label: 'Generate Report', href: '/reports/generate' },
-			{ label: 'Student Report Cards', href: '#' },
+			{ label: 'Marksheet', href: '/admin/marksheet' },
 			{ label: 'Class Result Analysis', href: '#' }
 		]
 	},

@@ -1,7 +1,7 @@
 import { query } from '$app/server';
 import { db } from '$lib/server/db';
 import { studExamSetups } from '$lib/server/db/schema/marksheet';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, notInArray, sql } from 'drizzle-orm';
 import * as v from 'valibot';
 
 export const getExistingSetups = query(
@@ -46,17 +46,33 @@ export const saveExamSetups = query(
     saveExamSetupsSchema,
     async (params: SaveExamSetupsInput) => {
         await db.transaction(async (tx) => {
-            // 1. Delete existing setups for this specific configuration
-            await tx.delete(studExamSetups)
-                .where(
-                    and(
-                        eq(studExamSetups.sessionId, params.sessionId),
-                        eq(studExamSetups.examTermId, params.examTermId),
-                        eq(studExamSetups.classId, params.classId)
-                    )
-                );
+            const subjectIdsToKeep = params.setups.map(s => s.subjectId);
 
-            // 2. Prepare for insert
+            // 1. Disable setups for this specific configuration that are no longer included
+            if (subjectIdsToKeep.length > 0) {
+                await tx.update(studExamSetups)
+                    .set({ includeInMarksheet: false, includeInTotal: false })
+                    .where(
+                        and(
+                            eq(studExamSetups.sessionId, params.sessionId),
+                            eq(studExamSetups.examTermId, params.examTermId),
+                            eq(studExamSetups.classId, params.classId),
+                            notInArray(studExamSetups.subjectId, subjectIdsToKeep)
+                        )
+                    );
+            } else {
+                await tx.update(studExamSetups)
+                    .set({ includeInMarksheet: false, includeInTotal: false })
+                    .where(
+                        and(
+                            eq(studExamSetups.sessionId, params.sessionId),
+                            eq(studExamSetups.examTermId, params.examTermId),
+                            eq(studExamSetups.classId, params.classId)
+                        )
+                    );
+            }
+
+            // 2. Prepare for insert/upsert
             const setupsToInsert = params.setups
                 .map((s) => ({
                     sessionId: params.sessionId,
@@ -70,9 +86,25 @@ export const saveExamSetups = query(
                     includeInTotal: s.includeInTotal
                 }));
 
-            // 3. Bulk insert if there's anything to insert
+            // 3. Bulk upsert if there's anything to insert
             if (setupsToInsert.length > 0) {
-                await tx.insert(studExamSetups).values(setupsToInsert);
+                await tx.insert(studExamSetups)
+                    .values(setupsToInsert)
+                    .onConflictDoUpdate({
+                        target: [
+                            studExamSetups.sessionId, 
+                            studExamSetups.classId, 
+                            studExamSetups.examTermId, 
+                            studExamSetups.subjectId
+                        ],
+                        set: {
+                            fullMark: sql`excluded.full_mark`,
+                            passMark: sql`excluded.pass_mark`,
+                            sortIndex: sql`excluded.sort_index`,
+                            includeInMarksheet: sql`excluded.include_in_marksheet`,
+                            includeInTotal: sql`excluded.include_in_total`
+                        }
+                    });
             }
         });
 
