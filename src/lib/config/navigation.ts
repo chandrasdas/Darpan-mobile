@@ -29,7 +29,8 @@ export const navItems: NavItem[] = [
 		icon: 'assessment',
 		subItems: [
 			{ label: 'Exam Setup', href: '/admin/exam-setup' },
-			{ label: 'Marks Entry', href: '/admin/marks-entry' }
+			{ label: 'Marks Entry', href: '/admin/marks-entry' },
+			{ label: 'Import Marks', href: '/admin/import-marks' }
 		]
 	},
 	{ 

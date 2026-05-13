@@ -228,6 +228,8 @@
 		if (student.marksObtained < 0 || isNaN(student.marksObtained)) {
 			student.marksObtained = 0;
 		}
+		// Round to 1 decimal place
+		student.marksObtained = Math.round(student.marksObtained * 10) / 10;
 
 		// Block save if marks exceed full marks — highlight red for user to fix
 		if (student.marksObtained > currentFullMark) {
@@ -423,6 +425,7 @@
 								<input 
 									type="number"
 									min="0"
+									step="0.1"
 									bind:value={student.marksObtained}
 									onchange={() => handleMarkBlur(student)}
 									onfocus={(e) => (e.target as HTMLInputElement).select()}

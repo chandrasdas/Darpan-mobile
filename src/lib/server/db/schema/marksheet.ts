@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, unique, index } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, real, unique, index } from 'drizzle-orm/sqlite-core';
 import { sql } from 'drizzle-orm';
 
 // --- Classes ---
@@ -98,7 +98,7 @@ export const studMarksEntries = sqliteTable('stud_marks_entries', {
   mid: integer('mid').primaryKey({ autoIncrement: true }),
   sessionEnrollId: integer('session_enroll_id').notNull().references(() => studSessionEnrollments.seid),
   examSetupId: integer('exam_setup_id').notNull().references(() => studExamSetups.setupId),
-  marksObtained: integer('marks_obtained').notNull().default(0),
+  marksObtained: real('marks_obtained').notNull().default(0),
   isPresent: integer('is_present', { mode: 'boolean' }).notNull().default(true),
   createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).default(sql`(unixepoch())`),

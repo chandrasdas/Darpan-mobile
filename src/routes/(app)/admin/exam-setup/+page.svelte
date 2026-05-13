@@ -622,19 +622,6 @@
 		gap: 16px;
 	}
 
-	.status-message {
-		font-size: 14px;
-		font-weight: 500;
-	}
-
-	.success-text {
-		color: var(--color-status-success);
-	}
-
-	.error-text {
-		color: var(--color-error);
-	}
-
 	.primary-button {
 		display: inline-flex;
 		align-items: center;
