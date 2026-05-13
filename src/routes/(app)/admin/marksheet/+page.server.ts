@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db';
-import { studSessions, studClasses } from '$lib/server/db/schema/marksheet';
+import { studSessions } from '$lib/server/db/schema/marksheet';
 import type { PageServerLoad } from './$types';
-import { desc, asc } from 'drizzle-orm';
+import { desc } from 'drizzle-orm';
 import { getSections, getClasses } from '../../students/students.remote';
 import { getStudentsList, getMarksheetData } from './marksheet.remote';
 

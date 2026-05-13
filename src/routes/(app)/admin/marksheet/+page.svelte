@@ -175,7 +175,7 @@
                         <div class="filter-group">
                             <select value={currentSession.toString()} onchange={(e) => { currentSession = Number((e.target as HTMLSelectElement).value); handleSessionChange(); }} class="form-select filter-select">
                                 {#each data.sessions as session (session.id)}
-                                    <option value={session.id.toString()}>{session.name}</option>
+                                    <option value={session.id.toString()}>{session.year}</option>
                                 {/each}
                             </select>
 

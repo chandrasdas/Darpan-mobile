@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getExistingSetups, saveExamSetups } from './setup.remote';
 	import { getClasses } from '../../students/students.remote';
-	import { fade } from 'svelte/transition';
+	import { fade, fly } from 'svelte/transition';
 	import { APP_NAME } from '$lib/config';
 	import type { PageData } from './$types';
 
@@ -173,10 +173,20 @@
 			}).run();
 			saveMessage = 'Configuration saved successfully!';
 			saveError = false;
-			setTimeout(() => saveMessage = '', 3000);
-		} catch {
-			saveMessage = 'Failed to save configuration.';
+			setTimeout(() => {
+				if (saveMessage === 'Configuration saved successfully!') {
+					saveMessage = '';
+				}
+			}, 4000);
+		} catch (e) {
+			console.error('Save error:', e);
+			saveMessage = 'Failed to save configuration. Please try again.';
 			saveError = true;
+			setTimeout(() => {
+				if (saveMessage === 'Failed to save configuration. Please try again.') {
+					saveMessage = '';
+				}
+			}, 4000);
 		} finally {
 			isSaving = false;
 		}
@@ -208,7 +218,7 @@
 					<div class="filter-group">
 					<select value={currentSession.toString()} onchange={handleSessionChange} class="form-select filter-select">
 						{#each data.sessions as session (session.id)}
-							<option value={session.id.toString()}>{session.name}</option>
+							<option value={session.id.toString()}>{session.year}</option>
 						{/each}
 					</select>
 
@@ -333,15 +343,32 @@
 	</div>
 
 	<div class="action-bar">
-		{#if saveMessage}
-			<span class="status-message {saveError ? 'error-text' : 'success-text'}" in:fade>
-				{saveMessage}
-			</span>
-		{/if}
 		<button onclick={handleSave} disabled={isSaving} class="primary-button">
-			{isSaving ? 'Saving...' : 'Save Configuration'}
+			{#if isSaving}
+				<span class="spinner"></span>
+				Saving...
+			{:else}
+				Save Configuration
+			{/if}
 		</button>
 	</div>
+
+	{#if saveMessage}
+		<div 
+			class="floating-toast {saveError ? 'toast-error' : 'toast-success'}"
+			in:fly={{ y: 20, duration: 400 }}
+			out:fade={{ duration: 300 }}
+		>
+			<div class="toast-icon">
+				{#if saveError}
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+				{:else}
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+				{/if}
+			</div>
+			<span class="toast-text">{saveMessage}</span>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -628,7 +655,74 @@
 	}
 
 	.primary-button:disabled {
-		opacity: 0.5;
+		opacity: 0.7;
 		cursor: not-allowed;
+	}
+
+	.spinner {
+		width: 16px;
+		height: 16px;
+		border: 2px solid rgba(255, 255, 255, 0.3);
+		border-top-color: white;
+		border-radius: 50%;
+		animation: spin 0.8s linear infinite;
+		margin-right: 8px;
+	}
+
+	@keyframes spin {
+		to { transform: rotate(360deg); }
+	}
+
+	/* Floating Toast Styles */
+	.floating-toast {
+		position: fixed;
+		bottom: 32px;
+		left: 50%;
+		transform: translateX(-50%);
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 12px 20px;
+		border-radius: var(--radius-xl);
+		box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+		z-index: 1000;
+		min-width: 280px;
+		max-width: calc(100vw - 40px);
+		backdrop-filter: blur(8px);
+	}
+
+	.toast-success {
+		background: linear-gradient(135deg, #059669, #10b981);
+		color: white;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.toast-error {
+		background: linear-gradient(135deg, #dc2626, #ef4444);
+		color: white;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.toast-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 28px;
+		height: 28px;
+		background: rgba(255, 255, 255, 0.2);
+		border-radius: 50%;
+		flex-shrink: 0;
+	}
+
+	.toast-text {
+		font-size: 14px;
+		font-weight: 600;
+		letter-spacing: 0.01em;
+	}
+
+	@media (max-width: 640px) {
+		.floating-toast {
+			bottom: 80px; /* Above mobile bottom bar if any */
+		}
 	}
 </style>
