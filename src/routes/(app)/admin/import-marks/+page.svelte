@@ -32,6 +32,18 @@
 	let expandedSheets = $state<Record<string, boolean>>({});
 	let selectedSheetKeys = $state<Record<string, boolean>>({});
 
+	// --- Helpers ---
+	function numberToRoman(num: number): string {
+		const romanMap: [number, string][] = [
+			[12, 'XII'], [11, 'XI'], [10, 'X'], [9, 'IX'], [8, 'VIII'],
+			[7, 'VII'], [6, 'VI'], [5, 'V'], [4, 'IV'], [3, 'III'], [2, 'II'], [1, 'I']
+		];
+		for (const [value, roman] of romanMap) {
+			if (num === value) return roman;
+		}
+		return String(num);
+	}
+
 	// --- Derived ---
 	let subjectNames = $derived(data.subjects.map(s => s.name));
 
@@ -42,15 +54,24 @@
 		const file = input.files[0];
 		fileName = file.name;
 
-		// Parse filename: "Class IX (2024).xlsx"
-		const fnMatch = fileName.match(/^Class\s+([A-Z0-9]+)\s*\((\d{4})\)/i);
-		if (!fnMatch) {
-			errorMsg = `Could not parse filename "${fileName}". Expected format: "Class IX (2024).xlsx"`;
+		// Parse filename — supports two formats:
+		// 1. "Class IX (2024).xlsx"  → class name = IX, year = 2024
+		// 2. "5-AB 2024.xlsx"       → class number = 5 (maps to class V), year = 2024
+		const fnMatchClassic = fileName.match(/^Class\s+([A-Z0-9]+)\s*\(?(\d{4})\)?/i);
+		const fnMatchShort = fileName.match(/^(\d{1,2})-[A-Z]+\s+(\d{4})/i);
+
+		if (fnMatchClassic) {
+			parsedClass = fnMatchClassic[1];
+			parsedYear = parseInt(fnMatchClassic[2]);
+		} else if (fnMatchShort) {
+			const classNum = parseInt(fnMatchShort[1]);
+			parsedClass = numberToRoman(classNum);
+			parsedYear = parseInt(fnMatchShort[2]);
+		} else {
+			errorMsg = `Could not parse filename "${fileName}". Expected format: "Class IX (2024).xlsx" or "5-AB 2024.xlsx"`;
 			step = 'error';
 			return;
 		}
-		parsedClass = fnMatch[1];
-		parsedYear = parseInt(fnMatch[2]);
 
 		// Auto-select session by year
 		const matchedSession = data.sessions.find(s => s.year === parsedYear);
@@ -299,7 +320,7 @@
 					<path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
 				</svg>
 				<p class="upload-label">Select an Excel file</p>
-				<p class="upload-hint">Format: <code>Class IX (2024).xlsx</code></p>
+				<p class="upload-hint">Format: <code>Class IX (2024).xlsx</code> or <code>5-AB 2024.xlsx</code></p>
 				<label class="upload-btn">
 					Choose File
 					<input type="file" accept=".xlsx,.xls" onchange={handleFile} class="sr-only" />
