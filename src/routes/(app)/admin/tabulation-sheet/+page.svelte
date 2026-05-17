@@ -48,6 +48,8 @@
 
 	let isLoading = $state(false);
 
+	let visibleSubjects = $derived(subjects.filter(sub => sub.fullMark !== 0));
+
 	async function fetchSections() {
 		if (!currentClass) {
 			sections = [];
@@ -123,7 +125,7 @@
 	// Derived metrics
 	let highestMarks = $derived(() => {
 		const highest: Record<number, number> = {};
-		for (const sub of subjects) {
+		for (const sub of visibleSubjects) {
 			highest[sub.setupId] = 0;
 		}
 		for (const m of marks) {
@@ -137,6 +139,61 @@
 			}
 		}
 		return highest;
+	});
+
+	let totalFullMarks = $derived(visibleSubjects.reduce((sum, sub) => sum + sub.fullMark, 0));
+
+	let studentCalculatedMetrics = $derived(() => {
+		const metrics: Record<number, { total: number; percentage: number; isPresent: boolean }> = {};
+		for (const student of students) {
+			if (student.transferDate) continue;
+
+			let total = 0;
+			let hasMarks = false;
+			let isPresentAny = false;
+
+			for (const sub of visibleSubjects) {
+				const m = marks.find(mark => mark.sessionEnrollId === student.seid && mark.examSetupId === sub.setupId);
+				if (m) {
+					hasMarks = true;
+					if (m.isPresent) {
+						total += m.marksObtained;
+						isPresentAny = true;
+					}
+				}
+			}
+
+			if (hasMarks) {
+				const percentage = totalFullMarks > 0 ? (total / totalFullMarks) * 100 : 0;
+				metrics[student.seid] = {
+					total: Math.round(total * 10) / 10,
+					percentage: Math.round(percentage * 100) / 100,
+					isPresent: isPresentAny
+				};
+			}
+		}
+		return metrics;
+	});
+
+	let highestTotalAndPercentage = $derived(() => {
+		let maxTotal = 0;
+		let maxPercentage = 0;
+		const metrics = studentCalculatedMetrics();
+
+		for (const seid of Object.keys(metrics)) {
+			const m = metrics[Number(seid)];
+			if (m.total > maxTotal) {
+				maxTotal = m.total;
+			}
+			if (m.percentage > maxPercentage) {
+				maxPercentage = m.percentage;
+			}
+		}
+
+		return {
+			total: maxTotal > 0 ? maxTotal.toFixed(1).replace(/\.0$/, '') : '0',
+			percentage: maxPercentage > 0 ? maxPercentage.toFixed(1) : '0.0'
+		};
 	});
 
 	function getMarkDisplay(seid: number, setupId: number, isTransferred: boolean) {
@@ -216,38 +273,53 @@
 					<tr>
 						<th class="w-16">Roll No</th>
 						<th class="w-48">Student Name</th>
-						{#each subjects as subject (subject.setupId)}
+						{#each visibleSubjects as subject (subject.setupId)}
 							<th class="subject-col" title={subject.subjectName}>
 								<div class="vertical-wrapper">
 									<span class="vertical-text">{subject.subjectName}</span>
 								</div>
 							</th>
 						{/each}
+						<th class="subject-col font-bold text-center" title="Total Marks">
+							<div class="vertical-wrapper">
+								<span class="vertical-text font-bold">Total</span>
+							</div>
+						</th>
+						<th class="subject-col font-bold text-center" title="Percentage">
+							<div class="vertical-wrapper">
+								<span class="vertical-text font-bold">Percentage</span>
+							</div>
+						</th>
 					</tr>
 				</thead>
 				<tbody>
 					<!-- Full Marks Row -->
-					{#if subjects.length > 0}
+					{#if visibleSubjects.length > 0}
 						<tr class="highlight-row">
 							<td></td>
 							<td class="font-bold">Full Marks</td>
-							{#each subjects as subject (subject.setupId)}
+							{#each visibleSubjects as subject (subject.setupId)}
 								<td class="text-center font-bold">{subject.fullMark}</td>
 							{/each}
+							<td class="text-center font-bold">{totalFullMarks}</td>
+							<td class="text-center font-bold">100.0</td>
 						</tr>
 						<!-- Highest Marks Row -->
 						<tr class="highlight-row">
 							<td></td>
 							<td class="font-bold">Highest Marks</td>
-							{#each subjects as subject (subject.setupId)}
+							{#each visibleSubjects as subject (subject.setupId)}
 								<td class="text-center font-bold text-primary">{highestMarks()[subject.setupId]}</td>
 							{/each}
+							<td class="text-center font-bold text-primary">{highestTotalAndPercentage().total}</td>
+							<td class="text-center font-bold text-primary">{highestTotalAndPercentage().percentage}</td>
 						</tr>
 					{/if}
 
 					<!-- Student Rows -->
 					{#each students as student (student.seid)}
 						{@const isTransferred = !!student.transferDate}
+						{@const metrics = studentCalculatedMetrics()[student.seid]}
 						<tr>
 							<td class="font-bold tabular-nums">
 								{student.rollNo}
@@ -255,23 +327,29 @@
 							<td class="font-medium {isTransferred ? 'text-muted italic' : ''}">
 								{isTransferred ? 'T.C.' : student.studentName}
 							</td>
-							{#each subjects as subject (subject.setupId)}
+							{#each visibleSubjects as subject (subject.setupId)}
 								<td class="text-center tabular-nums">
 									{getMarkDisplay(student.seid, subject.setupId, isTransferred)}
 								</td>
 							{/each}
+							<td class="text-center font-bold tabular-nums">
+								{isTransferred ? '' : (metrics ? metrics.total.toFixed(1).replace(/\.0$/, '') : '')}
+							</td>
+							<td class="text-center font-bold tabular-nums">
+								{isTransferred ? '' : (metrics ? metrics.percentage.toFixed(1) : '')}
+							</td>
 						</tr>
 					{/each}
 
 					{#if students.length === 0 && !isLoading}
 						<tr>
-							<td colspan={subjects.length + 2} class="empty-state">
+							<td colspan={visibleSubjects.length + 4} class="empty-state">
 								<div class="empty-icon">
 									<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
 									</svg>
 								</div>
-								{#if subjects.length === 0}
+								{#if visibleSubjects.length === 0}
 									<h3 class="empty-title">No subjects configured</h3>
 									<p class="empty-desc">Set up exam configuration first for this session, class, and term.</p>
 								{:else}
@@ -510,9 +588,9 @@
 
 	/* Vertical Subject Headers */
 	.subject-col {
-		height: 120px;
+		height: 80px;
 		vertical-align: bottom !important;
-		padding: 8px 0 !important;
+		padding: 4px 0 !important;
 	}
 
 	.vertical-wrapper {
@@ -521,16 +599,20 @@
 		align-items: flex-end;
 		height: 100%;
 		width: 100%;
-		padding-bottom: 8px;
+		padding-bottom: 4px;
 	}
 
 	.vertical-text {
 		writing-mode: vertical-rl;
 		transform: rotate(180deg);
-		white-space: nowrap;
+		white-space: normal;
 		text-align: left;
-		font-size: 12px;
+		font-size: 11px;
 		letter-spacing: 0.05em;
+		line-height: 1.1;
+		word-wrap: break-word;
+		word-break: keep-all;
+		max-height: 100px; /* Limit height so text wrapping is forced! */
 	}
 
 	.flex-header {
@@ -631,11 +713,12 @@
 		}
 
 		.subject-col {
-			height: 80px; /* Shorter for print */
+			height: 60px; /* Shorter for print */
 		}
 
 		.vertical-text {
 			font-size: 10px;
+			max-height: 48px;
 		}
 
 		/* Hide global sidebar/navbar elements if possible */

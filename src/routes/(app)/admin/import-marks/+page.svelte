@@ -196,6 +196,9 @@
 							continue;
 						}
 
+						// Skip subjects where fullMark is 0 (not a real exam)
+						if (setup.fullMark === 0) continue;
+
 						const mark = row.marks[subName];
 						entries.push({
 							section: sheet.section,
