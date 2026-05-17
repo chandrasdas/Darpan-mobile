@@ -58,8 +58,7 @@ export const getMarksheetData = query(
         .where(
             and(
                 eq(studExamSetups.sessionId, params.sessionId),
-                eq(studExamSetups.classId, params.classId),
-                eq(studExamSetups.includeInMarksheet, true)
+                eq(studExamSetups.classId, params.classId)
             )
         )
         .orderBy(asc(studExamTerms.id), asc(studExamSetups.sortIndex));

@@ -33,8 +33,7 @@ export const getTabulationData = query(
             and(
                 eq(studExamSetups.sessionId, params.sessionId),
                 eq(studExamSetups.classId, params.classId),
-                eq(studExamSetups.examTermId, params.examTermId),
-                eq(studExamSetups.includeInMarksheet, true)
+                eq(studExamSetups.examTermId, params.examTermId)
             )
         )
         .orderBy(asc(studExamSetups.sortIndex));

@@ -14,10 +14,15 @@
 	let currentSession = $state(data.defaults.session);
 	// svelte-ignore state_referenced_locally
 	let currentTerm = $state(data.defaults.term);
-	// svelte-ignore state_referenced_locally
 	let currentClass = $state(data.defaults.class);
 	// svelte-ignore state_referenced_locally
 	let classes = $state(data.classes);
+
+	// Import Config State
+	let importSession = $state(currentSession);
+	let importClass = $state(currentClass);
+	let importTerm = $state(currentTerm);
+	let importClasses = $state(classes);
 
 	// Filter exam terms based on the selected class
 	let filteredTerms = $derived(() => {
@@ -35,29 +40,57 @@
 		}
 	}
 
+	let filteredImportTerms = $derived(() => {
+		const allowed = ALLOWED_TERM_IDS[importClass];
+		if (!allowed) return data.examTerms;
+		return data.examTerms.filter(t => allowed.includes(t.id));
+	});
+
+	function ensureValidImportTerm() {
+		const terms = filteredImportTerms();
+		const isValid = terms.some(t => t.id === importTerm);
+		if (!isValid && terms.length > 0) {
+			importTerm = terms[0].id;
+		}
+	}
+
 	// Build initial state maps from server-provided data (before $state declarations)
 	function buildInitialState() {
 		const marks: Record<number, number | null> = {};
 		const passMarks: Record<number, number | null> = {};
 		const sorts: Record<number, number | null> = {};
-		const includeMarksheet: Record<number, boolean> = {};
 		const includes: Record<number, boolean> = {};
 		let sortIndex = 1;
 		for (const sub of data.subjects) {
 			marks[sub.id] = null;
 			passMarks[sub.id] = null;
 			sorts[sub.id] = sortIndex++;
-			includeMarksheet[sub.id] = false;
 			includes[sub.id] = true;
 		}
+		
+		let initialDisplaySubjects: typeof data.subjects = [];
+		if (data.initialSetups.length > 0) {
+			const setupSubjectIds = new Set(data.initialSetups.map(s => s.subjectId));
+			initialDisplaySubjects = data.subjects.filter(s => setupSubjectIds.has(s.id));
+			initialDisplaySubjects.sort((a, b) => {
+				const sortA = data.initialSetups.find(s => s.subjectId === a.id)?.sortIndex ?? 0;
+				const sortB = data.initialSetups.find(s => s.subjectId === b.id)?.sortIndex ?? 0;
+				return sortA - sortB;
+			});
+		}
+		
 		for (const setup of data.initialSetups) {
 			marks[setup.subjectId] = setup.fullMark;
 			passMarks[setup.subjectId] = setup.passMark;
 			sorts[setup.subjectId] = setup.sortIndex;
-			includeMarksheet[setup.subjectId] = setup.includeInMarksheet;
 			includes[setup.subjectId] = setup.includeInTotal;
 		}
-		return { marks, passMarks, sorts, includeMarksheet, includes };
+
+		initialDisplaySubjects.forEach((sub, idx) => {
+			sorts[sub.id] = idx + 1;
+		});
+
+		return { marks, passMarks, sorts, includes, initialDisplaySubjects };
 	}
 
 	const initial = buildInitialState();
@@ -66,21 +99,87 @@
 	let markInputs = $state<Record<number, number | null>>(initial.marks);
 	let passMarkInputs = $state<Record<number, number | null>>(initial.passMarks);
 	let sortInputs = $state<Record<number, number | null>>(initial.sorts);
-	let includeMarksheetInputs = $state<Record<number, boolean>>(initial.includeMarksheet);
 	let includeInputs = $state<Record<number, boolean>>(initial.includes);
 	let isSaving = $state(false);
 	let saveMessage = $state('');
 	let saveError = $state(false);
-	// svelte-ignore state_referenced_locally
-	let displaySubjects = $state(data.subjects);
+	
+	let displaySubjects = $state(initial.initialDisplaySubjects);
 
-	let addedToMarksheetCount = $derived(
-		displaySubjects.filter(sub => includeMarksheetInputs[sub.id]).length
+	let addedToMarksheetCount = $derived(displaySubjects.length);
+
+	let totalFullMarks = $derived(
+		displaySubjects.reduce((total, sub) => {
+			if (includeInputs[sub.id]) {
+				return total + (Number(markInputs[sub.id]) || 0);
+			}
+			return total;
+		}, 0)
 	);
 
 	let addedToTotalCount = $derived(
-		displaySubjects.filter(sub => includeMarksheetInputs[sub.id] && includeInputs[sub.id]).length
+		displaySubjects.filter(sub => includeInputs[sub.id]).length
 	);
+
+	let availableSubjectsToAdd = $derived(
+		data.subjects.filter(sub => !displaySubjects.some(d => d.id === sub.id))
+	);
+	let subjectToAddId = $state<number | null>(null);
+
+	function addSubject() {
+		if (!subjectToAddId) return;
+		const sub = data.subjects.find(s => s.id === subjectToAddId);
+		if (sub) {
+			displaySubjects = [...displaySubjects, sub];
+			includeInputs[sub.id] = true;
+			if (markInputs[sub.id] === null) markInputs[sub.id] = 50;
+			if (passMarkInputs[sub.id] === null) passMarkInputs[sub.id] = 15;
+			sortInputs[sub.id] = displaySubjects.length; 
+			subjectToAddId = null;
+		}
+	}
+
+	function removeSubject(id: number) {
+		const sub = data.subjects.find(s => s.id === id);
+		if (confirm(`Are you sure you want to remove ${sub?.name} from this configuration?`)) {
+			displaySubjects = displaySubjects.filter(sub => sub.id !== id);
+			includeInputs[id] = false;
+		}
+	}
+
+	let draggedIndex = $state<number | null>(null);
+
+	function handleDragStart(e: DragEvent, index: number) {
+		if (e.dataTransfer) {
+			e.dataTransfer.effectAllowed = 'move';
+			e.dataTransfer.setData('text/plain', index.toString());
+		}
+		draggedIndex = index;
+	}
+
+	function handleDragOver(e: DragEvent) {
+		e.preventDefault();
+		if (e.dataTransfer) {
+			e.dataTransfer.dropEffect = 'move';
+		}
+	}
+
+	function handleDrop(e: DragEvent, index: number) {
+		e.preventDefault();
+		if (draggedIndex === null || draggedIndex === index) return;
+
+		const newItems = [...displaySubjects];
+		const [draggedItem] = newItems.splice(draggedIndex, 1);
+		newItems.splice(index, 0, draggedItem);
+		
+		displaySubjects = newItems;
+		
+		displaySubjects.forEach((sub, idx) => {
+			sortInputs[sub.id] = idx + 1;
+		});
+
+		draggedIndex = null;
+	}
 
 	async function fetchSetups() {
 		if (!currentSession || !currentTerm || !currentClass) return;
@@ -97,14 +196,12 @@
 		const newInputs: Record<number, number | null> = {};
 		const newPassMarks: Record<number, number | null> = {};
 		const newSorts: Record<number, number | null> = {};
-		const newIncludeMarksheet: Record<number, boolean> = {};
 		const newIncludes: Record<number, boolean> = {};
 		let initialSortIndex = 1;
 		for (const sub of data.subjects) {
 			newInputs[sub.id] = null;
 			newPassMarks[sub.id] = null;
 			newSorts[sub.id] = initialSortIndex++;
-			newIncludeMarksheet[sub.id] = false;
 			newIncludes[sub.id] = true;
 		}
 
@@ -113,17 +210,30 @@
 			newInputs[setup.subjectId] = setup.fullMark;
 			newPassMarks[setup.subjectId] = setup.passMark;
 			newSorts[setup.subjectId] = setup.sortIndex;
-			newIncludeMarksheet[setup.subjectId] = setup.includeInMarksheet;
 			newIncludes[setup.subjectId] = setup.includeInTotal;
 		}
 		markInputs = newInputs;
 		passMarkInputs = newPassMarks;
 		sortInputs = newSorts;
-		includeMarksheetInputs = newIncludeMarksheet;
 		includeInputs = newIncludes;
 
 		// Use database order (no sorting)
-		displaySubjects = [...data.subjects];
+		if (setups.length > 0) {
+			const setupSubjectIds = new Set(setups.map(s => s.subjectId));
+			let newDisplaySubjects = data.subjects.filter(s => setupSubjectIds.has(s.id));
+			newDisplaySubjects.sort((a, b) => {
+				const sortA = setups.find(s => s.subjectId === a.id)?.sortIndex ?? 0;
+				const sortB = setups.find(s => s.subjectId === b.id)?.sortIndex ?? 0;
+				return sortA - sortB;
+			});
+			displaySubjects = newDisplaySubjects;
+
+			displaySubjects.forEach((sub, idx) => {
+				sortInputs[sub.id] = idx + 1;
+			});
+		} else {
+			displaySubjects = [];
+		}
 	}
 
 	async function handleSessionChange(e: Event) {
@@ -139,6 +249,92 @@
 		fetchSetups();
 	}
 
+	async function handleImportSessionChange(e: Event) {
+		const target = e.target as HTMLSelectElement;
+		importSession = Number(target.value);
+		importClasses = await getClasses(importSession).run();
+		if (importClasses.length > 0) {
+			importClass = importClasses[0].id;
+		} else {
+			importClass = 0;
+		}
+		ensureValidImportTerm();
+	}
+
+	async function handleImport() {
+		if (!importSession || !importTerm || !importClass) return;
+		
+		if (importSession === currentSession && importClass === currentClass && importTerm === currentTerm) {
+			alert("You are trying to import from the exact same Session, Class, and Term that you are currently editing. Please select a different configuration to import.");
+			return;
+		}
+
+		try {
+			const setupsToImport = await getExistingSetups({
+				sessionId: importSession,
+				examTermId: importTerm,
+				classId: importClass
+			}).run();
+
+			if (setupsToImport.length === 0) {
+				alert("No configuration found for the selected Session, Class, and Term.");
+				return;
+			}
+
+			if (confirm(`Are you sure you want to import ${setupsToImport.length} subjects? This will overwrite the configuration currently shown below. (Changes will not be saved until you click 'Save Configuration')`)) {
+				const newInputs: Record<number, number | null> = {};
+				const newPassMarks: Record<number, number | null> = {};
+				const newSorts: Record<number, number | null> = {};
+				const newIncludes: Record<number, boolean> = {};
+				
+				let initialSortIndex = 1;
+				for (const sub of data.subjects) {
+					newInputs[sub.id] = null;
+					newPassMarks[sub.id] = null;
+					newSorts[sub.id] = initialSortIndex++;
+					newIncludes[sub.id] = true;
+				}
+
+				for (const setup of setupsToImport) {
+					newInputs[setup.subjectId] = setup.fullMark;
+					newPassMarks[setup.subjectId] = setup.passMark;
+					newSorts[setup.subjectId] = setup.sortIndex;
+					newIncludes[setup.subjectId] = setup.includeInTotal;
+				}
+
+				markInputs = newInputs;
+				passMarkInputs = newPassMarks;
+				sortInputs = newSorts;
+				includeInputs = newIncludes;
+
+				const setupSubjectIds = new Set(setupsToImport.map(s => s.subjectId));
+				let newDisplaySubjects = data.subjects.filter(s => setupSubjectIds.has(s.id));
+				newDisplaySubjects.sort((a, b) => {
+					const sortA = setupsToImport.find(s => s.subjectId === a.id)?.sortIndex ?? 0;
+					const sortB = setupsToImport.find(s => s.subjectId === b.id)?.sortIndex ?? 0;
+					return sortA - sortB;
+				});
+				
+				displaySubjects = newDisplaySubjects;
+
+				displaySubjects.forEach((sub, idx) => {
+					sortInputs[sub.id] = idx + 1;
+				});
+				
+				saveMessage = 'Imported successfully! Click "Save Configuration" at the bottom to apply changes.';
+				saveError = false;
+				setTimeout(() => {
+					if (saveMessage === 'Imported successfully! Click "Save Configuration" at the bottom to apply changes.') {
+						saveMessage = '';
+					}
+				}, 5000);
+			}
+		} catch (error) {
+			console.error("Import error:", error);
+			alert("An error occurred while fetching the configuration to import.");
+		}
+	}
+
 	async function handleSave() {
 		if (!currentSession || !currentTerm || !currentClass) return;
 		isSaving = true;
@@ -146,22 +342,18 @@
 		saveError = false;
 
 		const setupsToSave = [];
-		for (const sub of data.subjects) {
-			const includeInMarksheet = includeMarksheetInputs[sub.id];
-			if (includeInMarksheet) {
-				const mark = markInputs[sub.id];
-				const passMark = passMarkInputs[sub.id];
-				const sort = sortInputs[sub.id];
-				const includeInTotal = includeInputs[sub.id];
-				setupsToSave.push({
-					subjectId: sub.id,
-					fullMark: mark ?? 0,
-					passMark: passMark ?? 0,
-					sortIndex: sort ?? 0,
-					includeInMarksheet: true,
-					includeInTotal: includeInTotal ?? true
-				});
-			}
+		for (const sub of displaySubjects) {
+			const mark = markInputs[sub.id];
+			const passMark = passMarkInputs[sub.id];
+			const sort = sortInputs[sub.id];
+			const includeInTotal = includeInputs[sub.id];
+			setupsToSave.push({
+				subjectId: sub.id,
+				fullMark: mark ?? 0,
+				passMark: passMark ?? 0,
+				sortIndex: sort ?? 0,
+				includeInTotal: includeInTotal ?? true
+			});
 		}
 
 		try {
@@ -207,12 +399,10 @@
 			</div>
 
 			<div class="hero-bottom">
-				{#if displaySubjects.length > 0}
-					<div class="stats-row">
-						<span class="stat-item">Subjects added to Marksheet: <strong>{addedToMarksheetCount}</strong></span>
-						<span class="stat-item">Subjects added in Grand Total: <strong>{addedToTotalCount}</strong></span>
-					</div>
-				{/if}
+				<div class="stats-row">
+					<span class="stat-item">Subjects added to Marksheet: <strong>{addedToMarksheetCount}</strong></span>
+					<span class="stat-item">Subjects added in Grand Total: <strong>{addedToTotalCount}</strong></span>
+				</div>
 
 				<div class="hero-filters">
 					<div class="filter-group">
@@ -261,26 +451,87 @@
 		</div>
 	</div>
 
+	<!-- Import Configuration Row -->
+	<div class="card" style="margin-bottom: 24px; padding: 12px 20px; background: color-mix(in srgb, var(--color-surface) 90%, var(--color-primary) 10%); border: 1px solid color-mix(in srgb, var(--color-outline-variant) 80%, var(--color-primary) 20%);">
+		<div class="flex items-center flex-wrap gap-4" style="justify-content: space-between;">
+			<div class="text-sm font-medium flex items-center gap-2" style="color: var(--color-primary);">
+				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+				Import from another configuration
+			</div>
+			<div class="flex items-center gap-2 flex-wrap">
+				<select value={importSession.toString()} onchange={handleImportSessionChange} class="form-select" style="padding: 6px 12px; font-size: 13px; max-width: 140px; border-color: transparent;">
+					{#each data.sessions as session (session.id)}
+						<option value={session.id.toString()}>{session.year}</option>
+					{/each}
+				</select>
+				<select 
+					value={importClass.toString()} 
+					onchange={(e) => {
+						const target = e.target as HTMLSelectElement;
+						importClass = Number(target.value);
+						ensureValidImportTerm();
+					}} 
+					class="form-select" style="padding: 6px 12px; font-size: 13px; max-width: 140px; border-color: transparent;"
+				>
+					{#if importClasses.length === 0}
+						<option value="0">No Class</option>
+					{/if}
+					{#each importClasses as cls (cls.id)}
+						<option value={cls.id.toString()}>{cls.name}</option>
+					{/each}
+				</select>
+				<select 
+					value={importTerm.toString()} 
+					onchange={(e) => {
+						const target = e.target as HTMLSelectElement;
+						importTerm = Number(target.value);
+					}} 
+					class="form-select" style="padding: 6px 12px; font-size: 13px; max-width: 140px; border-color: transparent;"
+				>
+					{#each filteredImportTerms() as term (term.id)}
+						<option value={term.id.toString()}>{term.name}</option>
+					{/each}
+				</select>
+				<button onclick={handleImport} class="primary-button flex items-center gap-1" style="padding: 6px 16px; font-size: 13px;">
+					Import Config
+				</button>
+			</div>
+		</div>
+	</div>
+
 	<!-- Data Table -->
 	<div class="card table-card">
 		<div class="table-scroll">
 			<table class="data-table">
 				<thead>
 					<tr>
-						<th class="w-16">SL</th>
-						<th>Subject Name</th>
-						<th class="text-center w-32">Include in Marksheet</th>
-						<th class="text-center w-32">Include in Total</th>
-						<th class="w-32">Sort Order</th>
-						<th class="w-48">Full Marks</th>
-						<th class="w-48">Pass Marks</th>
+						<th class="w-10 text-center px-1">SL</th>
+						<th class="px-1">Subject Name</th>
+						<th class="text-center w-16 px-1" style="line-height: 1.1; font-size: 10px;">Include in Total</th>
+						<th class="text-center w-14 px-1" style="line-height: 1.1; font-size: 10px;">Full Marks</th>
+						<th class="text-center w-14 px-1" style="line-height: 1.1; font-size: 10px;">Pass Marks</th>
+						<th class="w-14 text-center px-1">Action</th>
 					</tr>
 				</thead>
 				<tbody>
+					{#if displaySubjects.length === 0}
+					<tr class="no-hover">
+						<td colspan="6" class="text-center py-8 text-slate-500 font-medium">Not configured yet. Add a subject below.</td>
+					</tr>
+					{/if}
 					{#each displaySubjects as subject, i (subject.id)}
-					<tr>
-						<td class="font-medium text-slate-500">
-							{i + 1}
+					<tr 
+						draggable="true" 
+						ondragstart={(e) => handleDragStart(e, i)}
+						ondragover={handleDragOver}
+						ondrop={(e) => handleDrop(e, i)}
+						class:dragging={draggedIndex === i}
+					>
+						<td class="font-medium text-slate-500 text-center cursor-grab active:cursor-grabbing" title="Drag to reorder">
+							<div class="flex items-center justify-center gap-1">
+								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400 hover:text-slate-600 transition-colors"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+								{i + 1}
+							</div>
 						</td>
 						<td class="font-medium">
 							{subject.name}
@@ -288,28 +539,8 @@
 						<td class="text-center">
 							<input 
 								type="checkbox"
-								bind:checked={includeMarksheetInputs[subject.id]}
-								class="form-checkbox mx-auto"
-								tabindex="-1"
-							>
-						</td>
-						<td class="text-center">
-							<input 
-								type="checkbox"
 								bind:checked={includeInputs[subject.id]}
-								disabled={!includeMarksheetInputs[subject.id]}
 								class="form-checkbox mx-auto"
-								tabindex="-1"
-							>
-						</td>
-						<td>
-							<input 
-								type="number"
-								min="0"
-								bind:value={sortInputs[subject.id]}
-								placeholder="0"
-								disabled={!includeMarksheetInputs[subject.id]}
-								class="form-input small-input"
 								tabindex="-1"
 							>
 						</td>
@@ -320,7 +551,6 @@
 								max="1000"
 								bind:value={markInputs[subject.id]}
 								placeholder="-"
-								disabled={!includeMarksheetInputs[subject.id]}
 								class="form-input small-input"
 							>
 						</td>
@@ -331,12 +561,42 @@
 								max="1000"
 								bind:value={passMarkInputs[subject.id]}
 								placeholder="0"
-								disabled={!includeMarksheetInputs[subject.id]}
 								class="form-input small-input"
 							>
 						</td>
+						<td class="text-center">
+							<button type="button" onclick={() => removeSubject(subject.id)} class="text-red-500 hover:text-red-700 transition-colors inline-flex items-center justify-center" title="Remove Subject" style="height: 32px; width: 32px; border-radius: 6px; background-color: var(--color-surface); border: 1px solid var(--color-outline-variant);">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+							</button>
+						</td>
 					</tr>
 					{/each}
+					{#if displaySubjects.length > 0}
+					<tr class="no-hover" style="background-color: var(--color-surface-high);">
+						<td colspan="3" class="text-right font-bold text-slate-500" style="padding-right: 12px; font-size: 11px; text-transform: uppercase;">Total Included Marks</td>
+						<td class="text-center font-bold" style="color: var(--color-primary); font-size: 14px;">{totalFullMarks}</td>
+						<td colspan="2"></td>
+					</tr>
+					{/if}
+					{#if availableSubjectsToAdd.length > 0}
+					<tr class="no-hover">
+						<td></td>
+						<td colspan="5">
+							<div class="flex items-center gap-3 py-2">
+								<select bind:value={subjectToAddId} class="form-select" style="max-width: 250px; padding: 8px 16px;">
+									<option value={null}>Select subject to add...</option>
+									{#each availableSubjectsToAdd as sub (sub.id)}
+										<option value={sub.id}>{sub.name}</option>
+									{/each}
+								</select>
+								<button type="button" onclick={addSubject} class="primary-button flex items-center gap-1" disabled={!subjectToAddId} style="padding: 8px 16px; font-size: 13px;">
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+									Add Subject
+								</button>
+							</div>
+						</td>
+					</tr>
+					{/if}
 				</tbody>
 			</table>
 		</div>
@@ -483,7 +743,7 @@
 
 	.data-table {
 		width: 100%;
-		min-width: 460px;
+		min-width: 320px;
 		border-collapse: collapse;
 		text-align: left;
 		font-size: 13px;
@@ -528,7 +788,7 @@
 		transition: background-color 100ms ease;
 	}
 
-	.data-table tbody tr:hover {
+	.data-table tbody tr:not(.no-hover):hover {
 		background-color: color-mix(in srgb, var(--color-primary) 3%, transparent);
 	}
 
@@ -547,10 +807,6 @@
 	.text-slate-500 {
 		color: var(--color-on-surface-variant);
 	}
-
-	.w-16 { width: 32px; }
-	.w-32 { width: 64px; }
-	.w-48 { width: 64px; }
 
 	.mx-auto {
 		margin-left: auto;
@@ -598,14 +854,29 @@
 	}
 
 	.small-input {
-		padding: 3px 6px;
+		padding: 3px 4px;
 		border-radius: 2px;
 		border: 1px solid var(--color-outline-variant);
 		background-color: var(--color-surface);
 		font-size: 13px;
 		font-variant-numeric: tabular-nums;
 		width: 100%;
-		text-align: right;
+		text-align: center;
+		caret-color: var(--color-on-surface);
+	}
+
+	.small-input::-webkit-outer-spin-button,
+	.small-input::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+	.small-input[type=number] {
+		-moz-appearance: textfield;
+	}
+
+	.dragging {
+		opacity: 0.5;
+		background-color: color-mix(in srgb, var(--color-primary) 5%, var(--color-surface) 95%);
 	}
 
 	.small-input:focus {
@@ -712,4 +983,5 @@
 			bottom: 80px; /* Above mobile bottom bar if any */
 		}
 	}
+
 </style>

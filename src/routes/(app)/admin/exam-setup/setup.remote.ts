@@ -34,7 +34,6 @@ const saveExamSetupsSchema = v.object({
             fullMark: v.union([v.number(), v.null()]),
             passMark: v.number(),
             sortIndex: v.number(),
-            includeInMarksheet: v.boolean(),
             includeInTotal: v.boolean()
         })
     )
@@ -48,10 +47,9 @@ export const saveExamSetups = query(
         await db.transaction(async (tx) => {
             const subjectIdsToKeep = params.setups.map(s => s.subjectId);
 
-            // 1. Disable setups for this specific configuration that are no longer included
+            // 1. Delete setups for this specific configuration that are no longer included
             if (subjectIdsToKeep.length > 0) {
-                await tx.update(studExamSetups)
-                    .set({ includeInMarksheet: false, includeInTotal: false })
+                await tx.delete(studExamSetups)
                     .where(
                         and(
                             eq(studExamSetups.sessionId, params.sessionId),
@@ -61,8 +59,7 @@ export const saveExamSetups = query(
                         )
                     );
             } else {
-                await tx.update(studExamSetups)
-                    .set({ includeInMarksheet: false, includeInTotal: false })
+                await tx.delete(studExamSetups)
                     .where(
                         and(
                             eq(studExamSetups.sessionId, params.sessionId),
@@ -82,7 +79,6 @@ export const saveExamSetups = query(
                     fullMark: s.fullMark as number,
                     passMark: s.passMark,
                     sortIndex: s.sortIndex,
-                    includeInMarksheet: s.includeInMarksheet,
                     includeInTotal: s.includeInTotal
                 }));
 
@@ -101,7 +97,6 @@ export const saveExamSetups = query(
                             fullMark: sql`excluded.full_mark`,
                             passMark: sql`excluded.pass_mark`,
                             sortIndex: sql`excluded.sort_index`,
-                            includeInMarksheet: sql`excluded.include_in_marksheet`,
                             includeInTotal: sql`excluded.include_in_total`
                         }
                     });
