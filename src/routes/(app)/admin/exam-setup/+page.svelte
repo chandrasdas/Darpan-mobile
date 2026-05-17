@@ -14,15 +14,20 @@
 	let currentSession = $state(data.defaults.session);
 	// svelte-ignore state_referenced_locally
 	let currentTerm = $state(data.defaults.term);
+	// svelte-ignore state_referenced_locally
 	let currentClass = $state(data.defaults.class);
 	// svelte-ignore state_referenced_locally
 	let classes = $state(data.classes);
 
 	// Import Config State
-	let importSession = $state(currentSession);
-	let importClass = $state(currentClass);
-	let importTerm = $state(currentTerm);
-	let importClasses = $state(classes);
+	// svelte-ignore state_referenced_locally
+	let importSession = $state(data.defaults.session);
+	// svelte-ignore state_referenced_locally
+	let importClass = $state(data.defaults.class);
+	// svelte-ignore state_referenced_locally
+	let importTerm = $state(data.defaults.term);
+	// svelte-ignore state_referenced_locally
+	let importClasses = $state(data.classes);
 
 	// Filter exam terms based on the selected class
 	let filteredTerms = $derived(() => {
