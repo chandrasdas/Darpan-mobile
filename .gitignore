@@ -15,15 +15,9 @@ Thumbs.db
 # Env
 .env
 
-
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
-
-# database
-*.db-journal
-*.db-shm
-*.db-wal
 
 # misc
 *.zip
