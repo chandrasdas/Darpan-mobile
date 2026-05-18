@@ -12,6 +12,7 @@ import {
   studSessionEnrollments,
   studMarksEntries,
 } from "./marksheet";
+import { studAttendanceEntries, studAttendancePeriods } from "./attendance";
 
 // --- RELATIONS ---
 
@@ -111,6 +112,9 @@ export const studSessionEnrollmentsRelations = relations(studSessionEnrollments,
     references: [studSections.id],
   }),
   studMarksEntries: many(studMarksEntries),
+
+  // Allows you to query an enrollment and get all their attendance
+  attendanceEntries: many(studAttendanceEntries),
 }));
 
 export const studMarksEntriesRelations = relations(studMarksEntries, ({ one }) => ({
@@ -121,5 +125,20 @@ export const studMarksEntriesRelations = relations(studMarksEntries, ({ one }) =
   examSetup: one(studExamSetups, {
     fields: [studMarksEntries.examSetupId],
     references: [studExamSetups.setupId],
+  }),
+}));
+
+export const studAttendancePeriodsRelations = relations(studAttendancePeriods, ({ many }) => ({
+  studAttendanceEntries: many(studAttendanceEntries),
+}));
+
+export const studAttendanceEntriesRelations = relations(studAttendanceEntries, ({ one }) => ({
+  sessionEnrollment: one(studSessionEnrollments, {
+    fields: [studAttendanceEntries.sessionEnrollId],
+    references: [studSessionEnrollments.seid],
+  }),
+  period: one(studAttendancePeriods, {
+    fields: [studAttendanceEntries.periodId],
+    references: [studAttendancePeriods.id],
   }),
 }));
