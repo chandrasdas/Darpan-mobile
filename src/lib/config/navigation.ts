@@ -10,7 +10,6 @@ export const navItems: NavItem[] = [
 			{ label: 'Student List', href: '/students' },
 			{ label: 'Add Student', href: '/students/add' },
 			{ label: 'Student Details', href: '#' },
-			{ label: 'Attendance', href: '#' },
 			{ label: 'Promotion', href: '#' }
 		]
 	},
@@ -31,6 +30,14 @@ export const navItems: NavItem[] = [
 			{ label: 'Exam Setup', href: '/admin/exam-setup' },
 			{ label: 'Marks Entry', href: '/admin/marks-entry' },
 			{ label: 'Import Marks', href: '/admin/import-marks' }
+		]
+	},
+	{ 
+		label: 'Attendance', 
+		icon: 'event_available',
+		subItems: [
+			{ label: 'Period Setup', href: '/admin/period-setup' },
+			{ label: 'Attendance Entry', href: '/admin/attendance-entry' }
 		]
 	},
 	{ 
