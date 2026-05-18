@@ -116,6 +116,7 @@
 			examTermId: currentTerm
 		}).run();
 		periods = fetched;
+		fillExamDays();
 	}
 
 	async function fetchStudents() {
@@ -128,6 +129,7 @@
 				examTermId: currentTerm
 			}).run();
 			students = fetched;
+			fillExamDays();
 			saveStatus = {};
 		} finally {
 			isLoadingStudents = false;
@@ -219,6 +221,19 @@
 	// Stats
 	let studentCount = $derived(students.length);
 	let filledCount = $derived(students.filter(s => getTotalAttendance(s) > 0).length);
+
+	function fillExamDays() {
+		if (periods.length === 0 || students.length === 0) return;
+		const lastPeriod = periods[periods.length - 1];
+		for (let student of students) {
+			if (student.attendance[lastPeriod.periodId] === undefined || student.attendance[lastPeriod.periodId] === null) {
+				student.attendance[lastPeriod.periodId] = lastPeriod.totalWorkingDays || 0;
+			}
+		}
+	}
+
+	// Pre-fill exam days for initial data
+	fillExamDays();
 </script>
 
 <svelte:head>
@@ -297,7 +312,7 @@
 				<thead>
 					<tr>
 						<th class="w-16">Roll</th>
-						<th class="w-48">Student Name</th>
+						<th class="w-40">Student Name</th>
 						{#each periods as p (p.periodId)}
 							<th class="text-center w-20">
 								<div class="flex flex-col items-center">
@@ -306,10 +321,16 @@
 								</div>
 							</th>
 						{/each}
-						<th class="text-center w-20 border-l border-[var(--color-outline-variant)]">
+						<th class="text-center w-20 border-l border-outline-variant">
 							<div class="flex flex-col items-center">
 								<span>Total</span>
 								<span class="text-[10px] font-normal text-muted">({totalTermWorkingDays})</span>
+							</div>
+						</th>
+						<th class="text-center w-20 border-l border-outline-variant">
+							<div class="flex flex-col items-center">
+								<span>Perc</span>
+								<span class="text-[10px] font-normal text-muted">%</span>
 							</div>
 						</th>
 					</tr>
@@ -325,7 +346,6 @@
 							</td>
 							{#each periods as p, c (p.periodId)}
 								<td class="relative text-center">
-									<!-- svelte-ignore a11y_positive_tabindex -->
 									<input 
 										type="number"
 										min="0"
@@ -352,15 +372,18 @@
 									</div>
 								</td>
 							{/each}
-							<td class="text-center font-bold tabular-nums border-l border-[var(--color-outline-variant)]">
+							<td class="text-center tabular-nums border-l border-outline-variant">
 								{getTotalAttendance(student)}
+							</td>
+							<td class="text-center tabular-nums border-l border-outline-variant">
+								{totalTermWorkingDays > 0 ? ((getTotalAttendance(student) / totalTermWorkingDays) * 100).toFixed(1) : '0.0'}
 							</td>
 						</tr>
 					{/each}
 
 					{#if students.length === 0 && !isLoadingStudents}
 						<tr>
-							<td colspan={periods.length + 3} class="empty-state">
+							<td colspan={periods.length + 4} class="empty-state">
 								<div class="empty-icon">
 									<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
@@ -466,7 +489,7 @@
 	.text-muted { color: var(--color-on-surface-variant); }
 	.tabular-nums { font-variant-numeric: tabular-nums; }
 	.w-16 { width: 36px; }
-	.w-20 { width: 36px; }
+	.w-20 { width: 48px; }
 	.form-select, .form-input {
 		border-radius: var(--radius-lg);
 		border: 1px solid var(--color-outline);
