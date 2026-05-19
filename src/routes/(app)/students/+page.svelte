@@ -194,9 +194,17 @@
 						<td class="text-secondary">{student.rollNo || '-'}</td>
 						<td class="text-secondary">{student.guardianNo}</td>
 						<td>
-							<a href={resolve(`/students/${student.sid}` as "/")} class="action-link">
-								View Details
-							</a>
+							<div class="actions-flex">
+								<a href={resolve(`/students/${student.sid}` as "/")} class="action-icon-link view" title="View Details">
+									<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+								</a>
+								<a href="#" class="action-icon-link cert" title="Bonafide Certificate" onclick={(e) => e.preventDefault()}>
+									<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+								</a>
+								<a href="#" class="action-icon-link transfer" title="Transfer Student" onclick={(e) => e.preventDefault()}>
+									<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
+								</a>
+							</div>
 						</td>
 					</tr>
 					{/each}
@@ -534,16 +542,29 @@
 		border: 1px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
 	} */
 
-	.action-link {
-		font-weight: 500;
-		color: var(--color-primary);
-		text-decoration: none;
-		transition: color 200ms ease;
+	.actions-flex {
+		display: flex;
+		align-items: center;
+		gap: 8px;
 	}
 
-	.action-link:hover {
-		color: var(--color-secondary);
+	.action-icon-link {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--color-on-surface-variant);
+		transition: all 200ms ease;
+		border-radius: var(--radius-sm);
+		padding: 6px;
 	}
+
+	.action-icon-link:hover {
+		background-color: color-mix(in srgb, var(--color-on-surface) 5%, transparent);
+	}
+
+	.action-icon-link.view:hover { color: var(--color-primary); }
+	.action-icon-link.cert:hover { color: #10b981; }
+	.action-icon-link.transfer:hover { color: #f59e0b; }
 
 	.empty-state {
 		text-align: center;
