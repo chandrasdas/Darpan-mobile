@@ -211,9 +211,15 @@
 									<button type="button" class="action-icon-link cert" title="Bonafide Certificate">
 										<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
 									</button>
-									<a href={resolve(`/students/transferred?sid=${student.sid}` as "/")} class="action-icon-link transfer" title="Transfer Student">
-										<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
-									</a>
+									{#if currentSession === data.sessions[0]?.id.toString()}
+										<a href={resolve(`/students/transferred?sid=${student.sid}` as "/")} class="action-icon-link transfer" title="Transfer Student">
+											<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
+										</a>
+									{:else}
+										<button type="button" class="action-icon-link transfer" disabled title="Cannot transfer student from a previous session">
+											<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
+										</button>
+									{/if}
 								{/if}
 							</div>
 						</td>
@@ -598,13 +604,19 @@
 		min-height: 44px;
 	}
 
-	.action-icon-link:hover {
+	.action-icon-link:hover:not(:disabled) {
 		background-color: color-mix(in srgb, var(--color-on-surface) 5%, transparent);
 	}
 
-	.action-icon-link.view:hover { color: var(--color-primary); }
-	.action-icon-link.cert:hover { color: #10b981; }
-	.action-icon-link.transfer:hover { color: #f59e0b; }
+	.action-icon-link.view:hover:not(:disabled) { color: var(--color-primary); }
+	.action-icon-link.cert:hover:not(:disabled) { color: #10b981; }
+	.action-icon-link.transfer:hover:not(:disabled) { color: #f59e0b; }
+
+	.action-icon-link:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+		color: var(--color-outline) !important;
+	}
 
 	.empty-state {
 		text-align: center;

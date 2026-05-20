@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db';
-import { studInfo, studSessionEnrollments, studClasses, studSections } from '$lib/server/db/schema/marksheet';
+import { studInfo, studSessionEnrollments, studClasses, studSections, studSessions } from '$lib/server/db/schema/marksheet';
 import { eq, desc, and, or, like, isNull, isNotNull } from 'drizzle-orm';
 import { fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
@@ -8,7 +8,19 @@ export const load: PageServerLoad = async ({ url }) => {
     const searchQ = url.searchParams.get('searchQ') || '';
     const sidParam = url.searchParams.get('sid') || '';
 
-    // Load list of all transferred students
+    // Fetch the current active session (session with the latest year)
+    const dbSessions = await db.select().from(studSessions).orderBy(desc(studSessions.year));
+    const activeSession = dbSessions[0] || null;
+
+    let sessionCondition = isNotNull(studInfo.transferDate) as any;
+    if (activeSession) {
+        sessionCondition = and(
+            isNotNull(studInfo.transferDate),
+            eq(studSessionEnrollments.sessionId, activeSession.id)
+        );
+    }
+
+    // Load list of all transferred students for the current active session
     const transferredStudents = await db.select({
         sid: studInfo.sid,
         portalId: studInfo.portalId,
@@ -25,15 +37,23 @@ export const load: PageServerLoad = async ({ url }) => {
     .leftJoin(studSessionEnrollments, eq(studInfo.sid, studSessionEnrollments.studentId))
     .leftJoin(studSections, eq(studSessionEnrollments.sectionId, studSections.id))
     .leftJoin(studClasses, eq(studSections.classId, studClasses.id))
-    .where(isNotNull(studInfo.transferDate))
+    .where(sessionCondition)
     .groupBy(studInfo.sid)
     .orderBy(desc(studInfo.transferDate));
 
-    // Handle preselected student if passed as parameter
+    // Handle preselected student if passed as parameter, ensuring they belong to the active session
     let selectedStudent = null;
     if (sidParam) {
         const sid = parseInt(sidParam);
         if (!isNaN(sid)) {
+            const conditions = [
+                eq(studInfo.sid, sid),
+                isNull(studInfo.transferDate)
+            ];
+            if (activeSession) {
+                conditions.push(eq(studSessionEnrollments.sessionId, activeSession.id));
+            }
+
             const [student] = await db.select({
                 sid: studInfo.sid,
                 portalId: studInfo.portalId,
@@ -48,7 +68,7 @@ export const load: PageServerLoad = async ({ url }) => {
             .leftJoin(studSessionEnrollments, eq(studInfo.sid, studSessionEnrollments.studentId))
             .leftJoin(studSections, eq(studSessionEnrollments.sectionId, studSections.id))
             .leftJoin(studClasses, eq(studSections.classId, studClasses.id))
-            .where(and(eq(studInfo.sid, sid), isNull(studInfo.transferDate)))
+            .where(and(...conditions))
             .groupBy(studInfo.sid);
 
             if (student) {
@@ -57,9 +77,20 @@ export const load: PageServerLoad = async ({ url }) => {
         }
     }
 
-    // Handle search for active students
+    // Handle search for active students, restricted to the current active session
     let searchResults: any[] = [];
     if (searchQ && searchQ.trim().length >= 2) {
+        const searchConditions = [
+            isNull(studInfo.transferDate),
+            or(
+                like(studInfo.name, `%${searchQ}%`),
+                like(studInfo.portalId, `%${searchQ}%`)
+            )
+        ];
+        if (activeSession) {
+            searchConditions.push(eq(studSessionEnrollments.sessionId, activeSession.id));
+        }
+
         searchResults = await db.select({
             sid: studInfo.sid,
             name: studInfo.name,
@@ -73,15 +104,7 @@ export const load: PageServerLoad = async ({ url }) => {
         .leftJoin(studSessionEnrollments, eq(studInfo.sid, studSessionEnrollments.studentId))
         .leftJoin(studSections, eq(studSessionEnrollments.sectionId, studSections.id))
         .leftJoin(studClasses, eq(studSections.classId, studClasses.id))
-        .where(
-            and(
-                isNull(studInfo.transferDate),
-                or(
-                    like(studInfo.name, `%${searchQ}%`),
-                    like(studInfo.portalId, `%${searchQ}%`)
-                )
-            )
-        )
+        .where(and(...searchConditions))
         .groupBy(studInfo.sid)
         .limit(10);
     }
@@ -107,6 +130,21 @@ export const actions: Actions = {
         const [student] = await db.select().from(studInfo).where(eq(studInfo.sid, sid));
         if (!student) {
             return fail(404, { error: 'Student not found.' });
+        }
+
+        // Validate that the student is enrolled in the current active session
+        const dbSessions = await db.select().from(studSessions).orderBy(desc(studSessions.year));
+        const activeSession = dbSessions[0];
+        if (activeSession) {
+            const [enrollment] = await db.select()
+                .from(studSessionEnrollments)
+                .where(and(
+                    eq(studSessionEnrollments.studentId, sid),
+                    eq(studSessionEnrollments.sessionId, activeSession.id)
+                ));
+            if (!enrollment) {
+                return fail(400, { error: 'Cannot transfer a student who is not enrolled in the current active session.' });
+            }
         }
 
         await db.update(studInfo)

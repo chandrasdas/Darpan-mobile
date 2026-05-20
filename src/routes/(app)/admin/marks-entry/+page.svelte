@@ -31,7 +31,7 @@
 	let subjects = $state(data.initialSubjects);
 
 	// Filter exam terms based on the selected class
-	let filteredTerms = $derived(() => {
+	let filteredTerms = $derived.by(() => {
 		const allowed = ALLOWED_TERM_IDS[currentClass];
 		if (!allowed) return data.examTerms;
 		return data.examTerms.filter(t => allowed.includes(t.id));
@@ -41,7 +41,7 @@
 	// Must be called explicitly before fetching subjects (not via $effect,
 	// which runs too late — after fetchSubjects already fired).
 	function ensureValidTerm() {
-		const terms = filteredTerms();
+		const terms = filteredTerms;
 		const isValid = terms.some(t => t.id === currentTerm);
 		if (!isValid && terms.length > 0) {
 			currentTerm = terms[0].id;
@@ -365,7 +365,7 @@
 							</label>
 
 							<select value={currentTerm.toString()} onchange={(e) => { currentTerm = Number((e.target as HTMLSelectElement).value); handleTermChange(); }} class="form-select filter-select">
-								{#each filteredTerms() as term (term.id)}
+								{#each filteredTerms as term (term.id)}
 									<option value={term.id.toString()}>{term.name}</option>
 								{/each}
 							</select>

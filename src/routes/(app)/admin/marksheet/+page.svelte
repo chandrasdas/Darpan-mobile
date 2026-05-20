@@ -1,6 +1,5 @@
 <script lang="ts">
     import { fade } from 'svelte/transition';
-    import { SvelteMap } from 'svelte/reactivity';
     import { APP_NAME } from '$lib/config';
     import type { PageData } from './$types';
     import { getSections, getClasses } from '../../students/students.remote';
@@ -118,7 +117,7 @@
     }
 
     let uniqueTerms = $derived.by(() => {
-        const termsMap = new SvelteMap<number, string>();
+        const termsMap = new Map<number, string>();
         for (const s of setups) {
             if (!termsMap.has(s.examTermId)) {
                 termsMap.set(s.examTermId, s.termName);
@@ -128,7 +127,7 @@
     });
 
     let uniqueSubjects = $derived.by(() => {
-        const subMap = new SvelteMap<number, string>();
+        const subMap = new Map<number, string>();
         for (const s of setups) {
             if (!subMap.has(s.subjectId)) {
                 subMap.set(s.subjectId, s.subjectName);

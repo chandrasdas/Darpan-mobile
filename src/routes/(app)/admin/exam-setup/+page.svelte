@@ -30,7 +30,7 @@
 	let importClasses = $state(data.classes);
 
 	// Filter exam terms based on the selected class
-	let filteredTerms = $derived(() => {
+	let filteredTerms = $derived.by(() => {
 		const allowed = ALLOWED_TERM_IDS[currentClass];
 		if (!allowed) return data.examTerms;
 		return data.examTerms.filter(t => allowed.includes(t.id));
@@ -38,21 +38,21 @@
 
 	// Synchronously ensure currentTerm is valid for the current class.
 	function ensureValidTerm() {
-		const terms = filteredTerms();
+		const terms = filteredTerms;
 		const isValid = terms.some(t => t.id === currentTerm);
 		if (!isValid && terms.length > 0) {
 			currentTerm = terms[0].id;
 		}
 	}
 
-	let filteredImportTerms = $derived(() => {
+	let filteredImportTerms = $derived.by(() => {
 		const allowed = ALLOWED_TERM_IDS[importClass];
 		if (!allowed) return data.examTerms;
 		return data.examTerms.filter(t => allowed.includes(t.id));
 	});
 
 	function ensureValidImportTerm() {
-		const terms = filteredImportTerms();
+		const terms = filteredImportTerms;
 		const isValid = terms.some(t => t.id === importTerm);
 		if (!isValid && terms.length > 0) {
 			importTerm = terms[0].id;
@@ -444,7 +444,7 @@
 						}} 
 						class="form-select filter-select"
 					>
-						{#each filteredTerms() as term (term.id)}
+						{#each filteredTerms as term (term.id)}
 							<option value={term.id.toString()}>{term.name}</option>
 						{/each}
 					</select>
@@ -493,7 +493,7 @@
 					}} 
 					class="form-select" style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 140px; border-color: transparent;"
 				>
-					{#each filteredImportTerms() as term (term.id)}
+					{#each filteredImportTerms as term (term.id)}
 						<option value={term.id.toString()}>{term.name}</option>
 					{/each}
 				</select>
