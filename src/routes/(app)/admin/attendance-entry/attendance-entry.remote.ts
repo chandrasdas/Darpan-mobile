@@ -48,6 +48,7 @@ export const getStudentsForAttendance = query(
             seid: studSessionEnrollments.seid,
             rollNo: studSessionEnrollments.rollNo,
             studentName: studInfo.name,
+            transferDate: studInfo.transferDate,
         })
         .from(studSessionEnrollments)
         .innerJoin(studInfo, eq(studSessionEnrollments.studentId, studInfo.sid))

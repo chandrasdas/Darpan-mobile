@@ -46,6 +46,7 @@
 		seid: number;
 		rollNo: number;
 		studentName: string;
+		transferDate?: string | null;
 		attendance: Record<number, number>;
 	};
 	
@@ -337,12 +338,15 @@
 				</thead>
 				<tbody>
 					{#each students as student, r (student.seid)}
-						<tr>
+						<tr class:student-transferred={student.transferDate}>
 							<td class="font-bold tabular-nums">
 								{student.rollNo}
 							</td>
 							<td class="font-medium">
 								{student.studentName}
+								{#if student.transferDate}
+									<span class="text-xs text-error font-semibold ml-2 italic">(Transferred)</span>
+								{/if}
 							</td>
 							{#each periods as p, c (p.periodId)}
 								<td class="relative text-center">
@@ -358,6 +362,7 @@
 										onchange={() => handleAttendanceBlur(student, p.periodId, p.totalWorkingDays)}
 										onkeydown={(e) => handleKeydown(e, r, c)}
 										onfocus={(e) => (e.target as HTMLInputElement).select()}
+										disabled={!!student.transferDate}
 										placeholder="0"
 										class="form-input mark-input {saveStatus[getSaveKey(student.seid, p.periodId)] === 'warning' ? 'input-warning' : ''}"
 									>
@@ -523,6 +528,13 @@
 		border-color: var(--color-primary); outline: none;
 		box-shadow: inset 0 0 0 1px var(--color-primary);
 		background-color: var(--color-surface-lowest);
+	}
+	.student-transferred {
+		opacity: 0.6;
+		background-color: color-mix(in srgb, var(--color-outline-variant) 10%, transparent) !important;
+	}
+	.text-error {
+		color: #dc2626;
 	}
 	.input-warning {
 		border: 2px solid var(--color-error);

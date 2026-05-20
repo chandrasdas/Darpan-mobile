@@ -53,6 +53,7 @@
 		seid: number;
 		rollNo: number;
 		studentName: string;
+		transferDate?: string | null;
 		mid: number | null;
 		isPresent: boolean;
 		marksObtained: number;
@@ -403,12 +404,15 @@
 				</thead>
 				<tbody>
 					{#each students as student (student.seid)}
-						<tr>
+						<tr class:student-transferred={student.transferDate}>
 							<td class="font-bold tabular-nums">
 								{student.rollNo}
 							</td>
 							<td class="font-medium">
 								{student.studentName}
+								{#if student.transferDate}
+									<span class="text-xs text-error font-semibold ml-2 italic">(Transferred)</span>
+								{/if}
 							</td>
 							{#if !allPresentMode}
 								<td class="text-center">
@@ -416,6 +420,7 @@
 										type="checkbox"
 										bind:checked={student.isPresent}
 										onchange={() => handlePresentToggle(student)}
+										disabled={!!student.transferDate}
 										tabindex="-1"
 										class="form-checkbox mx-auto"
 									>
@@ -429,7 +434,7 @@
 									bind:value={student.marksObtained}
 									onchange={() => handleMarkBlur(student)}
 									onfocus={(e) => (e.target as HTMLInputElement).select()}
-									disabled={!allPresentMode && !student.isPresent}
+									disabled={!!student.transferDate || (!allPresentMode && !student.isPresent)}
 									placeholder="0"
 									class="form-input mark-input {saveStatus[student.seid] === 'warning' ? 'input-warning' : isFailed(student) ? 'input-failed' : ''}"
 								>
@@ -798,6 +803,15 @@
 		opacity: 0.3;
 		cursor: not-allowed;
 		background-color: var(--color-surface);
+	}
+
+	.student-transferred {
+		opacity: 0.6;
+		background-color: color-mix(in srgb, var(--color-outline-variant) 10%, transparent) !important;
+	}
+
+	.text-error {
+		color: #dc2626;
 	}
 
 	.input-warning {

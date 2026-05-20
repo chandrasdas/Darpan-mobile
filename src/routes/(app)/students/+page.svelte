@@ -186,9 +186,14 @@
 				</thead>
 				<tbody>
 					{#each students as student, i (student.sid)}
-					<tr>
+					<tr class:student-transferred={student.transferDate}>
 						<td>{((currentPage - 1) * 80) + (i + 1)}</td>
-						<td class="font-medium">{student.name}</td>
+						<td class="font-medium">
+							{student.name}
+							{#if student.transferDate}
+								<span class="transfer-badge">Transferred</span>
+							{/if}
+						</td>
 						<td class="text-secondary">{student.className || '-'}</td>
 						<td class="text-secondary">{student.sectionLetter || '-'}</td>
 						<td class="text-secondary">{student.rollNo || '-'}</td>
@@ -198,12 +203,18 @@
 								<a href={resolve(`/students/${student.sid}` as "/")} class="action-icon-link view" title="View Details">
 									<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
 								</a>
-								<a href="#" class="action-icon-link cert" title="Bonafide Certificate" onclick={(e) => e.preventDefault()}>
-									<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
-								</a>
-								<a href="#" class="action-icon-link transfer" title="Transfer Student" onclick={(e) => e.preventDefault()}>
-									<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
-								</a>
+								{#if student.transferDate}
+									<a href={resolve(`/students/${student.sid}/transfer-certificate` as "/")} class="action-icon-link cert" title="Print Transfer Certificate">
+										<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+									</a>
+								{:else}
+									<button type="button" class="action-icon-link cert" title="Bonafide Certificate">
+										<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+									</button>
+									<a href={resolve(`/students/transferred?sid=${student.sid}` as "/")} class="action-icon-link transfer" title="Transfer Student">
+										<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
+									</a>
+								{/if}
 							</div>
 						</td>
 					</tr>
@@ -525,6 +536,29 @@
 		color: var(--color-on-surface-variant);
 	}
 
+	.student-transferred {
+		opacity: 0.65;
+		background-color: color-mix(in srgb, var(--color-outline-variant) 8%, transparent);
+	}
+
+	.student-transferred:hover {
+		background-color: color-mix(in srgb, var(--color-outline-variant) 12%, transparent) !important;
+	}
+
+	.transfer-badge {
+		display: inline-flex;
+		align-items: center;
+		border-radius: var(--radius-sm);
+		background-color: color-mix(in srgb, var(--color-error) 15%, transparent);
+		padding: 2px 6px;
+		font-size: 11px;
+		font-weight: 600;
+		color: var(--color-error);
+		border: 1px solid color-mix(in srgb, var(--color-error) 20%, transparent);
+		margin-left: 8px;
+		vertical-align: middle;
+	}
+
 	/* .col-dob {
 		min-width: 110px;
 		white-space: nowrap;
@@ -556,6 +590,12 @@
 		transition: all 200ms ease;
 		border-radius: var(--radius-sm);
 		padding: 6px;
+		background: none;
+		border: none;
+		cursor: pointer;
+		font: inherit;
+		min-width: 44px;
+		min-height: 44px;
 	}
 
 	.action-icon-link:hover {

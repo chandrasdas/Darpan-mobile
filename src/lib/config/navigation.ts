@@ -9,6 +9,7 @@ export const navItems: NavItem[] = [
 		subItems: [
 			{ label: 'Student List', href: '/students' },
 			{ label: 'Add Student', href: '/students/add' },
+			{ label: 'Transferred Students', href: '/students/transferred' },
 			{ label: 'Student Details', href: '#' },
 			{ label: 'Promotion', href: '#' }
 		]

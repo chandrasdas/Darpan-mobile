@@ -59,6 +59,7 @@ export const getStudentsForMarks = query(
             seid: studSessionEnrollments.seid,
             rollNo: studSessionEnrollments.rollNo,
             studentName: studInfo.name,
+            transferDate: studInfo.transferDate,
             mid: studMarksEntries.mid,
             isPresent: studMarksEntries.isPresent,
             marksObtained: studMarksEntries.marksObtained
