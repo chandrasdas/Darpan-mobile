@@ -24,14 +24,14 @@
 	// svelte-ignore state_referenced_locally
 	let sections = $state(data.initialSections);
 
-	let filteredTerms = $derived(() => {
+	let filteredTerms = $derived.by(() => {
 		const allowed = ALLOWED_TERM_IDS[currentClass];
 		if (!allowed) return data.examTerms;
 		return data.examTerms.filter(t => allowed.includes(t.id));
 	});
 
 	function ensureValidTerm() {
-		const terms = filteredTerms();
+		const terms = filteredTerms;
 		const isValid = terms.some(t => t.id === currentTerm);
 		if (!isValid && terms.length > 0) {
 			currentTerm = terms[0].id;
@@ -123,18 +123,26 @@
 	}
 
 	// Derived metrics
-	let highestMarks = $derived(() => {
+	let marksMap = $derived.by(() => {
+		const map = new Map<string, typeof marks[0]>();
+		for (const m of marks) {
+			map.set(`${m.sessionEnrollId}_${m.examSetupId}`, m);
+		}
+		return map;
+	});
+
+	let highestMarks = $derived.by(() => {
 		const highest: Record<number, number> = {};
 		for (const sub of visibleSubjects) {
 			highest[sub.setupId] = 0;
 		}
+		const activeStudentIds = new Set(
+			students.filter(s => !s.transferDate).map(s => s.seid)
+		);
 		for (const m of marks) {
-			if (m.isPresent) {
-				const stu = students.find(s => s.seid === m.sessionEnrollId);
-				if (stu && !stu.transferDate) {
-					if (m.marksObtained > (highest[m.examSetupId] || 0)) {
-						highest[m.examSetupId] = m.marksObtained;
-					}
+			if (m.isPresent && activeStudentIds.has(m.sessionEnrollId)) {
+				if (m.marksObtained > (highest[m.examSetupId] || 0)) {
+					highest[m.examSetupId] = m.marksObtained;
 				}
 			}
 		}
@@ -143,7 +151,7 @@
 
 	let totalFullMarks = $derived(visibleSubjects.reduce((sum, sub) => sum + sub.fullMark, 0));
 
-	let studentCalculatedMetrics = $derived(() => {
+	let studentCalculatedMetrics = $derived.by(() => {
 		const metrics: Record<number, { total: number; percentage: number; isPresent: boolean }> = {};
 		for (const student of students) {
 			if (student.transferDate) continue;
@@ -153,7 +161,7 @@
 			let isPresentAny = false;
 
 			for (const sub of visibleSubjects) {
-				const m = marks.find(mark => mark.sessionEnrollId === student.seid && mark.examSetupId === sub.setupId);
+				const m = marksMap.get(`${student.seid}_${sub.setupId}`);
 				if (m) {
 					hasMarks = true;
 					if (m.isPresent) {
@@ -175,10 +183,10 @@
 		return metrics;
 	});
 
-	let highestTotalAndPercentage = $derived(() => {
+	let highestTotalAndPercentage = $derived.by(() => {
 		let maxTotal = 0;
 		let maxPercentage = 0;
-		const metrics = studentCalculatedMetrics();
+		const metrics = studentCalculatedMetrics;
 
 		for (const seid of Object.keys(metrics)) {
 			const m = metrics[Number(seid)];
@@ -198,7 +206,7 @@
 
 	function getMarkDisplay(seid: number, setupId: number, isTransferred: boolean) {
 		if (isTransferred) return '';
-		const m = marks.find(mark => mark.sessionEnrollId === seid && mark.examSetupId === setupId);
+		const m = marksMap.get(`${seid}_${setupId}`);
 		if (!m) return '';
 		if (!m.isPresent) return 'Ab';
 		return m.marksObtained;
@@ -254,7 +262,7 @@
 							</select>
 
 							<select value={currentTerm.toString()} onchange={(e) => { currentTerm = Number((e.target as HTMLSelectElement).value); handleOtherChange(); }} class="form-select filter-select">
-								{#each filteredTerms() as term (term.id)}
+								{#each filteredTerms as term (term.id)}
 									<option value={term.id.toString()}>{term.name}</option>
 								{/each}
 							</select>
@@ -309,17 +317,17 @@
 							<td></td>
 							<td class="font-bold">Highest Marks</td>
 							{#each visibleSubjects as subject (subject.setupId)}
-								<td class="text-center font-bold text-primary">{highestMarks()[subject.setupId]}</td>
+								<td class="text-center font-bold text-primary">{highestMarks[subject.setupId]}</td>
 							{/each}
-							<td class="text-center font-bold text-primary">{highestTotalAndPercentage().total}</td>
-							<td class="text-center font-bold text-primary">{highestTotalAndPercentage().percentage}</td>
+							<td class="text-center font-bold text-primary">{highestTotalAndPercentage.total}</td>
+							<td class="text-center font-bold text-primary">{highestTotalAndPercentage.percentage}</td>
 						</tr>
 					{/if}
 
 					<!-- Student Rows -->
 					{#each students as student (student.seid)}
 						{@const isTransferred = !!student.transferDate}
-						{@const metrics = studentCalculatedMetrics()[student.seid]}
+						{@const metrics = studentCalculatedMetrics[student.seid]}
 						<tr>
 							<td class="font-bold tabular-nums">
 								{student.rollNo}
