@@ -208,9 +208,9 @@
 										<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
 									</a>
 								{:else}
-									<button type="button" class="action-icon-link cert" title="Bonafide Certificate">
+									<a href={resolve(`/students/${student.sid}/bonafide-certificate` as "/")} class="action-icon-link cert" title="Bonafide Certificate">
 										<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
-									</button>
+									</a>
 									{#if currentSession === data.sessions[0]?.id.toString()}
 										<a href={resolve(`/students/transferred?sid=${student.sid}` as "/")} class="action-icon-link transfer" title="Transfer Student">
 											<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>

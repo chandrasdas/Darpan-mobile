@@ -108,26 +108,26 @@
 
 	<!-- Printable Certificate Wrapper -->
 	<div class="certificate-wrapper relative">
-		<!-- Watermark (Rotated in background) -->
+		<!-- Watermark (Rotated and faded in background) -->
 		<div class="watermark-container absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
-			<div class="watermark text-slate-100 text-6xl font-bold uppercase tracking-wider opacity-30 select-none">
-				RKM VIVEKANANDA VIDYAMANDIR
-			</div>
+			<img src={resolve('/emblem.jpg' as "/")} alt="Watermark" class="watermark-img opacity-5 select-none" />
 		</div>
 
 		<!-- Certificate Content -->
 		<div class="certificate-content relative z-10">
 			<!-- Header -->
 			<div class="certificate-header">
-				<div class="emblem-placeholder">
-					<!-- Circular mission logo text -->
-					<div class="circular-logo">
-						<span class="logo-text">RAMAKRISHNA MISSION</span>
+				<div class="header-main-flex">
+					<img src={resolve('/emblem.jpg' as "/")} alt="RKM Logo" class="school-logo-img" />
+					<div class="vertical-separator"></div>
+					<div class="school-info-details">
+						<h1 class="school-name">RAMAKRISHNA MISSION VIVEKANANDA VIDYAMANDIR</h1>
+						<p class="school-address">PO & DT : MALDA &bull; PIN : 732 101 &bull; WEST BENGAL</p>
+						<p class="school-phone">Phone No. : 03512 - 252850</p>
+						<p class="school-web-email">website : www.rkmvvmmalda.org &bull; e-mail : rkmvvmmalda@gmail.com</p>
+						<p class="school-index">School Index No. : Secondary : R1-091 &bull; Higher Secondary : 111082</p>
 					</div>
 				</div>
-				<h1 class="school-name">RAMAKRISHNA MISSION VIVEKANANDA VIDYAMANDIR</h1>
-				<p class="school-address">P.O. & Dist. - Malda, West Bengal, Pin - 732101</p>
-				<p class="affiliation-text">Affiliated to W.B.B.S.E. & W.B.C.H.S.E. | School Code: 11105</p>
 				<div class="title-badge-wrapper">
 					<span class="title-badge">TRANSFER CERTIFICATE</span>
 				</div>
@@ -347,17 +347,15 @@
 	}
 
 	.watermark-container {
-		transform: rotate(-25deg);
 		z-index: 1;
 	}
 
-	.watermark {
-		color: #f1f5f9;
-		font-size: 40px;
-		font-weight: 800;
-		text-align: center;
-		width: 120%;
-		white-space: nowrap;
+	.watermark-img {
+		width: 300px;
+		height: 300px;
+		object-fit: contain;
+		opacity: 0.04;
+		transform: rotate(-15deg);
 	}
 
 	/* Header styles */
@@ -365,63 +363,82 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		text-align: center;
-		gap: 6px;
+		width: 100%;
 		border-bottom: 2px solid #1e3a8a;
 		padding-bottom: 16px;
 	}
 
-	.emblem-placeholder {
-		margin-bottom: 8px;
-	}
-
-	.circular-logo {
-		width: 60px;
-		height: 60px;
-		border: 2px solid #1e3a8a;
-		border-radius: 50%;
+	.header-main-flex {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 4px;
-		position: relative;
+		gap: 24px;
+		width: 100%;
 	}
 
-	/* Inner cross representation or small visual logo */
-	.circular-logo::after {
-		content: "RKM";
-		font-weight: 900;
-		font-size: 10px;
-		color: #1e3a8a;
+	.school-logo-img {
+		width: 75px;
+		height: 85px;
+		object-fit: contain;
 	}
 
-	.logo-text {
-		display: none;
+	.vertical-separator {
+		width: 2px;
+		height: 85px;
+		background-color: #1e3a8a;
+	}
+
+	.school-info-details {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		text-align: left;
+		gap: 2px;
 	}
 
 	.school-name {
-		font-size: 20px;
+		font-size: 15px;
 		font-weight: 800;
 		color: #1e3a8a;
-		letter-spacing: 0.02em;
+		letter-spacing: 0.01em;
 		margin: 0;
+		line-height: 1.2;
+	}
+
+	@media (min-width: 640px) {
+		.school-name {
+			font-size: 19px;
+		}
 	}
 
 	.school-address {
-		font-size: 13px;
+		font-size: 10px;
 		margin: 0;
 		font-weight: 600;
+		color: #1e293b;
 	}
 
-	.affiliation-text {
-		font-size: 11px;
-		color: #475569;
+	@media (min-width: 640px) {
+		.school-address {
+			font-size: 11.5px;
+		}
+	}
+
+	.school-phone, .school-web-email, .school-index {
+		font-size: 9.5px;
 		margin: 0;
-		font-style: italic;
+		color: #475569;
+		line-height: 1.3;
+	}
+
+	@media (min-width: 640px) {
+		.school-phone, .school-web-email, .school-index {
+			font-size: 10.5px;
+		}
 	}
 
 	.title-badge-wrapper {
-		margin-top: 10px;
+		margin-top: 12px;
 	}
 
 	.title-badge {
@@ -506,8 +523,8 @@
 			padding: 10px !important;
 		}
 
-		.watermark {
-			color: #f8fafc !important; /* Extremely faint grey */
+		.watermark-img {
+			opacity: 0.04 !important;
 		}
 
 		@page {
