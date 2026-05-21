@@ -492,8 +492,13 @@
 	.data-table {
 		width: 100%;
 		border-collapse: collapse;
-		text-align: left;
+		text-align: center;
 		font-size: 13px;
+	}
+
+	.data-table th:nth-child(2),
+	.data-table td:nth-child(2) {
+		text-align: left;
 	}
 
 	.data-table th {
@@ -585,7 +590,8 @@
 	.actions-flex {
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		justify-content: center;
+		gap: 4px;
 	}
 
 	.action-icon-link {
