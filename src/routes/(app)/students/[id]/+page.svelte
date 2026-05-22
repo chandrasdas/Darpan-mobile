@@ -83,6 +83,16 @@
                     {/if}
                 </div>
             </div>
+
+            <!-- Actions -->
+            <div class="profile-actions">
+                <a href={resolve(`/students/${student.sid}/edit` as "/")} class="edit-button-link">
+                    <svg class="edit-btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    <span>Edit Details</span>
+                </a>
+            </div>
         </div>
     </div>
 
@@ -498,5 +508,48 @@
         font-size: 14px;
         color: var(--color-on-surface-variant);
         margin: 0;
+    }
+
+    .profile-actions {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+
+    @media (min-width: 768px) {
+        .profile-actions {
+            width: auto;
+            justify-content: flex-end;
+        }
+    }
+
+    .edit-button-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: var(--radius-xl);
+        background-color: var(--color-surface);
+        color: var(--color-primary);
+        border: 1px solid var(--color-outline-variant);
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        transition: all 200ms ease;
+        min-height: 44px;
+        box-shadow: var(--shadow-ambient-sm);
+    }
+
+    .edit-button-link:hover {
+        background-color: var(--color-surface-lowest);
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-ambient);
+    }
+
+    .edit-btn-icon {
+        height: 18px;
+        width: 18px;
     }
 </style>

@@ -10,7 +10,7 @@ export const navItems: NavItem[] = [
 			{ label: 'Student List', href: '/students' },
 			{ label: 'Add Student', href: '/students/add' },
 			{ label: 'Transferred Students', href: '/students/transferred' },
-			{ label: 'Student Details', href: '#' },
+			{ label: 'Enrolment Report', href: '/students/enrolment-report' },
 			{ label: 'Promotion', href: '#' }
 		]
 	},
@@ -79,8 +79,23 @@ export const mobileNavItems = [
 	{ label: 'Fees', href: '/fees', icon: 'receipt_long' }
 ];
 
-export function isActive(href: string, currentPath: string): boolean {
+export function isActive(href: string, currentPath: string, siblingHrefs?: string[]): boolean {
 	if (href === '#') return false;
 	if (href === '/dashboard') return currentPath === '/dashboard' || currentPath === '/';
-	return currentPath === href || currentPath.startsWith(href + '/');
+	
+	const matches = currentPath === href || currentPath.startsWith(href + '/');
+	if (!matches) return false;
+
+	if (siblingHrefs) {
+		for (const sibling of siblingHrefs) {
+			if (sibling !== href && sibling !== '#') {
+				const siblingMatches = currentPath === sibling || currentPath.startsWith(sibling + '/');
+				if (siblingMatches && sibling.length > href.length) {
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
 }

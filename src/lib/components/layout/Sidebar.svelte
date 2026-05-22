@@ -20,7 +20,7 @@
 
 	onMount(() => {
 		for (const item of visibleNavItems) {
-			if (item.subItems?.some(sub => isActive(sub.href, page.url.pathname))) {
+			if (item.subItems?.some(sub => isActive(sub.href, page.url.pathname, item.subItems?.map(s => s.href)))) {
 				expandedMenus[item.label] = true;
 			}
 		}
@@ -42,7 +42,7 @@
 		<nav class="sidebar-nav">
 			{#each visibleNavItems as item (item.label)}
 				{@const hasSubItems = item.subItems && item.subItems.length > 0}
-				{@const active = item.href ? isActive(item.href, page.url.pathname) : (item.subItems?.some(sub => isActive(sub.href, page.url.pathname)) ?? false)}
+				{@const active = item.href ? isActive(item.href, page.url.pathname) : (item.subItems?.some(sub => isActive(sub.href, page.url.pathname, item.subItems?.map(s => s.href))) ?? false)}
 				
 				{#if hasSubItems}
 					<button
@@ -62,7 +62,7 @@
 					{#if expandedMenus[item.label]}
 						<div class="sidebar-subnav flex flex-col gap-1 pl-10 pr-4 pb-2">
 							{#each item.subItems as sub (sub.label)}
-								{@const subActive = isActive(sub.href, page.url.pathname)}
+								{@const subActive = isActive(sub.href, page.url.pathname, item.subItems?.map(s => s.href))}
 								<a
 									href={sub.href === '#' ? '#' : resolve(sub.href as "/")}
 									class="sidebar-sublink flex items-center gap-3 py-2 px-3 rounded-md text-[14px] transition-colors duration-200 {subActive ? 'text-(--color-on-secondary-container) font-medium bg-(--color-secondary-container)' : 'text-(--color-on-surface-variant) hover:text-(--color-on-surface) hover:bg-(--color-surface-high)'}"
