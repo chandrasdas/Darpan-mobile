@@ -1,16 +1,31 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
+
+	interface StatCard {
+		id: string;
+		value: string;
+		label: string;
+		badge: string;
+		badgeType: 'success' | 'info' | 'warning';
+		color: 'green' | 'purple' | 'blue' | 'amber';
+		icon: string;
+		href?: string;
+	}
 
 	/* ── Stat Cards Data ── */
-	const statCards = [
+	const statCards = $derived<StatCard[]>([
 		{
 			id: 'total-students',
-			value: '1,248',
+			value: data.totalStudents.toLocaleString(),
 			label: 'Total Students',
 			badge: '+2.4%',
 			badgeType: 'success' as const,
 			color: 'green' as const,
-			icon: 'school'
+			icon: 'school',
+			href: '/students'
 		},
 		{
 			id: 'total-faculties',
@@ -39,7 +54,7 @@
 			color: 'amber' as const,
 			icon: 'payment'
 		}
-	];
+	]);
 
 	/* ── Quick Actions ── */
 	const quickActions = [
@@ -104,39 +119,49 @@
 	</section>
 
 	<!-- ── Stat Cards Grid ── -->
+	{#snippet cardContent(card: StatCard)}
+		<!-- Top row: icon + badge -->
+		<div class="stat-top">
+			<div class="stat-icon stat-icon-{card.color}">
+				{#if card.icon === 'school'}
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+						<path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
+					</svg>
+				{:else if card.icon === 'groups'}
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+						<path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+					</svg>
+				{:else if card.icon === 'assessment'}
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+						<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+					</svg>
+				{:else if card.icon === 'payment'}
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+						<path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
+					</svg>
+				{/if}
+			</div>
+			<span class="stat-badge stat-badge-{card.badgeType}">{card.badge}</span>
+		</div>
+
+		<!-- Value + Label -->
+		<div class="stat-body">
+			<span class="stat-value">{card.value}</span>
+			<span class="stat-label">{card.label}</span>
+		</div>
+	{/snippet}
+
 	<section class="stat-grid" aria-label="Key statistics">
 		{#each statCards as card (card.id)}
-			<div class="stat-card stat-card-{card.color}" id="stat-{card.id}">
-				<!-- Top row: icon + badge -->
-				<div class="stat-top">
-					<div class="stat-icon stat-icon-{card.color}">
-						{#if card.icon === 'school'}
-							<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-								<path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
-							</svg>
-						{:else if card.icon === 'groups'}
-							<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-								<path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-							</svg>
-						{:else if card.icon === 'assessment'}
-							<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-								<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
-							</svg>
-						{:else if card.icon === 'payment'}
-							<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-								<path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
-							</svg>
-						{/if}
-					</div>
-					<span class="stat-badge stat-badge-{card.badgeType}">{card.badge}</span>
+			{#if card.href}
+				<a href={resolve(card.href as "/")} class="stat-card stat-card-{card.color} stat-card-link" id="stat-{card.id}">
+					{@render cardContent(card)}
+				</a>
+			{:else}
+				<div class="stat-card stat-card-{card.color}" id="stat-{card.id}">
+					{@render cardContent(card)}
 				</div>
-
-				<!-- Value + Label -->
-				<div class="stat-body">
-					<span class="stat-value">{card.value}</span>
-					<span class="stat-label">{card.label}</span>
-				</div>
-			</div>
+			{/if}
 		{/each}
 	</section>
 
@@ -240,6 +265,12 @@
 		flex-direction: column;
 		justify-content: space-between;
 		transition: transform 250ms var(--ease-smooth), box-shadow 250ms var(--ease-smooth);
+	}
+
+	.stat-card-link {
+		text-decoration: none;
+		color: inherit;
+		cursor: pointer;
 	}
 
 	.stat-card:active {
