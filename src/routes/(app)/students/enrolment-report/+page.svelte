@@ -11,7 +11,7 @@
 		const select = e.target as HTMLSelectElement;
 		const url = new URL(page.url);
 		url.searchParams.set('sessionId', select.value);
-		goto(url.toString(), { replaceState: true, keepFocus: true });
+		goto(resolve((url.pathname + url.search) as "/"), { replaceState: true, keepFocus: true });
 	}
 
 	function printTable(type: 'section' | 'caste') {
@@ -148,7 +148,7 @@
 				</table>
 			</div>
 		</section>
-
+		<br> <br>
 		<!-- Table 2: Caste-Based Enrolment -->
 		<section class="report-section caste-table-card">
 			<div class="section-header non-printable">
