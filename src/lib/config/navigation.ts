@@ -1,10 +1,16 @@
 export type NavSubItem = { label: string; href: string; adminOnly?: boolean };
-export type NavItem = { label: string; href?: string; icon: string; subItems?: NavSubItem[]; adminOnly?: boolean };
+export type NavItem = {
+	label: string;
+	href?: string;
+	icon: string;
+	subItems?: NavSubItem[];
+	adminOnly?: boolean;
+};
 
 export const navItems: NavItem[] = [
 	{ label: 'Dashboard', href: '/dashboard', icon: 'home' },
-	{ 
-		label: 'Students', 
+	{
+		label: 'Students',
 		icon: 'person',
 		subItems: [
 			{ label: 'Student List', href: '/students' },
@@ -14,8 +20,8 @@ export const navItems: NavItem[] = [
 			{ label: 'Promotion', href: '#' }
 		]
 	},
-	{ 
-		label: 'Faculties', 
+	{
+		label: 'Faculties',
 		icon: 'groups',
 		subItems: [
 			{ label: 'Faculty List', href: '/staff' },
@@ -24,8 +30,8 @@ export const navItems: NavItem[] = [
 			{ label: 'Leave Management', href: '#' }
 		]
 	},
-	{ 
-		label: 'Examinations', 
+	{
+		label: 'Examinations',
 		icon: 'assessment',
 		subItems: [
 			{ label: 'Exam Setup', href: '/admin/exam-setup' },
@@ -33,16 +39,16 @@ export const navItems: NavItem[] = [
 			{ label: 'Import Marks', href: '/admin/import-marks' }
 		]
 	},
-	{ 
-		label: 'Attendance', 
+	{
+		label: 'Attendance',
 		icon: 'event_available',
 		subItems: [
 			{ label: 'Period Setup', href: '/admin/period-setup' },
 			{ label: 'Attendance Entry', href: '/admin/attendance-entry' }
 		]
 	},
-	{ 
-		label: 'Reports & Marksheets', 
+	{
+		label: 'Reports & Marksheets',
 		icon: 'reports',
 		subItems: [
 			{ label: 'Tabulation Sheet', href: '/admin/tabulation-sheet' },
@@ -51,8 +57,8 @@ export const navItems: NavItem[] = [
 			{ label: 'Class Result Analysis', href: '#' }
 		]
 	},
-	{ 
-		label: 'Finance', 
+	{
+		label: 'Finance',
 		icon: 'receipt_long',
 		subItems: [
 			{ label: 'Fee Collection', href: '/fees' },
@@ -61,8 +67,8 @@ export const navItems: NavItem[] = [
 			{ label: 'Expenses', href: '#' }
 		]
 	},
-	{ 
-		label: 'Administration', 
+	{
+		label: 'Administration',
 		icon: 'settings',
 		subItems: [
 			{ label: 'Settings', href: '#' },
@@ -82,7 +88,7 @@ export const mobileNavItems = [
 export function isActive(href: string, currentPath: string, siblingHrefs?: string[]): boolean {
 	if (href === '#') return false;
 	if (href === '/dashboard') return currentPath === '/dashboard' || currentPath === '/';
-	
+
 	const matches = currentPath === href || currentPath.startsWith(href + '/');
 	if (!matches) return false;
 

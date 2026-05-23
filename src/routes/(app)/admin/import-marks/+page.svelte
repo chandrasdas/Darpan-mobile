@@ -9,11 +9,24 @@
 	// --- Types ---
 	type ParsedMark = { value: number; isPresent: boolean };
 	type ParsedRow = { roll: number; name: string; marks: Record<string, ParsedMark> };
-	type ParsedSheet = { sheetName: string; section: string; termNum: number; subjectCols: string[]; rows: ParsedRow[] };
+	type ParsedSheet = {
+		sheetName: string;
+		section: string;
+		termNum: number;
+		subjectCols: string[];
+		rows: ParsedRow[];
+	};
 	type MatchedEntry = {
-		section: string; termName: string; roll: number; studentName: string;
-		dbStudentName: string; subject: string; marksObtained: number; isPresent: boolean;
-		sessionEnrollId: number; examSetupId: number;
+		section: string;
+		termName: string;
+		roll: number;
+		studentName: string;
+		dbStudentName: string;
+		subject: string;
+		marksObtained: number;
+		isPresent: boolean;
+		sessionEnrollId: number;
+		examSetupId: number;
 	};
 
 	// --- State ---
@@ -35,8 +48,18 @@
 	// --- Helpers ---
 	function numberToRoman(num: number): string {
 		const romanMap: [number, string][] = [
-			[12, 'XII'], [11, 'XI'], [10, 'X'], [9, 'IX'], [8, 'VIII'],
-			[7, 'VII'], [6, 'VI'], [5, 'V'], [4, 'IV'], [3, 'III'], [2, 'II'], [1, 'I']
+			[12, 'XII'],
+			[11, 'XI'],
+			[10, 'X'],
+			[9, 'IX'],
+			[8, 'VIII'],
+			[7, 'VII'],
+			[6, 'VI'],
+			[5, 'V'],
+			[4, 'IV'],
+			[3, 'III'],
+			[2, 'II'],
+			[1, 'I']
 		];
 		for (const [value, roman] of romanMap) {
 			if (num === value) return roman;
@@ -45,7 +68,7 @@
 	}
 
 	// --- Derived ---
-	let subjectNames = $derived(data.subjects.map(s => s.name));
+	let subjectNames = $derived(data.subjects.map((s) => s.name));
 
 	// --- File Upload & Parse ---
 	async function handleFile(e: Event) {
@@ -74,13 +97,14 @@
 		}
 
 		// Auto-select session by year
-		const matchedSession = data.sessions.find(s => s.year === parsedYear);
+		const matchedSession = data.sessions.find((s) => s.year === parsedYear);
 		if (matchedSession) selectedSession = matchedSession.id;
 
 		// Auto-select class by name (contains match)
-		const matchedClass = data.classes.find(c =>
-			c.name.toUpperCase().includes(parsedClass.toUpperCase()) ||
-			parsedClass.toUpperCase().includes(c.name.toUpperCase())
+		const matchedClass = data.classes.find(
+			(c) =>
+				c.name.toUpperCase().includes(parsedClass.toUpperCase()) ||
+				parsedClass.toUpperCase().includes(c.name.toUpperCase())
 		);
 		if (matchedClass) selectedClass = matchedClass.id;
 
@@ -145,7 +169,13 @@
 					marks
 				});
 			}
-			sheets.push({ sheetName: name, section, termNum, subjectCols: subjectCols.map(s => s.name), rows });
+			sheets.push({
+				sheetName: name,
+				section,
+				termNum,
+				subjectCols: subjectCols.map((s) => s.name),
+				rows
+			});
 		}
 		parsedSheets = sheets;
 		step = 'parsed';
@@ -159,40 +189,49 @@
 		matchedEntries = [];
 
 		try {
-			const ctx = await getImportContext({ sessionId: selectedSession, classId: selectedClass }).run();
+			const ctx = await getImportContext({
+				sessionId: selectedSession,
+				classId: selectedClass
+			}).run();
 			const entries: MatchedEntry[] = [];
 
 			for (const sheet of parsedSheets) {
 				// Match section
-				const dbSection = ctx.sections.find(s => s.letter.toUpperCase() === sheet.section);
+				const dbSection = ctx.sections.find((s) => s.letter.toUpperCase() === sheet.section);
 				if (!dbSection) {
-					warnings.push(`Sheet "${sheet.sheetName}": No DB section found for letter "${sheet.section}".`);
+					warnings.push(
+						`Sheet "${sheet.sheetName}": No DB section found for letter "${sheet.section}".`
+					);
 					continue;
 				}
 
 				// Match term
-				const dbTerm = data.examTerms.find(t => t.id === sheet.termNum);
+				const dbTerm = data.examTerms.find((t) => t.id === sheet.termNum);
 				const termName = dbTerm?.name ?? `Term ${sheet.termNum}`;
 
 				// Enrollments for this section
-				const sectionEnrollments = ctx.enrollments.filter(e => e.sectionId === dbSection.id);
+				const sectionEnrollments = ctx.enrollments.filter((e) => e.sectionId === dbSection.id);
 
 				for (const row of sheet.rows) {
-					const enrollment = sectionEnrollments.find(e => e.rollNo === row.roll);
+					const enrollment = sectionEnrollments.find((e) => e.rollNo === row.roll);
 					if (!enrollment) {
-						warnings.push(`Sheet "${sheet.sheetName}": Roll ${row.roll} (${row.name}) is in Excel but NOT in DB enrollments.`);
+						warnings.push(
+							`Sheet "${sheet.sheetName}": Roll ${row.roll} (${row.name}) is in Excel but NOT in DB enrollments.`
+						);
 						continue;
 					}
 
 					for (const subName of sheet.subjectCols) {
-						const dbSubject = data.subjects.find(s => s.name === subName);
+						const dbSubject = data.subjects.find((s) => s.name === subName);
 						if (!dbSubject) continue;
 
 						const setup = ctx.examSetups.find(
-							s => s.subjectId === dbSubject.id && s.examTermId === sheet.termNum
+							(s) => s.subjectId === dbSubject.id && s.examTermId === sheet.termNum
 						);
 						if (!setup) {
-							warnings.push(`Sheet "${sheet.sheetName}": No exam setup for "${subName}" in ${termName}.`);
+							warnings.push(
+								`Sheet "${sheet.sheetName}": No exam setup for "${subName}" in ${termName}.`
+							);
 							continue;
 						}
 
@@ -216,10 +255,12 @@
 				}
 
 				// Check for DB students missing from the Excel sheet
-				const excelRolls = new Set(sheet.rows.map(r => r.roll));
+				const excelRolls = new Set(sheet.rows.map((r) => r.roll));
 				for (const enr of sectionEnrollments) {
 					if (!excelRolls.has(enr.rollNo)) {
-						warnings.push(`Sheet "${sheet.sheetName}": Roll ${enr.rollNo} (${enr.studentName}) is in DB but NOT in Excel file.`);
+						warnings.push(
+							`Sheet "${sheet.sheetName}": Roll ${enr.rollNo} (${enr.studentName}) is in DB but NOT in Excel file.`
+						);
 					}
 				}
 			}
@@ -242,7 +283,7 @@
 
 	// --- Selected entries (filtered by checkbox) ---
 	let selectedEntries = $derived(
-		matchedEntries.filter(e => selectedSheetKeys[`${e.section}|${e.termName}`])
+		matchedEntries.filter((e) => selectedSheetKeys[`${e.section}|${e.termName}`])
 	);
 
 	function toggleSheetSelection(key: string) {
@@ -253,7 +294,7 @@
 	async function doImport() {
 		step = 'importing';
 		try {
-			const payload = selectedEntries.map(e => ({
+			const payload = selectedEntries.map((e) => ({
 				sessionEnrollId: e.sessionEnrollId,
 				examSetupId: e.examSetupId,
 				marksObtained: e.marksObtained,
@@ -319,11 +360,23 @@
 	{#if step === 'idle'}
 		<div class="card upload-card">
 			<div class="upload-zone">
-				<svg class="upload-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-					<path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+				<svg
+					class="upload-icon"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="1.5"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+					/>
 				</svg>
 				<p class="upload-label">Select an Excel file</p>
-				<p class="upload-hint">Format: <code>Class IX (2024).xlsx</code> or <code>5-AB 2024.xlsx</code></p>
+				<p class="upload-hint">
+					Format: <code>Class IX (2024).xlsx</code> or <code>5-AB 2024.xlsx</code>
+				</p>
 				<label class="upload-btn">
 					Choose File
 					<input type="file" accept=".xlsx,.xls" onchange={handleFile} class="sr-only" />
@@ -340,7 +393,10 @@
 				<div class="info-chip"><strong>File:</strong> {fileName}</div>
 				<div class="info-chip"><strong>Class:</strong> {parsedClass}</div>
 				<div class="info-chip"><strong>Year:</strong> {parsedYear}</div>
-				<div class="info-chip"><strong>Sheets:</strong> {parsedSheets.map(s => s.sheetName).join(', ')}</div>
+				<div class="info-chip">
+					<strong>Sheets:</strong>
+					{parsedSheets.map((s) => s.sheetName).join(', ')}
+				</div>
 			</div>
 
 			<div class="config-row">
@@ -366,7 +422,11 @@
 
 			<div class="config-actions">
 				<button class="btn-secondary" onclick={reset}>Cancel</button>
-				<button class="btn-primary" onclick={loadAndMatch} disabled={!selectedSession || !selectedClass || isLoading}>
+				<button
+					class="btn-primary"
+					onclick={loadAndMatch}
+					disabled={!selectedSession || !selectedClass || isLoading}
+				>
 					{#if isLoading}Matching…{:else}Load & Match{/if}
 				</button>
 			</div>
@@ -377,10 +437,16 @@
 	{#if step === 'preview'}
 		<div class="card preview-card">
 			<div class="preview-header">
-				<h2 class="card-title">Preview — {selectedEntries.length} of {matchedEntries.length} entries selected</h2>
+				<h2 class="card-title">
+					Preview — {selectedEntries.length} of {matchedEntries.length} entries selected
+				</h2>
 				<div class="preview-actions">
 					<button class="btn-secondary" onclick={reset}>Cancel</button>
-					<button class="btn-primary import-btn" onclick={doImport} disabled={selectedEntries.length === 0}>
+					<button
+						class="btn-primary import-btn"
+						onclick={doImport}
+						disabled={selectedEntries.length === 0}
+					>
 						Import {selectedEntries.length} Entries
 					</button>
 				</div>
@@ -388,7 +454,9 @@
 
 			{#if warnings.length > 0}
 				<details class="warnings-box">
-					<summary class="warnings-summary">⚠ {warnings.length} warning{warnings.length > 1 ? 's' : ''}</summary>
+					<summary class="warnings-summary"
+						>⚠ {warnings.length} warning{warnings.length > 1 ? 's' : ''}</summary
+					>
 					<ul class="warnings-list">
 						{#each warnings as w, i (i)}
 							<li>{w}</li>
@@ -399,18 +467,24 @@
 
 			{#each Object.entries(groupedEntries) as [key, entries], gi (gi)}
 				{@const [sec, term] = key.split('|')}
-				{@const uniqueRolls = new Set(entries.map(e => e.roll)).size}
-				{@const uniqueSubjects = new Set(entries.map(e => e.subject)).size}
+				{@const uniqueRolls = new Set(entries.map((e) => e.roll)).size}
+				{@const uniqueSubjects = new Set(entries.map((e) => e.subject)).size}
 				<div class="sheet-group" class:sheet-deselected={!selectedSheetKeys[key]}>
 					<div class="sheet-header">
 						<span class="sheet-checkbox">
-							<input type="checkbox" checked={selectedSheetKeys[key] ?? false} onchange={() => toggleSheetSelection(key)} />
+							<input
+								type="checkbox"
+								checked={selectedSheetKeys[key] ?? false}
+								onchange={() => toggleSheetSelection(key)}
+							/>
 						</span>
 						<button class="sheet-toggle" onclick={() => toggleSheet(key)}>
 							<div class="sheet-info">
 								<span class="sheet-badge">Section {sec}</span>
 								<span class="sheet-term">{term}</span>
-								<span class="sheet-stats">{uniqueRolls} students · {uniqueSubjects} subjects · {entries.length} marks</span>
+								<span class="sheet-stats"
+									>{uniqueRolls} students · {uniqueSubjects} subjects · {entries.length} marks</span
+								>
 							</div>
 							<span class="chevron" class:rotated={expandedSheets[key]}>▸</span>
 						</button>
@@ -460,8 +534,18 @@
 	<!-- Done -->
 	{#if step === 'done'}
 		<div class="card status-card success-card">
-			<svg class="status-icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-				<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+			<svg
+				class="status-icon-svg"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				stroke-width="2"
+			>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+				/>
 			</svg>
 			<h2>Import Complete</h2>
 			<p><strong>{importResult.inserted}</strong> marks entries imported successfully.</p>
@@ -486,125 +570,233 @@
 		gap: 16px;
 	}
 	@media (min-width: 640px) {
-		.page-shell { padding: 0 20px 32px; gap: 24px; }
+		.page-shell {
+			padding: 0 20px 32px;
+			gap: 24px;
+		}
 	}
-	.page-hero { padding: 24px 0 0; }
+	.page-hero {
+		padding: 24px 0 0;
+	}
 	.hero-content {
-		display: flex; flex-direction: column; gap: 16px;
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
 		background-color: var(--color-surface-lowest);
-		padding: 16px; border-radius: var(--radius-xl);
+		padding: 16px;
+		border-radius: var(--radius-xl);
 		border: 1px solid var(--color-outline-variant);
 		box-shadow: var(--shadow-ambient-md);
 	}
 	@media (min-width: 640px) {
-		.hero-content { padding: 24px; border-radius: var(--radius-2xl); }
+		.hero-content {
+			padding: 24px;
+			border-radius: var(--radius-2xl);
+		}
 	}
 	.page-title {
-		font-family: var(--font-heading); font-size: 32px; font-weight: 700;
-		color: var(--color-on-surface); letter-spacing: -0.02em; margin: 0;
+		font-family: var(--font-heading);
+		font-size: 32px;
+		font-weight: 700;
+		color: var(--color-on-surface);
+		letter-spacing: -0.02em;
+		margin: 0;
 	}
 	.page-subtitle {
-		font-family: var(--font-body); font-size: 14px;
-		color: var(--color-on-surface-variant); margin-top: 6px; line-height: 1.5;
+		font-family: var(--font-body);
+		font-size: 14px;
+		color: var(--color-on-surface-variant);
+		margin-top: 6px;
+		line-height: 1.5;
 	}
 	.card {
 		background-color: var(--color-surface-lowest);
 		border-radius: var(--radius-xl);
 		border: 1px solid var(--color-outline-variant);
-		overflow: hidden; padding: 24px;
+		overflow: hidden;
+		padding: 24px;
 	}
 	.card-title {
-		font-size: 18px; font-weight: 700;
-		color: var(--color-on-surface); margin: 0 0 16px;
+		font-size: 18px;
+		font-weight: 700;
+		color: var(--color-on-surface);
+		margin: 0 0 16px;
 	}
 
 	/* Upload */
 	.upload-zone {
-		display: flex; flex-direction: column; align-items: center;
-		justify-content: center; padding: 48px 24px;
-		border: 2px dashed var(--color-outline-variant); border-radius: var(--radius-lg);
-		text-align: center; transition: border-color 200ms;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 48px 24px;
+		border: 2px dashed var(--color-outline-variant);
+		border-radius: var(--radius-lg);
+		text-align: center;
+		transition: border-color 200ms;
 	}
-	.upload-zone:hover { border-color: var(--color-primary); }
+	.upload-zone:hover {
+		border-color: var(--color-primary);
+	}
 	.upload-icon {
-		width: 48px; height: 48px; color: var(--color-primary); margin-bottom: 16px;
+		width: 48px;
+		height: 48px;
+		color: var(--color-primary);
+		margin-bottom: 16px;
 	}
 	.upload-label {
-		font-size: 16px; font-weight: 600; color: var(--color-on-surface); margin-bottom: 4px;
+		font-size: 16px;
+		font-weight: 600;
+		color: var(--color-on-surface);
+		margin-bottom: 4px;
 	}
 	.upload-hint {
-		font-size: 13px; color: var(--color-on-surface-variant); margin-bottom: 16px;
+		font-size: 13px;
+		color: var(--color-on-surface-variant);
+		margin-bottom: 16px;
 	}
 	.upload-hint code {
-		background: var(--color-surface-high); padding: 2px 6px; border-radius: 4px; font-size: 12px;
+		background: var(--color-surface-high);
+		padding: 2px 6px;
+		border-radius: 4px;
+		font-size: 12px;
 	}
 	.upload-btn {
-		display: inline-flex; align-items: center; gap: 8px;
-		background-color: var(--color-primary); color: var(--color-on-primary); border: none;
-		border-radius: var(--radius-md); padding: 10px 24px;
-		font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color 0.2s;
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		background-color: var(--color-primary);
+		color: var(--color-on-primary);
+		border: none;
+		border-radius: var(--radius-md);
+		padding: 10px 24px;
+		font-size: 14px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background-color 0.2s;
 	}
-	.upload-btn:hover { background-color: color-mix(in srgb, var(--color-primary) 80%, black); }
+	.upload-btn:hover {
+		background-color: color-mix(in srgb, var(--color-primary) 80%, black);
+	}
 	.sr-only {
-		position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-		overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
 	}
 
 	/* Config */
 	.parsed-info {
-		display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-bottom: 20px;
 	}
 	.info-chip {
-		background: var(--color-surface-high); padding: 6px 12px;
-		border-radius: var(--radius-md); font-size: 13px; color: var(--color-on-surface);
+		background: var(--color-surface-high);
+		padding: 6px 12px;
+		border-radius: var(--radius-md);
+		font-size: 13px;
+		color: var(--color-on-surface);
 	}
 	.config-row {
-		display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 16px;
+		margin-bottom: 20px;
 	}
 	.config-field {
-		flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 6px;
+		flex: 1;
+		min-width: 200px;
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
 	}
 	.config-field label {
-		font-size: 12px; font-weight: 600; text-transform: uppercase;
+		font-size: 12px;
+		font-weight: 600;
+		text-transform: uppercase;
 		color: var(--color-on-surface-variant);
 	}
 	.config-actions {
-		display: flex; gap: 12px; justify-content: flex-end;
+		display: flex;
+		gap: 12px;
+		justify-content: flex-end;
 	}
 	.form-select {
-		border-radius: var(--radius-lg); border: 1px solid var(--color-outline);
-		background-color: var(--color-surface); padding: 10px 16px;
-		font-size: 14px; color: var(--color-on-surface); transition: all 200ms ease; width: 100%;
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--color-outline);
+		background-color: var(--color-surface);
+		padding: 10px 16px;
+		font-size: 14px;
+		color: var(--color-on-surface);
+		transition: all 200ms ease;
+		width: 100%;
 	}
 	.form-select:focus {
-		border-color: var(--color-primary); outline: none;
+		border-color: var(--color-primary);
+		outline: none;
 		box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
 	}
 
 	/* Buttons */
 	.btn-primary {
-		display: inline-flex; align-items: center; gap: 8px;
-		background-color: var(--color-primary); color: var(--color-on-primary); border: none;
-		border-radius: var(--radius-md); padding: 10px 20px;
-		font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color 0.2s;
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		background-color: var(--color-primary);
+		color: var(--color-on-primary);
+		border: none;
+		border-radius: var(--radius-md);
+		padding: 10px 20px;
+		font-size: 14px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background-color 0.2s;
 	}
-	.btn-primary:hover { background-color: color-mix(in srgb, var(--color-primary) 80%, black); }
-	.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+	.btn-primary:hover {
+		background-color: color-mix(in srgb, var(--color-primary) 80%, black);
+	}
+	.btn-primary:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
 	.btn-secondary {
-		display: inline-flex; align-items: center; gap: 8px;
-		background-color: var(--color-surface-high); color: var(--color-on-surface);
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		background-color: var(--color-surface-high);
+		color: var(--color-on-surface);
 		border: 1px solid var(--color-outline-variant);
-		border-radius: var(--radius-md); padding: 10px 20px;
-		font-size: 14px; font-weight: 500; cursor: pointer; transition: background-color 0.2s;
+		border-radius: var(--radius-md);
+		padding: 10px 20px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background-color 0.2s;
 	}
-	.btn-secondary:hover { background-color: var(--color-surface); }
+	.btn-secondary:hover {
+		background-color: var(--color-surface);
+	}
 
 	/* Preview */
 	.preview-header {
-		display: flex; justify-content: space-between; align-items: center;
-		flex-wrap: wrap; gap: 12px; margin-bottom: 16px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 12px;
+		margin-bottom: 16px;
 	}
-	.preview-actions { display: flex; gap: 12px; }
+	.preview-actions {
+		display: flex;
+		gap: 12px;
+	}
 	.btn-primary.import-btn {
 		background-color: #16a34a;
 		color: #fff;
@@ -617,92 +809,189 @@
 	.warnings-box {
 		background: color-mix(in srgb, var(--color-warning, #f59e0b) 10%, transparent);
 		border: 1px solid color-mix(in srgb, var(--color-warning, #f59e0b) 40%, transparent);
-		border-radius: var(--radius-md); padding: 12px 16px; margin-bottom: 16px;
+		border-radius: var(--radius-md);
+		padding: 12px 16px;
+		margin-bottom: 16px;
 	}
 	.warnings-summary {
-		font-size: 14px; font-weight: 600; cursor: pointer;
+		font-size: 14px;
+		font-weight: 600;
+		cursor: pointer;
 		color: var(--color-on-surface);
 	}
 	.warnings-list {
-		margin: 8px 0 0 16px; font-size: 13px;
-		color: var(--color-on-surface-variant); line-height: 1.6;
+		margin: 8px 0 0 16px;
+		font-size: 13px;
+		color: var(--color-on-surface-variant);
+		line-height: 1.6;
 	}
 
 	/* Sheet groups */
 	.sheet-group {
 		border: 1px solid var(--color-outline-variant);
-		border-radius: var(--radius-md); margin-bottom: 12px; overflow: hidden;
+		border-radius: var(--radius-md);
+		margin-bottom: 12px;
+		overflow: hidden;
 	}
-	.sheet-deselected { opacity: 0.5; }
+	.sheet-deselected {
+		opacity: 0.5;
+	}
 	.sheet-header {
-		width: 100%; display: flex; align-items: center; gap: 0;
+		width: 100%;
+		display: flex;
+		align-items: center;
+		gap: 0;
 		background: var(--color-surface-high);
-		font-size: 14px; color: var(--color-on-surface); transition: background 150ms;
+		font-size: 14px;
+		color: var(--color-on-surface);
+		transition: background 150ms;
 	}
 	.sheet-checkbox {
-		display: flex; align-items: center; justify-content: center;
-		padding: 12px 4px 12px 16px; cursor: pointer; flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 12px 4px 12px 16px;
+		cursor: pointer;
+		flex-shrink: 0;
 	}
 	.sheet-checkbox input {
-		width: 18px; height: 18px; cursor: pointer; accent-color: var(--color-primary);
+		width: 18px;
+		height: 18px;
+		cursor: pointer;
+		accent-color: var(--color-primary);
 	}
 	.sheet-toggle {
-		flex: 1; display: flex; justify-content: space-between; align-items: center;
-		padding: 12px 16px 12px 8px; background: none; border: none;
-		cursor: pointer; text-align: left; color: inherit; font-size: inherit;
+		flex: 1;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 12px 16px 12px 8px;
+		background: none;
+		border: none;
+		cursor: pointer;
+		text-align: left;
+		color: inherit;
+		font-size: inherit;
 	}
-	.sheet-toggle:hover { background: color-mix(in srgb, var(--color-surface) 50%, transparent); }
-	.sheet-info { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+	.sheet-toggle:hover {
+		background: color-mix(in srgb, var(--color-surface) 50%, transparent);
+	}
+	.sheet-info {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		flex-wrap: wrap;
+	}
 	.sheet-badge {
-		background: var(--color-primary); color: var(--color-on-primary);
-		padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 700;
+		background: var(--color-primary);
+		color: var(--color-on-primary);
+		padding: 2px 10px;
+		border-radius: 99px;
+		font-size: 12px;
+		font-weight: 700;
 	}
-	.sheet-term { font-weight: 600; }
-	.sheet-stats { font-size: 12px; color: var(--color-on-surface-variant); }
+	.sheet-term {
+		font-weight: 600;
+	}
+	.sheet-stats {
+		font-size: 12px;
+		color: var(--color-on-surface-variant);
+	}
 	.chevron {
-		font-size: 16px; transition: transform 200ms; color: var(--color-on-surface-variant);
+		font-size: 16px;
+		transition: transform 200ms;
+		color: var(--color-on-surface-variant);
 	}
-	.chevron.rotated { transform: rotate(90deg); }
+	.chevron.rotated {
+		transform: rotate(90deg);
+	}
 
 	/* Data table */
-	.sheet-table-wrap { overflow-x: auto; }
+	.sheet-table-wrap {
+		overflow-x: auto;
+	}
 	.data-table {
-		width: 100%; border-collapse: collapse; font-size: 13px; text-align: left;
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 13px;
+		text-align: left;
 	}
 	.data-table th {
-		padding: 8px 12px; font-size: 11px; font-weight: 600;
-		text-transform: uppercase; letter-spacing: 0.03em;
-		color: var(--color-on-surface-variant); background-color: var(--color-surface-high);
-		border-bottom: 2px solid var(--color-outline-variant); white-space: nowrap;
+		padding: 8px 12px;
+		font-size: 11px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+		color: var(--color-on-surface-variant);
+		background-color: var(--color-surface-high);
+		border-bottom: 2px solid var(--color-outline-variant);
+		white-space: nowrap;
 	}
 	.data-table td {
-		padding: 6px 12px; border-bottom: 1px solid var(--color-outline-variant);
-		color: var(--color-on-surface); white-space: nowrap;
+		padding: 6px 12px;
+		border-bottom: 1px solid var(--color-outline-variant);
+		color: var(--color-on-surface);
+		white-space: nowrap;
 	}
 	.data-table tbody tr:hover {
 		background-color: color-mix(in srgb, var(--color-primary) 3%, transparent);
 	}
-	.col-roll { width: 60px; }
-	.text-right { text-align: right; }
-	.text-center { text-align: center; }
-	.tabular-nums { font-variant-numeric: tabular-nums; }
+	.col-roll {
+		width: 60px;
+	}
+	.text-right {
+		text-align: right;
+	}
+	.text-center {
+		text-align: center;
+	}
+	.tabular-nums {
+		font-variant-numeric: tabular-nums;
+	}
 
 	/* Status cards */
 	.status-card {
-		display: flex; flex-direction: column; align-items: center;
-		justify-content: center; text-align: center; padding: 48px 24px; gap: 16px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		padding: 48px 24px;
+		gap: 16px;
 	}
-	.status-icon-svg { width: 64px; height: 64px; color: var(--color-status-success); }
-	.success-card h2 { color: var(--color-status-success); margin: 0; }
-	.success-card p { font-size: 16px; color: var(--color-on-surface-variant); }
-	.error-card { border-color: var(--color-error); }
-	.error-text { color: var(--color-error); font-size: 14px; }
+	.status-icon-svg {
+		width: 64px;
+		height: 64px;
+		color: var(--color-status-success);
+	}
+	.success-card h2 {
+		color: var(--color-status-success);
+		margin: 0;
+	}
+	.success-card p {
+		font-size: 16px;
+		color: var(--color-on-surface-variant);
+	}
+	.error-card {
+		border-color: var(--color-error);
+	}
+	.error-text {
+		color: var(--color-error);
+		font-size: 14px;
+	}
 
 	/* Spinner */
 	.spinner {
-		width: 40px; height: 40px; border: 4px solid var(--color-outline-variant);
-		border-top-color: var(--color-primary); border-radius: 50%;
+		width: 40px;
+		height: 40px;
+		border: 4px solid var(--color-outline-variant);
+		border-top-color: var(--color-primary);
+		border-radius: 50%;
 		animation: spin 0.8s linear infinite;
 	}
-	@keyframes spin { to { transform: rotate(360deg); } }
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
 </style>

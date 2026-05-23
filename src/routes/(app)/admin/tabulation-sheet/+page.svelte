@@ -27,12 +27,12 @@
 	let filteredTerms = $derived.by(() => {
 		const allowed = ALLOWED_TERM_IDS[currentClass];
 		if (!allowed) return data.examTerms;
-		return data.examTerms.filter(t => allowed.includes(t.id));
+		return data.examTerms.filter((t) => allowed.includes(t.id));
 	});
 
 	function ensureValidTerm() {
 		const terms = filteredTerms;
-		const isValid = terms.some(t => t.id === currentTerm);
+		const isValid = terms.some((t) => t.id === currentTerm);
 		if (!isValid && terms.length > 0) {
 			currentTerm = terms[0].id;
 		}
@@ -48,7 +48,7 @@
 
 	let isLoading = $state(false);
 
-	let visibleSubjects = $derived(subjects.filter(sub => sub.fullMark !== 0));
+	let visibleSubjects = $derived(subjects.filter((sub) => sub.fullMark !== 0));
 
 	async function fetchSections() {
 		if (!currentClass) {
@@ -124,7 +124,7 @@
 
 	// Derived metrics
 	let marksMap = $derived.by(() => {
-		const map = new Map<string, typeof marks[0]>();
+		const map = new Map<string, (typeof marks)[0]>();
 		for (const m of marks) {
 			map.set(`${m.sessionEnrollId}_${m.examSetupId}`, m);
 		}
@@ -136,9 +136,7 @@
 		for (const sub of visibleSubjects) {
 			highest[sub.setupId] = 0;
 		}
-		const activeStudentIds = new Set(
-			students.filter(s => !s.transferDate).map(s => s.seid)
-		);
+		const activeStudentIds = new Set(students.filter((s) => !s.transferDate).map((s) => s.seid));
 		for (const m of marks) {
 			if (m.isPresent && activeStudentIds.has(m.sessionEnrollId)) {
 				if (m.marksObtained > (highest[m.examSetupId] || 0)) {
@@ -223,11 +221,24 @@
 			<div class="hero-header flex-header">
 				<div>
 					<h1 class="page-title">Tabulation Sheet</h1>
-					<p class="page-subtitle">View class performance and marks across all subjects for a given section.</p>
+					<p class="page-subtitle">
+						View class performance and marks across all subjects for a given section.
+					</p>
 				</div>
 				<button class="btn-primary print-btn" onclick={() => window.print()}>
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-5 w-5"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						stroke-width="2"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+						/>
 					</svg>
 					Print
 				</button>
@@ -237,13 +248,27 @@
 				<div class="hero-filters">
 					<div class="filter-columns">
 						<div class="filter-group">
-							<select value={currentSession.toString()} onchange={(e) => { currentSession = Number((e.target as HTMLSelectElement).value); handleSessionChange(); }} class="form-select filter-select">
+							<select
+								value={currentSession.toString()}
+								onchange={(e) => {
+									currentSession = Number((e.target as HTMLSelectElement).value);
+									handleSessionChange();
+								}}
+								class="filter-select form-select"
+							>
 								{#each data.sessions as session (session.id)}
 									<option value={session.id.toString()}>{session.year}</option>
 								{/each}
 							</select>
 
-							<select value={currentClass.toString()} onchange={(e) => { currentClass = Number((e.target as HTMLSelectElement).value); handleClassChange(); }} class="form-select filter-select">
+							<select
+								value={currentClass.toString()}
+								onchange={(e) => {
+									currentClass = Number((e.target as HTMLSelectElement).value);
+									handleClassChange();
+								}}
+								class="filter-select form-select"
+							>
 								{#if classes.length === 0}
 									<option value="0">No Class</option>
 								{/if}
@@ -252,7 +277,14 @@
 								{/each}
 							</select>
 
-							<select value={currentSection.toString()} onchange={(e) => { currentSection = Number((e.target as HTMLSelectElement).value); handleOtherChange(); }} class="form-select filter-select">
+							<select
+								value={currentSection.toString()}
+								onchange={(e) => {
+									currentSection = Number((e.target as HTMLSelectElement).value);
+									handleOtherChange();
+								}}
+								class="filter-select form-select"
+							>
 								{#if sections.length === 0}
 									<option value="0">No sections</option>
 								{/if}
@@ -261,7 +293,14 @@
 								{/each}
 							</select>
 
-							<select value={currentTerm.toString()} onchange={(e) => { currentTerm = Number((e.target as HTMLSelectElement).value); handleOtherChange(); }} class="form-select filter-select">
+							<select
+								value={currentTerm.toString()}
+								onchange={(e) => {
+									currentTerm = Number((e.target as HTMLSelectElement).value);
+									handleOtherChange();
+								}}
+								class="filter-select form-select"
+							>
 								{#each filteredTerms as term (term.id)}
 									<option value={term.id.toString()}>{term.name}</option>
 								{/each}
@@ -288,12 +327,12 @@
 								</div>
 							</th>
 						{/each}
-						<th class="subject-col font-bold text-center" title="Total Marks">
+						<th class="subject-col text-center font-bold" title="Total Marks">
 							<div class="vertical-wrapper">
 								<span class="vertical-text font-bold">Total</span>
 							</div>
 						</th>
-						<th class="subject-col font-bold text-center" title="Percentage">
+						<th class="subject-col text-center font-bold" title="Percentage">
 							<div class="vertical-wrapper">
 								<span class="vertical-text font-bold">Percentage</span>
 							</div>
@@ -320,7 +359,9 @@
 								<td class="text-center font-bold text-primary">{highestMarks[subject.setupId]}</td>
 							{/each}
 							<td class="text-center font-bold text-primary">{highestTotalAndPercentage.total}</td>
-							<td class="text-center font-bold text-primary">{highestTotalAndPercentage.percentage}</td>
+							<td class="text-center font-bold text-primary"
+								>{highestTotalAndPercentage.percentage}</td
+							>
 						</tr>
 					{/if}
 
@@ -341,10 +382,10 @@
 								</td>
 							{/each}
 							<td class="text-center font-bold tabular-nums">
-								{isTransferred ? '' : (metrics ? metrics.total.toFixed(1).replace(/\.0$/, '') : '')}
+								{isTransferred ? '' : metrics ? metrics.total.toFixed(1).replace(/\.0$/, '') : ''}
 							</td>
 							<td class="text-center font-bold tabular-nums">
-								{isTransferred ? '' : (metrics ? metrics.percentage.toFixed(1) : '')}
+								{isTransferred ? '' : metrics ? metrics.percentage.toFixed(1) : ''}
 							</td>
 						</tr>
 					{/each}
@@ -353,13 +394,25 @@
 						<tr>
 							<td colspan={visibleSubjects.length + 4} class="empty-state">
 								<div class="empty-icon">
-									<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-										<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
+									<svg
+										class="h-6 w-6"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+										stroke-width="1.5"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z"
+										/>
 									</svg>
 								</div>
 								{#if visibleSubjects.length === 0}
 									<h3 class="empty-title">No subjects configured</h3>
-									<p class="empty-desc">Set up exam configuration first for this session, class, and term.</p>
+									<p class="empty-desc">
+										Set up exam configuration first for this session, class, and term.
+									</p>
 								{:else}
 									<h3 class="empty-title">No students found</h3>
 									<p class="empty-desc">No students are enrolled for the selected section.</p>
@@ -528,17 +581,37 @@
 		border-bottom: 2px solid var(--color-outline-variant);
 	}
 
-	.text-center { text-align: center; }
-	.font-medium { font-weight: 500; }
-	.font-bold { font-weight: 700; }
-	.text-muted { color: var(--color-on-surface-variant); }
-	.italic { font-style: italic; }
-	.tabular-nums { font-variant-numeric: tabular-nums; }
-	.text-primary { color: var(--color-primary); }
+	.text-center {
+		text-align: center;
+	}
+	.font-medium {
+		font-weight: 500;
+	}
+	.font-bold {
+		font-weight: 700;
+	}
+	.text-muted {
+		color: var(--color-on-surface-variant);
+	}
+	.italic {
+		font-style: italic;
+	}
+	.tabular-nums {
+		font-variant-numeric: tabular-nums;
+	}
+	.text-primary {
+		color: var(--color-primary);
+	}
 
-	.w-16 { width: 48px; }
-	.subject-col { width: 40px; }
-	.w-48 { width: 200px; }
+	.w-16 {
+		width: 48px;
+	}
+	.subject-col {
+		width: 40px;
+	}
+	.w-48 {
+		width: 200px;
+	}
 
 	.form-select {
 		border-radius: var(--radius-lg);
@@ -730,7 +803,9 @@
 		}
 
 		/* Hide global sidebar/navbar elements if possible */
-		:global(nav), :global(aside), :global(header) {
+		:global(nav),
+		:global(aside),
+		:global(header) {
 			display: none !important;
 		}
 	}

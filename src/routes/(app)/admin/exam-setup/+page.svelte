@@ -33,13 +33,13 @@
 	let filteredTerms = $derived.by(() => {
 		const allowed = ALLOWED_TERM_IDS[currentClass];
 		if (!allowed) return data.examTerms;
-		return data.examTerms.filter(t => allowed.includes(t.id));
+		return data.examTerms.filter((t) => allowed.includes(t.id));
 	});
 
 	// Synchronously ensure currentTerm is valid for the current class.
 	function ensureValidTerm() {
 		const terms = filteredTerms;
-		const isValid = terms.some(t => t.id === currentTerm);
+		const isValid = terms.some((t) => t.id === currentTerm);
 		if (!isValid && terms.length > 0) {
 			currentTerm = terms[0].id;
 		}
@@ -48,12 +48,12 @@
 	let filteredImportTerms = $derived.by(() => {
 		const allowed = ALLOWED_TERM_IDS[importClass];
 		if (!allowed) return data.examTerms;
-		return data.examTerms.filter(t => allowed.includes(t.id));
+		return data.examTerms.filter((t) => allowed.includes(t.id));
 	});
 
 	function ensureValidImportTerm() {
 		const terms = filteredImportTerms;
-		const isValid = terms.some(t => t.id === importTerm);
+		const isValid = terms.some((t) => t.id === importTerm);
 		if (!isValid && terms.length > 0) {
 			importTerm = terms[0].id;
 		}
@@ -72,18 +72,18 @@
 			sorts[sub.id] = sortIndex++;
 			includes[sub.id] = true;
 		}
-		
+
 		let initialDisplaySubjects: typeof data.subjects = [];
 		if (data.initialSetups.length > 0) {
-			const setupSubjectIds = new Set(data.initialSetups.map(s => s.subjectId));
-			initialDisplaySubjects = data.subjects.filter(s => setupSubjectIds.has(s.id));
+			const setupSubjectIds = new Set(data.initialSetups.map((s) => s.subjectId));
+			initialDisplaySubjects = data.subjects.filter((s) => setupSubjectIds.has(s.id));
 			initialDisplaySubjects.sort((a, b) => {
-				const sortA = data.initialSetups.find(s => s.subjectId === a.id)?.sortIndex ?? 0;
-				const sortB = data.initialSetups.find(s => s.subjectId === b.id)?.sortIndex ?? 0;
+				const sortA = data.initialSetups.find((s) => s.subjectId === a.id)?.sortIndex ?? 0;
+				const sortB = data.initialSetups.find((s) => s.subjectId === b.id)?.sortIndex ?? 0;
 				return sortA - sortB;
 			});
 		}
-		
+
 		for (const setup of data.initialSetups) {
 			marks[setup.subjectId] = setup.fullMark;
 			passMarks[setup.subjectId] = setup.passMark;
@@ -108,7 +108,7 @@
 	let isSaving = $state(false);
 	let saveMessage = $state('');
 	let saveError = $state(false);
-	
+
 	let displaySubjects = $state(initial.initialDisplaySubjects);
 
 	let addedToMarksheetCount = $derived(displaySubjects.length);
@@ -122,32 +122,30 @@
 		}, 0)
 	);
 
-	let addedToTotalCount = $derived(
-		displaySubjects.filter(sub => includeInputs[sub.id]).length
-	);
+	let addedToTotalCount = $derived(displaySubjects.filter((sub) => includeInputs[sub.id]).length);
 
 	let availableSubjectsToAdd = $derived(
-		data.subjects.filter(sub => !displaySubjects.some(d => d.id === sub.id))
+		data.subjects.filter((sub) => !displaySubjects.some((d) => d.id === sub.id))
 	);
 	let subjectToAddId = $state<number | null>(null);
 
 	function addSubject() {
 		if (!subjectToAddId) return;
-		const sub = data.subjects.find(s => s.id === subjectToAddId);
+		const sub = data.subjects.find((s) => s.id === subjectToAddId);
 		if (sub) {
 			displaySubjects = [...displaySubjects, sub];
 			includeInputs[sub.id] = true;
 			if (markInputs[sub.id] === null) markInputs[sub.id] = 50;
 			if (passMarkInputs[sub.id] === null) passMarkInputs[sub.id] = 15;
-			sortInputs[sub.id] = displaySubjects.length; 
+			sortInputs[sub.id] = displaySubjects.length;
 			subjectToAddId = null;
 		}
 	}
 
 	function removeSubject(id: number) {
-		const sub = data.subjects.find(s => s.id === id);
+		const sub = data.subjects.find((s) => s.id === id);
 		if (confirm(`Are you sure you want to remove ${sub?.name} from this configuration?`)) {
-			displaySubjects = displaySubjects.filter(sub => sub.id !== id);
+			displaySubjects = displaySubjects.filter((sub) => sub.id !== id);
 			includeInputs[id] = false;
 		}
 	}
@@ -176,9 +174,9 @@
 		const newItems = [...displaySubjects];
 		const [draggedItem] = newItems.splice(draggedIndex, 1);
 		newItems.splice(index, 0, draggedItem);
-		
+
 		displaySubjects = newItems;
-		
+
 		displaySubjects.forEach((sub, idx) => {
 			sortInputs[sub.id] = idx + 1;
 		});
@@ -188,7 +186,7 @@
 
 	async function fetchSetups() {
 		if (!currentSession || !currentTerm || !currentClass) return;
-		
+
 		saveMessage = '';
 		saveError = false;
 		const setups = await getExistingSetups({
@@ -224,11 +222,11 @@
 
 		// Use database order (no sorting)
 		if (setups.length > 0) {
-			const setupSubjectIds = new Set(setups.map(s => s.subjectId));
-			let newDisplaySubjects = data.subjects.filter(s => setupSubjectIds.has(s.id));
+			const setupSubjectIds = new Set(setups.map((s) => s.subjectId));
+			let newDisplaySubjects = data.subjects.filter((s) => setupSubjectIds.has(s.id));
 			newDisplaySubjects.sort((a, b) => {
-				const sortA = setups.find(s => s.subjectId === a.id)?.sortIndex ?? 0;
-				const sortB = setups.find(s => s.subjectId === b.id)?.sortIndex ?? 0;
+				const sortA = setups.find((s) => s.subjectId === a.id)?.sortIndex ?? 0;
+				const sortB = setups.find((s) => s.subjectId === b.id)?.sortIndex ?? 0;
 				return sortA - sortB;
 			});
 			displaySubjects = newDisplaySubjects;
@@ -268,9 +266,15 @@
 
 	async function handleImport() {
 		if (!importSession || !importTerm || !importClass) return;
-		
-		if (importSession === currentSession && importClass === currentClass && importTerm === currentTerm) {
-			alert("You are trying to import from the exact same Session, Class, and Term that you are currently editing. Please select a different configuration to import.");
+
+		if (
+			importSession === currentSession &&
+			importClass === currentClass &&
+			importTerm === currentTerm
+		) {
+			alert(
+				'You are trying to import from the exact same Session, Class, and Term that you are currently editing. Please select a different configuration to import.'
+			);
 			return;
 		}
 
@@ -282,16 +286,20 @@
 			}).run();
 
 			if (setupsToImport.length === 0) {
-				alert("No configuration found for the selected Session, Class, and Term.");
+				alert('No configuration found for the selected Session, Class, and Term.');
 				return;
 			}
 
-			if (confirm(`Are you sure you want to import ${setupsToImport.length} subjects? This will overwrite the configuration currently shown below. (Changes will not be saved until you click 'Save Configuration')`)) {
+			if (
+				confirm(
+					`Are you sure you want to import ${setupsToImport.length} subjects? This will overwrite the configuration currently shown below. (Changes will not be saved until you click 'Save Configuration')`
+				)
+			) {
 				const newInputs: Record<number, number | null> = {};
 				const newPassMarks: Record<number, number | null> = {};
 				const newSorts: Record<number, number | null> = {};
 				const newIncludes: Record<number, boolean> = {};
-				
+
 				let initialSortIndex = 1;
 				for (const sub of data.subjects) {
 					newInputs[sub.id] = null;
@@ -312,31 +320,35 @@
 				sortInputs = newSorts;
 				includeInputs = newIncludes;
 
-				const setupSubjectIds = new Set(setupsToImport.map(s => s.subjectId));
-				let newDisplaySubjects = data.subjects.filter(s => setupSubjectIds.has(s.id));
+				const setupSubjectIds = new Set(setupsToImport.map((s) => s.subjectId));
+				let newDisplaySubjects = data.subjects.filter((s) => setupSubjectIds.has(s.id));
 				newDisplaySubjects.sort((a, b) => {
-					const sortA = setupsToImport.find(s => s.subjectId === a.id)?.sortIndex ?? 0;
-					const sortB = setupsToImport.find(s => s.subjectId === b.id)?.sortIndex ?? 0;
+					const sortA = setupsToImport.find((s) => s.subjectId === a.id)?.sortIndex ?? 0;
+					const sortB = setupsToImport.find((s) => s.subjectId === b.id)?.sortIndex ?? 0;
 					return sortA - sortB;
 				});
-				
+
 				displaySubjects = newDisplaySubjects;
 
 				displaySubjects.forEach((sub, idx) => {
 					sortInputs[sub.id] = idx + 1;
 				});
-				
-				saveMessage = 'Imported successfully! Click "Save Configuration" at the bottom to apply changes.';
+
+				saveMessage =
+					'Imported successfully! Click "Save Configuration" at the bottom to apply changes.';
 				saveError = false;
 				setTimeout(() => {
-					if (saveMessage === 'Imported successfully! Click "Save Configuration" at the bottom to apply changes.') {
+					if (
+						saveMessage ===
+						'Imported successfully! Click "Save Configuration" at the bottom to apply changes.'
+					) {
 						saveMessage = '';
 					}
 				}, 5000);
 			}
 		} catch (error) {
-			console.error("Import error:", error);
-			alert("An error occurred while fetching the configuration to import.");
+			console.error('Import error:', error);
+			alert('An error occurred while fetching the configuration to import.');
 		}
 	}
 
@@ -400,56 +412,65 @@
 		<div class="hero-content">
 			<div class="hero-header">
 				<h1 class="page-title">Exam Setup</h1>
-				<p class="page-subtitle">Configure full marks for each subject. Check 'Include in Marksheet' to add a subject to the exam.</p>
+				<p class="page-subtitle">
+					Configure full marks for each subject. Check 'Include in Marksheet' to add a subject to
+					the exam.
+				</p>
 			</div>
 
 			<div class="hero-bottom">
 				<div class="stats-row">
-					<span class="stat-item">Subjects added to Marksheet: <strong>{addedToMarksheetCount}</strong></span>
-					<span class="stat-item">Subjects added in Grand Total: <strong>{addedToTotalCount}</strong></span>
+					<span class="stat-item"
+						>Subjects added to Marksheet: <strong>{addedToMarksheetCount}</strong></span
+					>
+					<span class="stat-item"
+						>Subjects added in Grand Total: <strong>{addedToTotalCount}</strong></span
+					>
 				</div>
 
 				<div class="hero-filters">
 					<div class="filter-group">
-					<select value={currentSession.toString()} onchange={handleSessionChange} class="form-select filter-select">
-						{#each data.sessions as session (session.id)}
-							<option value={session.id.toString()}>{session.year}</option>
-						{/each}
-					</select>
+						<select
+							value={currentSession.toString()}
+							onchange={handleSessionChange}
+							class="filter-select form-select"
+						>
+							{#each data.sessions as session (session.id)}
+								<option value={session.id.toString()}>{session.year}</option>
+							{/each}
+						</select>
 
-					<select 
-						value={currentClass.toString()} 
-						onchange={(e) => {
-							const target = e.target as HTMLSelectElement;
-							currentClass = Number(target.value);
-							ensureValidTerm();
-							fetchSetups();
-						}} 
-						class="form-select filter-select"
-					>
-						{#if classes.length === 0}
-							<option value="0">No Class</option>
-						{/if}
-						{#each classes as cls (cls.id)}
-							<option value={cls.id.toString()}>{cls.name}</option>
-						{/each}
-					</select>
+						<select
+							value={currentClass.toString()}
+							onchange={(e) => {
+								const target = e.target as HTMLSelectElement;
+								currentClass = Number(target.value);
+								ensureValidTerm();
+								fetchSetups();
+							}}
+							class="filter-select form-select"
+						>
+							{#if classes.length === 0}
+								<option value="0">No Class</option>
+							{/if}
+							{#each classes as cls (cls.id)}
+								<option value={cls.id.toString()}>{cls.name}</option>
+							{/each}
+						</select>
 
-					<select 
-						value={currentTerm.toString()} 
-						onchange={(e) => {
-							const target = e.target as HTMLSelectElement;
-							currentTerm = Number(target.value);
-							fetchSetups();
-						}} 
-						class="form-select filter-select"
-					>
-						{#each filteredTerms as term (term.id)}
-							<option value={term.id.toString()}>{term.name}</option>
-						{/each}
-					</select>
-
-					
+						<select
+							value={currentTerm.toString()}
+							onchange={(e) => {
+								const target = e.target as HTMLSelectElement;
+								currentTerm = Number(target.value);
+								fetchSetups();
+							}}
+							class="filter-select form-select"
+						>
+							{#each filteredTerms as term (term.id)}
+								<option value={term.id.toString()}>{term.name}</option>
+							{/each}
+						</select>
 					</div>
 				</div>
 			</div>
@@ -457,26 +478,48 @@
 	</div>
 
 	<!-- Import Configuration Row -->
-	<div class="card" style="margin-bottom: 24px; padding: 12px 20px; background: color-mix(in srgb, var(--color-surface) 90%, var(--color-primary) 10%); border: 1px solid color-mix(in srgb, var(--color-outline-variant) 80%, var(--color-primary) 20%);">
-		<div class="flex items-center flex-wrap gap-4" style="justify-content: space-between;">
-			<div class="text-sm font-medium flex items-center gap-2" style="color: var(--color-primary);">
-				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+	<div
+		class="card"
+		style="margin-bottom: 24px; padding: 12px 20px; background: color-mix(in srgb, var(--color-surface) 90%, var(--color-primary) 10%); border: 1px solid color-mix(in srgb, var(--color-outline-variant) 80%, var(--color-primary) 20%);"
+	>
+		<div class="flex flex-wrap items-center gap-4" style="justify-content: space-between;">
+			<div class="flex items-center gap-2 text-sm font-medium" style="color: var(--color-primary);">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="18"
+					height="18"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline
+						points="7 10 12 15 17 10"
+					></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg
+				>
 				Import from another configuration
 			</div>
-			<div class="flex items-center gap-2 flex-wrap">
-				<select value={importSession.toString()} onchange={handleImportSessionChange} class="form-select" style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 140px; border-color: transparent;">
+			<div class="flex flex-wrap items-center gap-2">
+				<select
+					value={importSession.toString()}
+					onchange={handleImportSessionChange}
+					class="form-select"
+					style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 140px; border-color: transparent;"
+				>
 					{#each data.sessions as session (session.id)}
 						<option value={session.id.toString()}>{session.year}</option>
 					{/each}
 				</select>
-				<select 
-					value={importClass.toString()} 
+				<select
+					value={importClass.toString()}
 					onchange={(e) => {
 						const target = e.target as HTMLSelectElement;
 						importClass = Number(target.value);
 						ensureValidImportTerm();
-					}} 
-					class="form-select" style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 140px; border-color: transparent;"
+					}}
+					class="form-select"
+					style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 140px; border-color: transparent;"
 				>
 					{#if importClasses.length === 0}
 						<option value="0">No Class</option>
@@ -485,19 +528,24 @@
 						<option value={cls.id.toString()}>{cls.name}</option>
 					{/each}
 				</select>
-				<select 
-					value={importTerm.toString()} 
+				<select
+					value={importTerm.toString()}
 					onchange={(e) => {
 						const target = e.target as HTMLSelectElement;
 						importTerm = Number(target.value);
-					}} 
-					class="form-select" style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 140px; border-color: transparent;"
+					}}
+					class="form-select"
+					style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 140px; border-color: transparent;"
 				>
 					{#each filteredImportTerms as term (term.id)}
 						<option value={term.id.toString()}>{term.name}</option>
 					{/each}
 				</select>
-				<button onclick={handleImport} class="primary-button flex items-center gap-1" style="padding: 6px 16px; font-size: 13px;">
+				<button
+					onclick={handleImport}
+					class="primary-button flex items-center gap-1"
+					style="padding: 6px 16px; font-size: 13px;"
+				>
 					Import Config
 				</button>
 			</div>
@@ -510,97 +558,188 @@
 			<table class="data-table">
 				<thead>
 					<tr>
-						<th class="w-10 text-center px-1">SL</th>
+						<th class="w-10 px-1 text-center">SL</th>
 						<th class="px-1">Subject Name</th>
-						<th class="text-center w-16 px-1" style="line-height: 1.1; font-size: 10px;">Include in Total</th>
-						<th class="text-center w-14 px-1" style="line-height: 1.1; font-size: 10px;">Full Marks</th>
-						<th class="text-center w-14 px-1" style="line-height: 1.1; font-size: 10px;">Pass Marks</th>
-						<th class="w-14 text-center px-1">Action</th>
+						<th class="w-16 px-1 text-center" style="line-height: 1.1; font-size: 10px;"
+							>Include in Total</th
+						>
+						<th class="w-14 px-1 text-center" style="line-height: 1.1; font-size: 10px;"
+							>Full Marks</th
+						>
+						<th class="w-14 px-1 text-center" style="line-height: 1.1; font-size: 10px;"
+							>Pass Marks</th
+						>
+						<th class="w-14 px-1 text-center">Action</th>
 					</tr>
 				</thead>
 				<tbody>
 					{#if displaySubjects.length === 0}
-					<tr class="no-hover">
-						<td colspan="6" class="text-center py-8 text-slate-500 font-medium">Not configured yet. Add a subject below.</td>
-					</tr>
+						<tr class="no-hover">
+							<td colspan="6" class="py-8 text-center font-medium text-slate-500"
+								>Not configured yet. Add a subject below.</td
+							>
+						</tr>
 					{/if}
 					{#each displaySubjects as subject, i (subject.id)}
-					<tr 
-						draggable="true" 
-						ondragstart={(e) => handleDragStart(e, i)}
-						ondragover={handleDragOver}
-						ondrop={(e) => handleDrop(e, i)}
-						class:dragging={draggedIndex === i}
-					>
-						<td class="font-medium text-slate-500 text-center cursor-grab active:cursor-grabbing" title="Drag to reorder">
-							<div class="flex items-center justify-center gap-1">
-								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400 hover:text-slate-600 transition-colors"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-								{i + 1}
-							</div>
-						</td>
-						<td class="font-medium">
-							{subject.name}
-						</td>
-						<td class="text-center">
-							<input 
-								type="checkbox"
-								bind:checked={includeInputs[subject.id]}
-								class="form-checkbox mx-auto"
-								tabindex="-1"
+						<tr
+							draggable="true"
+							ondragstart={(e) => handleDragStart(e, i)}
+							ondragover={handleDragOver}
+							ondrop={(e) => handleDrop(e, i)}
+							class:dragging={draggedIndex === i}
+						>
+							<td
+								class="cursor-grab text-center font-medium text-slate-500 active:cursor-grabbing"
+								title="Drag to reorder"
 							>
-						</td>
-						<td>
-							<input 
-								type="number"
-								min="0"
-								max="1000"
-								bind:value={markInputs[subject.id]}
-								placeholder="-"
-								class="form-input small-input"
-							>
-						</td>
-						<td>
-							<input 
-								type="number"
-								min="0"
-								max="1000"
-								bind:value={passMarkInputs[subject.id]}
-								placeholder="0"
-								class="form-input small-input"
-							>
-						</td>
-						<td class="text-center">
-							<button type="button" onclick={() => removeSubject(subject.id)} class="text-red-500 hover:text-red-700 transition-colors inline-flex items-center justify-center" title="Remove Subject" style="height: 32px; width: 32px; border-radius: 6px; background-color: var(--color-surface); border: 1px solid var(--color-outline-variant);">
-								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-							</button>
-						</td>
-					</tr>
+								<div class="flex items-center justify-center gap-1">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="14"
+										height="14"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										class="text-slate-400 transition-colors hover:text-slate-600"
+										><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"
+										></line><line x1="8" y1="18" x2="21" y2="18"></line><line
+											x1="3"
+											y1="6"
+											x2="3.01"
+											y2="6"
+										></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line
+											x1="3"
+											y1="18"
+											x2="3.01"
+											y2="18"
+										></line></svg
+									>
+									{i + 1}
+								</div>
+							</td>
+							<td class="font-medium">
+								{subject.name}
+							</td>
+							<td class="text-center">
+								<input
+									type="checkbox"
+									bind:checked={includeInputs[subject.id]}
+									class="mx-auto form-checkbox"
+									tabindex="-1"
+								/>
+							</td>
+							<td>
+								<input
+									type="number"
+									min="0"
+									max="1000"
+									bind:value={markInputs[subject.id]}
+									placeholder="-"
+									class="small-input form-input"
+								/>
+							</td>
+							<td>
+								<input
+									type="number"
+									min="0"
+									max="1000"
+									bind:value={passMarkInputs[subject.id]}
+									placeholder="0"
+									class="small-input form-input"
+								/>
+							</td>
+							<td class="text-center">
+								<button
+									type="button"
+									onclick={() => removeSubject(subject.id)}
+									class="inline-flex items-center justify-center text-red-500 transition-colors hover:text-red-700"
+									title="Remove Subject"
+									style="height: 32px; width: 32px; border-radius: 6px; background-color: var(--color-surface); border: 1px solid var(--color-outline-variant);"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="16"
+										height="16"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"
+										></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line
+											x1="10"
+											y1="11"
+											x2="10"
+											y2="17"
+										></line><line x1="14" y1="11" x2="14" y2="17"></line></svg
+									>
+								</button>
+							</td>
+						</tr>
 					{/each}
 					{#if displaySubjects.length > 0}
-					<tr class="no-hover" style="background-color: var(--color-surface-high);">
-						<td colspan="3" class="text-right font-bold text-slate-500" style="padding-right: 12px; font-size: 11px; text-transform: uppercase;">Total Included Marks</td>
-						<td class="text-center font-bold" style="color: var(--color-primary); font-size: 14px;">{totalFullMarks}</td>
-						<td colspan="2"></td>
-					</tr>
+						<tr class="no-hover" style="background-color: var(--color-surface-high);">
+							<td
+								colspan="3"
+								class="text-right font-bold text-slate-500"
+								style="padding-right: 12px; font-size: 11px; text-transform: uppercase;"
+								>Total Included Marks</td
+							>
+							<td
+								class="text-center font-bold"
+								style="color: var(--color-primary); font-size: 14px;">{totalFullMarks}</td
+							>
+							<td colspan="2"></td>
+						</tr>
 					{/if}
 					{#if availableSubjectsToAdd.length > 0}
-					<tr class="no-hover">
-						<td></td>
-						<td colspan="5">
-							<div class="flex items-center gap-3 py-2">
-								<select bind:value={subjectToAddId} class="form-select" style="max-width: 250px; padding: 8px 16px;">
-									<option value={null}>Select subject to add...</option>
-									{#each availableSubjectsToAdd as sub (sub.id)}
-										<option value={sub.id}>{sub.name}</option>
-									{/each}
-								</select>
-								<button type="button" onclick={addSubject} class="primary-button flex items-center gap-1" disabled={!subjectToAddId} style="padding: 8px 16px; font-size: 13px;">
-									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-									Add Subject
-								</button>
-							</div>
-						</td>
-					</tr>
+						<tr class="no-hover">
+							<td></td>
+							<td colspan="5">
+								<div class="flex items-center gap-3 py-2">
+									<select
+										bind:value={subjectToAddId}
+										class="form-select"
+										style="max-width: 250px; padding: 8px 16px;"
+									>
+										<option value={null}>Select subject to add...</option>
+										{#each availableSubjectsToAdd as sub (sub.id)}
+											<option value={sub.id}>{sub.name}</option>
+										{/each}
+									</select>
+									<button
+										type="button"
+										onclick={addSubject}
+										class="primary-button flex items-center gap-1"
+										disabled={!subjectToAddId}
+										style="padding: 8px 16px; font-size: 13px;"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											width="16"
+											height="16"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											><line x1="12" y1="5" x2="12" y2="19"></line><line
+												x1="5"
+												y1="12"
+												x2="19"
+												y2="12"
+											></line></svg
+										>
+										Add Subject
+									</button>
+								</div>
+							</td>
+						</tr>
 					{/if}
 				</tbody>
 			</table>
@@ -619,16 +758,42 @@
 	</div>
 
 	{#if saveMessage}
-		<div 
+		<div
 			class="floating-toast {saveError ? 'toast-error' : 'toast-success'}"
 			in:fly={{ y: 20, duration: 400 }}
 			out:fade={{ duration: 300 }}
 		>
 			<div class="toast-icon">
 				{#if saveError}
-					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line
+							x1="12"
+							y1="16"
+							x2="12.01"
+							y2="16"
+						/></svg
+					>
 				{:else}
-					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="3"
+						stroke-linecap="round"
+						stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg
+					>
 				{/if}
 			</div>
 			<span class="toast-text">{saveMessage}</span>
@@ -825,7 +990,8 @@
 		border-radius: 2px;
 	}
 
-	.form-select, .form-input {
+	.form-select,
+	.form-input {
 		border-radius: var(--radius-lg);
 		border: 1px solid var(--color-outline);
 		background-color: var(--color-surface);
@@ -845,7 +1011,8 @@
 		padding-right: 40px;
 	}
 
-	.form-select:focus, .form-input:focus {
+	.form-select:focus,
+	.form-input:focus {
 		border-color: var(--color-primary);
 		background-color: var(--color-surface-lowest);
 		outline: none;
@@ -875,7 +1042,7 @@
 		-webkit-appearance: none;
 		margin: 0;
 	}
-	.small-input[type=number] {
+	.small-input[type='number'] {
 		-moz-appearance: textfield;
 	}
 
@@ -933,7 +1100,9 @@
 	}
 
 	@keyframes spin {
-		to { transform: rotate(360deg); }
+		to {
+			transform: rotate(360deg);
+		}
 	}
 
 	/* Floating Toast Styles */
@@ -947,7 +1116,9 @@
 		gap: 12px;
 		padding: 12px 20px;
 		border-radius: var(--radius-xl);
-		box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+		box-shadow:
+			0 10px 25px -5px rgba(0, 0, 0, 0.1),
+			0 8px 10px -6px rgba(0, 0, 0, 0.1);
 		z-index: 1000;
 		min-width: 280px;
 		max-width: calc(100vw - 40px);
@@ -988,5 +1159,4 @@
 			bottom: 80px; /* Above mobile bottom bar if any */
 		}
 	}
-
 </style>

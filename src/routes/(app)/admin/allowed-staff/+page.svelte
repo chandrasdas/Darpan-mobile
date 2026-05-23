@@ -5,9 +5,9 @@
 	import { resolve } from '$app/paths';
 
 	let { data, form } = $props();
-	
+
 	let loading = $state(false);
-	
+
 	// Helper state for editing rows
 	let editingId = $state<number | null>(null);
 
@@ -27,14 +27,21 @@
 <div class="page-shell" in:fade={{ duration: 400 }}>
 	<div class="page-hero">
 		<div class="hero-header">
-			<a href={resolve('/dashboard' as "/")} aria-label="Back to Dashboard" class="back-button">
+			<a href={resolve('/dashboard' as '/')} aria-label="Back to Dashboard" class="back-button">
 				<svg class="back-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M10 19l-7-7m0 0l7-7m-7 7h18"
+					/>
 				</svg>
 			</a>
 			<div class="hero-text">
 				<h1 class="page-title">Allowed Staff Management</h1>
-				<p class="page-subtitle">Manage the list of staff members permanently allowed to register for an account.</p>
+				<p class="page-subtitle">
+					Manage the list of staff members permanently allowed to register for an account.
+				</p>
 			</div>
 		</div>
 	</div>
@@ -46,32 +53,39 @@
 	{/if}
 
 	<div class="layout-grid">
-		
 		<!-- Add New Member Form Area -->
 		<div class="form-section">
 			<div class="card form-card">
 				<div class="card-glow"></div>
 				<h2 class="card-title">Add New Allowed Member</h2>
-				
-				<form method="POST" action="?/add" use:enhance={() => {
-					loading = true;
-					return async ({ update }) => {
-						loading = false;
-						update();
-					};
-				}} class="form-body">
+
+				<form
+					method="POST"
+					action="?/add"
+					use:enhance={() => {
+						loading = true;
+						return async ({ update }) => {
+							loading = false;
+							update();
+						};
+					}}
+					class="form-body"
+				>
 					<div class="form-group">
 						<label for="name" class="form-label">Name (Optional)</label>
-						<input type="text" id="name" name="name" 
-							class="form-input" 
-							placeholder="John Doe" />
+						<input type="text" id="name" name="name" class="form-input" placeholder="John Doe" />
 					</div>
 
 					<div class="form-group">
 						<label for="email" class="form-label">Email <span class="required">*</span></label>
-						<input type="email" id="email" name="email" required
-							class="form-input" 
-							placeholder="john@example.com" />
+						<input
+							type="email"
+							id="email"
+							name="email"
+							required
+							class="form-input"
+							placeholder="john@example.com"
+						/>
 					</div>
 
 					<div class="form-group">
@@ -90,7 +104,20 @@
 
 					<button type="submit" disabled={loading} class="submit-button">
 						{#if loading}
-							<svg class="spinner-icon" fill="none" viewBox="0 0 24 24"><circle class="spinner-track" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="spinner-head" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+							<svg class="spinner-icon" fill="none" viewBox="0 0 24 24"
+								><circle
+									class="spinner-track"
+									cx="12"
+									cy="12"
+									r="10"
+									stroke="currentColor"
+									stroke-width="4"
+								></circle><path
+									class="spinner-head"
+									fill="currentColor"
+									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+								></path></svg
+							>
 						{:else}
 							Add Staff Member
 						{/if}
@@ -123,34 +150,62 @@
 										<!-- EDIT ROW -->
 										<tr class="edit-row">
 											<td colspan="4" class="edit-cell">
-												<form method="POST" action="?/edit" use:enhance={() => {
-													return async ({ update }) => {
-														cancelEdit();
-														update();
-													};
-												}} class="edit-form">
+												<form
+													method="POST"
+													action="?/edit"
+													use:enhance={() => {
+														return async ({ update }) => {
+															cancelEdit();
+															update();
+														};
+													}}
+													class="edit-form"
+												>
 													<input type="hidden" name="id" value={staff.id} />
-													
+
 													<div class="edit-inputs">
-														<input type="text" name="name" value={staff.name || ''} placeholder="Name" class="form-input small-input" />
-														<input type="email" name="email" value={staff.email} required placeholder="Email" class="form-input small-input" />
+														<input
+															type="text"
+															name="name"
+															value={staff.name || ''}
+															placeholder="Name"
+															class="small-input form-input"
+														/>
+														<input
+															type="email"
+															name="email"
+															value={staff.email}
+															required
+															placeholder="Email"
+															class="small-input form-input"
+														/>
 													</div>
 
 													<div class="edit-controls">
-														<select name="role" class="form-select small-select" value={staff.role}>
+														<select name="role" class="small-select form-select" value={staff.role}>
 															<option value="teacher">Teacher</option>
 															<option value="staff">Staff</option>
 															<option value="admin">Admin</option>
 														</select>
 														<div class="checkbox-group inline-checkbox">
-															<input type="checkbox" name="isAllowed" id="edit-allow-{staff.id}" checked={staff.isAllowed} class="form-checkbox small-checkbox" />
-															<label for="edit-allow-{staff.id}" class="checkbox-label small-label">Allowed</label>
+															<input
+																type="checkbox"
+																name="isAllowed"
+																id="edit-allow-{staff.id}"
+																checked={staff.isAllowed}
+																class="small-checkbox form-checkbox"
+															/>
+															<label for="edit-allow-{staff.id}" class="checkbox-label small-label"
+																>Allowed</label
+															>
 														</div>
 													</div>
 
 													<div class="edit-actions">
 														<button type="submit" class="action-btn save-btn">Save</button>
-														<button type="button" onclick={cancelEdit} class="action-btn cancel-btn">Cancel</button>
+														<button type="button" onclick={cancelEdit} class="action-btn cancel-btn"
+															>Cancel</button
+														>
 													</div>
 												</form>
 											</td>
@@ -163,7 +218,13 @@
 												<div class="staff-email">{staff.email}</div>
 											</td>
 											<td>
-												<span class="role-badge {staff.role === 'admin' ? 'role-admin' : staff.role === 'teacher' ? 'role-teacher' : 'role-staff'}">
+												<span
+													class="role-badge {staff.role === 'admin'
+														? 'role-admin'
+														: staff.role === 'teacher'
+															? 'role-teacher'
+															: 'role-staff'}"
+												>
 													{staff.role}
 												</span>
 											</td>
@@ -182,17 +243,61 @@
 											</td>
 											<td class="text-right">
 												<div class="row-actions">
-													<button type="button" onclick={() => startEdit(staff.id)} class="icon-btn edit-icon" title="Edit">
-														<svg class="icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+													<button
+														type="button"
+														onclick={() => startEdit(staff.id)}
+														class="icon-btn edit-icon"
+														title="Edit"
+													>
+														<svg
+															class="icon-svg"
+															fill="none"
+															viewBox="0 0 24 24"
+															stroke="currentColor"
+															><path
+																stroke-linecap="round"
+																stroke-linejoin="round"
+																stroke-width="2"
+																d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+															/></svg
+														>
 													</button>
-													<form method="POST" action="?/delete" use:enhance={() => {
-														return async ({ update }) => {
-															update();
-														};
-													}} class="inline-form">
+													<form
+														method="POST"
+														action="?/delete"
+														use:enhance={() => {
+															return async ({ update }) => {
+																update();
+															};
+														}}
+														class="inline-form"
+													>
 														<input type="hidden" name="id" value={staff.id} />
-														<button type="submit" class="icon-btn delete-icon" title="Delete" onclick={(e) => { if(!confirm('Are you sure you want to delete this allowed staff member?')) e.preventDefault(); }}>
-															<svg class="icon-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+														<button
+															type="submit"
+															class="icon-btn delete-icon"
+															title="Delete"
+															onclick={(e) => {
+																if (
+																	!confirm(
+																		'Are you sure you want to delete this allowed staff member?'
+																	)
+																)
+																	e.preventDefault();
+															}}
+														>
+															<svg
+																class="icon-svg"
+																fill="none"
+																viewBox="0 0 24 24"
+																stroke="currentColor"
+																><path
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																	stroke-width="2"
+																	d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+																/></svg
+															>
 														</button>
 													</form>
 												</div>
@@ -362,7 +467,8 @@
 		color: var(--color-error);
 	}
 
-	.form-input, .form-select {
+	.form-input,
+	.form-select {
 		width: 100%;
 		border-radius: var(--radius-lg);
 		border: 1px solid var(--color-outline);
@@ -378,7 +484,8 @@
 		opacity: 0.5;
 	}
 
-	.form-input:focus, .form-select:focus {
+	.form-input:focus,
+	.form-select:focus {
 		border-color: var(--color-primary);
 		background-color: var(--color-surface-lowest);
 		outline: none;
@@ -441,12 +548,20 @@
 		animation: spin 1s linear infinite;
 	}
 
-	.spinner-track { opacity: 0.25; }
-	.spinner-head { opacity: 0.75; }
+	.spinner-track {
+		opacity: 0.25;
+	}
+	.spinner-head {
+		opacity: 0.75;
+	}
 
 	@keyframes spin {
-		from { transform: rotate(0deg); }
-		to { transform: rotate(360deg); }
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg);
+		}
 	}
 
 	.table-scroll {
@@ -660,7 +775,8 @@
 		}
 	}
 
-	.small-input, .small-select {
+	.small-input,
+	.small-select {
 		padding: 6px 12px;
 	}
 

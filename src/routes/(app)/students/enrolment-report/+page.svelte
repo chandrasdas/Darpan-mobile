@@ -11,14 +11,14 @@
 		const select = e.target as HTMLSelectElement;
 		const url = new URL(page.url);
 		url.searchParams.set('sessionId', select.value);
-		goto(resolve((url.pathname + url.search) as "/"), { replaceState: true, keepFocus: true });
+		goto(resolve((url.pathname + url.search) as '/'), { replaceState: true, keepFocus: true });
 	}
 
 	function printTable(type: 'section' | 'caste') {
 		const className = `print-${type}-only`;
 		document.body.classList.add(className);
 		window.print();
-		
+
 		const cleanup = () => {
 			document.body.classList.remove(className);
 			window.removeEventListener('afterprint', cleanup);
@@ -30,7 +30,10 @@
 
 <svelte:head>
 	<title>Enrolment Report — Darpan</title>
-	<meta name="description" content="Detailed enrolment reports by class, section, roll number, transfer status, and caste category." />
+	<meta
+		name="description"
+		content="Detailed enrolment reports by class, section, roll number, transfer status, and caste category."
+	/>
 </svelte:head>
 
 <div class="page-shell" in:fade={{ duration: 400 }}>
@@ -54,13 +57,13 @@
 				<h1 class="page-title">Enrolment Report</h1>
 				<p class="page-subtitle">Detailed statistics on school enrolment per session.</p>
 			</div>
-			
+
 			<div class="filter-controls">
 				<label for="session-filter-select" class="sr-only">Select Session</label>
-				<select 
-					id="session-filter-select" 
-					value={data.selectedSessionId} 
-					onchange={handleSessionChange} 
+				<select
+					id="session-filter-select"
+					value={data.selectedSessionId}
+					onchange={handleSessionChange}
 					class="session-select"
 				>
 					{#each data.sessions as session (session.id)}
@@ -77,19 +80,29 @@
 			<div class="section-header non-printable">
 				<h2 class="section-title">
 					<svg class="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+						/>
 					</svg>
 					Class &amp; Section-Wise Enrolment
 				</h2>
-				
-				<button 
-					id="print-section-wise-btn" 
+
+				<button
+					id="print-section-wise-btn"
 					class="print-button"
 					onclick={() => printTable('section')}
 					aria-label="Print Section-Wise Table"
 				>
 					<svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+						/>
 					</svg>
 					Print Table
 				</button>
@@ -118,12 +131,15 @@
 									{/if}
 									<td class="text-center font-medium">Section {sec.letter}</td>
 									<td class="text-center">{sec.lastRoll || '—'}</td>
-									<td class="text-center tc-highlight" class:has-tc={sec.tcCount > 0}>
+									<td class="tc-highlight text-center" class:has-tc={sec.tcCount > 0}>
 										{sec.tcCount}
 									</td>
 									<td class="text-center font-medium">{sec.activeCount}</td>
 									{#if i === 0}
-										<td rowspan={cls.sections.length} class="class-total-column text-center font-semibold">
+										<td
+											rowspan={cls.sections.length}
+											class="class-total-column text-center font-semibold"
+										>
 											{cls.totalActiveInClass}
 										</td>
 									{/if}
@@ -148,25 +164,35 @@
 				</table>
 			</div>
 		</section>
-		<br> <br>
+		<br /> <br />
 		<!-- Table 2: Caste-Based Enrolment -->
 		<section class="report-section caste-table-card">
 			<div class="section-header non-printable">
 				<h2 class="section-title">
 					<svg class="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+						/>
 					</svg>
 					Caste-Based Enrolment (Active)
 				</h2>
-				
-				<button 
-					id="print-caste-wise-btn" 
+
+				<button
+					id="print-caste-wise-btn"
 					class="print-button"
 					onclick={() => printTable('caste')}
 					aria-label="Print Caste-Based Table"
 				>
 					<svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+						/>
 					</svg>
 					Print Table
 				</button>
@@ -194,7 +220,7 @@
 								<td class="text-center">{cls.st}</td>
 								<td class="text-center">{cls.obcA}</td>
 								<td class="text-center">{cls.obcB}</td>
-								<td class="text-center font-bold bg-surface-variant-alpha">{cls.total}</td>
+								<td class="bg-surface-variant-alpha text-center font-bold">{cls.total}</td>
 							</tr>
 						{:else}
 							<tr>
@@ -286,7 +312,9 @@
 		background-size: 20px 20px;
 		padding-right: 40px;
 		box-shadow: var(--shadow-ambient-sm);
-		transition: border-color 200ms ease, box-shadow 200ms ease;
+		transition:
+			border-color 200ms ease,
+			box-shadow 200ms ease;
 	}
 
 	.session-select:focus {
@@ -453,7 +481,6 @@
 		:global(body.print-section-only .bottom-nav),
 		:global(body.print-section-only .non-printable),
 		:global(body.print-section-only .caste-table-card),
-		
 		:global(body.print-caste-only .sidebar),
 		:global(body.print-caste-only .header),
 		:global(body.print-caste-only .bottom-nav),
@@ -463,7 +490,7 @@
 		}
 
 		/* Format print page */
-		:global(body.print-section-only), 
+		:global(body.print-section-only),
 		:global(body.print-caste-only) {
 			background: white !important;
 			color: black !important;
@@ -536,7 +563,7 @@
 			font-size: 11pt !important;
 		}
 
-		.report-table th, 
+		.report-table th,
 		.report-table td {
 			border: 1px solid #000 !important;
 			color: #000 !important;
@@ -551,13 +578,13 @@
 			print-color-adjust: exact;
 		}
 
-		.class-column, 
-		.class-total-column, 
+		.class-column,
+		.class-total-column,
 		.totals-row td {
 			background-color: transparent !important;
 			color: #000 !important;
 		}
-		
+
 		.totals-row td {
 			font-weight: bold !important;
 			border-top: 2px double #000 !important;

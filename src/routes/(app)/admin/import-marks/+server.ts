@@ -5,7 +5,7 @@ import { studMarksEntries } from '$lib/server/db/schema/marksheet';
 import { sql } from 'drizzle-orm';
 
 export const POST: RequestHandler = async ({ request }) => {
-	const { entries } = await request.json() as {
+	const { entries } = (await request.json()) as {
 		entries: {
 			sessionEnrollId: number;
 			examSetupId: number;

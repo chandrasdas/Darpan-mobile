@@ -9,16 +9,28 @@
 	</section>
 
 	<div class="placeholder-card">
-		<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.3">
-			<path d="M18 20V10M12 20V4M6 20v-6" stroke-linecap="round" stroke-linejoin="round"/>
+		<svg
+			width="48"
+			height="48"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="1.2"
+			opacity="0.3"
+		>
+			<path d="M18 20V10M12 20V4M6 20v-6" stroke-linecap="round" stroke-linejoin="round" />
 		</svg>
 		<span class="placeholder-text">Reporting module coming soon</span>
 	</div>
 </div>
 
 <style>
-	.page-shell { padding: 0 20px 32px; }
-	.page-hero { padding: 24px 0 20px; }
+	.page-shell {
+		padding: 0 20px 32px;
+	}
+	.page-hero {
+		padding: 24px 0 20px;
+	}
 	.page-title {
 		font-family: var(--font-heading);
 		font-size: 32px;

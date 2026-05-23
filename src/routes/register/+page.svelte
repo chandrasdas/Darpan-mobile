@@ -71,12 +71,12 @@
 
 	async function handleFinalRegister(e: Event) {
 		e.preventDefault();
-		
+
 		if (password !== confirmPassword) {
 			error = 'Passwords do not match.';
 			return;
 		}
-		
+
 		loading = true;
 		error = '';
 
@@ -95,7 +95,7 @@
 				error = registerError.message || 'An error occurred during registration.';
 			}
 		} else {
-			window.location.href = resolve('/dashboard' as "/");
+			window.location.href = resolve('/dashboard' as '/');
 		}
 	}
 </script>
@@ -105,9 +105,14 @@
 </svelte:head>
 
 <div class="auth-page">
-	<a href={resolve('/' as "/")} class="back-link">
+	<a href={resolve('/' as '/')} class="back-link">
 		<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+			<path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				d="M10 19l-7-7m0 0l7-7m-7 7h18"
+			/>
 		</svg>
 		Back
 	</a>
@@ -138,7 +143,10 @@
 		</div>
 
 		<div class="auth-card">
-			<form onsubmit={step === 1 ? handleSendOTP : step === 2 ? handleVerifyOTP : handleFinalRegister} class="auth-form">
+			<form
+				onsubmit={step === 1 ? handleSendOTP : step === 2 ? handleVerifyOTP : handleFinalRegister}
+				class="auth-form"
+			>
 				{#if error}
 					<div in:slide class="auth-error">
 						{error}
@@ -169,7 +177,7 @@
 							required
 							maxlength="6"
 							placeholder="123456"
-							class="input-field text-center tracking-widest text-2xl"
+							class="input-field text-center text-2xl tracking-widest"
 							style="letter-spacing: 0.5em;"
 						/>
 					</div>
@@ -187,7 +195,7 @@
 							class="input-field"
 						/>
 					</div>
-					
+
 					<div class="input-group" in:fade>
 						<label for="confirmPassword" class="input-label">Confirm Password</label>
 						<input
@@ -208,9 +216,20 @@
 				>
 					{#if loading}
 						<svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
+							<circle
+								class="opacity-25"
+								cx="12"
+								cy="12"
+								r="10"
+								stroke="currentColor"
+								stroke-width="4"
+							></circle>
+							<path
+								class="opacity-75"
+								fill="currentColor"
+								d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+							></path>
+						</svg>
 						Processing...
 					{:else}
 						{#if step === 1}
@@ -221,16 +240,21 @@
 							Complete Registration
 						{/if}
 						<svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                        </svg>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M14 5l7 7m0 0l-7 7m7-7H3"
+							/>
+						</svg>
 					{/if}
 				</button>
-				
+
 				{#if step > 1 && !loading}
-					<button 
-						type="button" 
-						onclick={() => step = step - 1}
-						class="text-sm font-medium color-outline hover:color-primary mt-2"
+					<button
+						type="button"
+						onclick={() => (step = step - 1)}
+						class="color-outline hover:color-primary mt-2 text-sm font-medium"
 					>
 						Go Back
 					</button>
@@ -241,7 +265,7 @@
 		{#if step === 1}
 			<p class="auth-footer">
 				Already have an account?
-				<a href={resolve('/login' as "/")} class="signup-link">Sign in here</a>
+				<a href={resolve('/login' as '/')} class="signup-link">Sign in here</a>
 			</p>
 		{/if}
 	</div>
@@ -353,7 +377,6 @@
 		gap: 8px;
 	}
 
-
 	.input-label {
 		font-size: 12px;
 		font-weight: 600;
@@ -454,7 +477,11 @@
 	}
 
 	@keyframes spin {
-		from { transform: rotate(0deg); }
-		to { transform: rotate(360deg); }
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg);
+		}
 	}
 </style>

@@ -7,7 +7,7 @@
 	let newPassword = $state('');
 	let confirmPassword = $state('');
 	let token = $state(''); // Stores the Better-Auth compatible token returned from OTP verify
-	
+
 	let loading = $state(false);
 	let errorMsg = $state('');
 	let successMsg = $state('');
@@ -16,7 +16,7 @@
 		e.preventDefault();
 		errorMsg = '';
 		loading = true;
-		
+
 		try {
 			const res = await fetch('/api/forgot-password/otp', {
 				method: 'POST',
@@ -25,7 +25,7 @@
 			});
 			const data = await res.json();
 			if (!res.ok) throw new Error(data.error || 'Failed to send OTP.');
-			
+
 			step = 2;
 			successMsg = 'An OTP has been sent to your email address.';
 		} catch (err) {
@@ -40,7 +40,7 @@
 		errorMsg = '';
 		successMsg = '';
 		loading = true;
-		
+
 		try {
 			const res = await fetch('/api/forgot-password/otp', {
 				method: 'POST',
@@ -49,9 +49,9 @@
 			});
 			const data = await res.json();
 			if (!res.ok) throw new Error(data.error || 'Failed to verify OTP.');
-			
+
 			token = data.verifiedToken; // Set the internal auth token temporarily
-			step = 3; 
+			step = 3;
 		} catch (err) {
 			errorMsg = err instanceof Error ? err.message : String(err);
 		} finally {
@@ -62,7 +62,7 @@
 	async function handleResetPassword(e: Event) {
 		e.preventDefault();
 		errorMsg = '';
-		
+
 		if (newPassword !== confirmPassword) {
 			errorMsg = 'Passwords do not match.';
 			return;
@@ -81,11 +81,11 @@
 			});
 			const data = await res.json();
 			if (!res.ok) throw new Error(data.error || 'Failed to reset password.');
-			
+
 			successMsg = 'Your password has been successfully reset! Redirecting to login...';
 			step = 4; // Final success state
 			setTimeout(() => {
-				window.location.href = resolve('/login' as "/");
+				window.location.href = resolve('/login' as '/');
 			}, 3000);
 		} catch (err) {
 			errorMsg = err instanceof Error ? err.message : String(err);
@@ -100,9 +100,14 @@
 </svelte:head>
 
 <div class="auth-page">
-	<a href={resolve('/login' as "/")} class="back-link">
+	<a href={resolve('/login' as '/')} class="back-link">
 		<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+			<path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				d="M10 19l-7-7m0 0l7-7m-7 7h18"
+			/>
 		</svg>
 		Back
 	</a>
@@ -151,15 +156,27 @@
 						/>
 					</div>
 
-					<button
-						type="submit"
-						disabled={loading || !email}
-						class="submit-btn"
-					>
+					<button type="submit" disabled={loading || !email} class="submit-btn">
 						{#if loading}
-							<svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-								<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-								<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+							<svg
+								class="spinner"
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+							>
+								<circle
+									class="opacity-25"
+									cx="12"
+									cy="12"
+									r="10"
+									stroke="currentColor"
+									stroke-width="4"
+								></circle>
+								<path
+									class="opacity-75"
+									fill="currentColor"
+									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+								></path>
 							</svg>
 							Sending...
 						{:else}
@@ -180,32 +197,44 @@
 							bind:value={otp}
 							required
 							placeholder="------"
-							class="input-field text-center tracking-widest text-2xl"
+							class="input-field text-center text-2xl tracking-widest"
 							style="letter-spacing: 0.5em;"
 						/>
 					</div>
 
 					<div class="flex-col-gap">
-						<button
-							type="submit"
-							disabled={loading || otp.length !== 6}
-							class="submit-btn"
-						>
+						<button type="submit" disabled={loading || otp.length !== 6} class="submit-btn">
 							{#if loading}
-								<svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-									<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-									<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+								<svg
+									class="spinner"
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+								>
+									<circle
+										class="opacity-25"
+										cx="12"
+										cy="12"
+										r="10"
+										stroke="currentColor"
+										stroke-width="4"
+									></circle>
+									<path
+										class="opacity-75"
+										fill="currentColor"
+										d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+									></path>
 								</svg>
 								Verifying...
 							{:else}
 								Verify Code
 							{/if}
 						</button>
-						<button 
-							type="button" 
-							onclick={handleSendEmail} 
+						<button
+							type="button"
+							onclick={handleSendEmail}
 							disabled={loading}
-							class="text-sm font-medium color-outline hover:color-primary mt-2"
+							class="color-outline hover:color-primary mt-2 text-sm font-medium"
 						>
 							Resend Code
 						</button>
@@ -239,13 +268,32 @@
 
 					<button
 						type="submit"
-						disabled={loading || !newPassword || !confirmPassword || newPassword !== confirmPassword}
+						disabled={loading ||
+							!newPassword ||
+							!confirmPassword ||
+							newPassword !== confirmPassword}
 						class="submit-btn"
 					>
 						{#if loading}
-							<svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-								<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-								<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+							<svg
+								class="spinner"
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+							>
+								<circle
+									class="opacity-25"
+									cx="12"
+									cy="12"
+									r="10"
+									stroke="currentColor"
+									stroke-width="4"
+								></circle>
+								<path
+									class="opacity-75"
+									fill="currentColor"
+									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+								></path>
 							</svg>
 							Saving...
 						{:else}
@@ -256,7 +304,13 @@
 			{:else if step === 4}
 				<div class="flex-col-center">
 					<div class="success-icon-wrapper">
-						<svg class="success-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+						<svg
+							class="success-icon"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							stroke-width="2"
+						>
 							<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
 						</svg>
 					</div>
@@ -268,7 +322,7 @@
 
 		<p class="auth-footer">
 			Remembered your password?
-			<a href={resolve('/login' as "/")} class="signup-link">Log in</a>
+			<a href={resolve('/login' as '/')} class="signup-link">Log in</a>
 		</p>
 	</div>
 </div>
@@ -508,7 +562,11 @@
 	}
 
 	@keyframes spin {
-		from { transform: rotate(0deg); }
-		to { transform: rotate(360deg); }
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg);
+		}
 	}
 </style>

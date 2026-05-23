@@ -6,7 +6,11 @@ import { allowedStaff } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { requireRole } from '$lib/server/auth-utils';
 import * as v from 'valibot';
-import { addAllowedStaffSchema, editAllowedStaffSchema, deleteAllowedStaffSchema } from '$lib/validations/allowed-staff';
+import {
+	addAllowedStaffSchema,
+	editAllowedStaffSchema,
+	deleteAllowedStaffSchema
+} from '$lib/validations/allowed-staff';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const user = requireRole(locals, 'admin');
@@ -78,7 +82,8 @@ export const actions: Actions = {
 		const validated = result.output;
 
 		try {
-			await db.update(allowedStaff)
+			await db
+				.update(allowedStaff)
 				.set({
 					name: validated.name || null,
 					email: validated.email,
@@ -86,7 +91,7 @@ export const actions: Actions = {
 					isAllowed: validated.isAllowed
 				})
 				.where(eq(allowedStaff.id, validated.id));
-			
+
 			return { success: true, message: 'Staff member updated successfully.' };
 		} catch (error: unknown) {
 			if (isUniqueConstraintError(error)) {

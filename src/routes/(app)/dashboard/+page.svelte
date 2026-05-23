@@ -95,7 +95,10 @@
 
 <svelte:head>
 	<title>Dashboard — Darpan</title>
-	<meta name="description" content="Darpan school management dashboard — overview of students, faculties, evaluations, and fees at a glance." />
+	<meta
+		name="description"
+		content="Darpan school management dashboard — overview of students, faculties, evaluations, and fees at a glance."
+	/>
 </svelte:head>
 
 <!-- ── Dashboard Content ── -->
@@ -106,13 +109,22 @@
 			<h1 class="hero-title">Overview</h1>
 			<p class="hero-subtitle">Welcome back to the Darpan management suite.</p>
 		</div>
-		<a href={resolve('/reports/generate' as "/")} class="hero-cta">
-			<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-				<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-				<polyline points="14 2 14 8 20 8"/>
-				<line x1="16" y1="13" x2="8" y2="13"/>
-				<line x1="16" y1="17" x2="8" y2="17"/>
-				<polyline points="10 9 9 9 8 9"/>
+		<a href={resolve('/reports/generate' as '/')} class="hero-cta">
+			<svg
+				width="18"
+				height="18"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+				<polyline points="14 2 14 8 20 8" />
+				<line x1="16" y1="13" x2="8" y2="13" />
+				<line x1="16" y1="17" x2="8" y2="17" />
+				<polyline points="10 9 9 9 8 9" />
 			</svg>
 			Generate Report
 		</a>
@@ -125,19 +137,25 @@
 			<div class="stat-icon stat-icon-{card.color}">
 				{#if card.icon === 'school'}
 					<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-						<path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
+						<path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z" />
 					</svg>
 				{:else if card.icon === 'groups'}
 					<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-						<path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+						<path
+							d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"
+						/>
 					</svg>
 				{:else if card.icon === 'assessment'}
 					<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-						<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+						<path
+							d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"
+						/>
 					</svg>
 				{:else if card.icon === 'payment'}
 					<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-						<path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
+						<path
+							d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"
+						/>
 					</svg>
 				{/if}
 			</div>
@@ -154,7 +172,11 @@
 	<section class="stat-grid" aria-label="Key statistics">
 		{#each statCards as card (card.id)}
 			{#if card.href}
-				<a href={resolve(card.href as "/")} class="stat-card stat-card-{card.color} stat-card-link" id="stat-{card.id}">
+				<a
+					href={resolve(card.href as '/')}
+					class="stat-card stat-card-{card.color} stat-card-link"
+					id="stat-{card.id}"
+				>
 					{@render cardContent(card)}
 				</a>
 			{:else}
@@ -170,28 +192,64 @@
 		<h3 class="section-title">Quick Actions</h3>
 		<div class="quick-actions-grid">
 			{#each quickActions as action (action.href)}
-				<a href={resolve(action.href as "/")} class="quick-action-btn">
+				<a href={resolve(action.href as '/')} class="quick-action-btn">
 					<div class="quick-action-icon">
 						{#if action.icon === 'person_add'}
-							<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-								<path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-								<circle cx="8.5" cy="7" r="4"/>
-								<line x1="20" y1="8" x2="20" y2="14"/>
-								<line x1="23" y1="11" x2="17" y2="11"/>
+							<svg
+								width="22"
+								height="22"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.8"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+								<circle cx="8.5" cy="7" r="4" />
+								<line x1="20" y1="8" x2="20" y2="14" />
+								<line x1="23" y1="11" x2="17" y2="11" />
 							</svg>
 						{:else if action.icon === 'edit_note'}
-							<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-								<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-								<path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+							<svg
+								width="22"
+								height="22"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.8"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+								<path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
 							</svg>
 						{:else if action.icon === 'receipt'}
-							<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-								<path d="M4 2v20l3-2 3 2 3-2 3 2 3-2 3 2V2l-3 2-3-2-3 2-3-2-3 2-3-2z"/>
-								<path d="M8 10h8M8 14h4"/>
+							<svg
+								width="22"
+								height="22"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.8"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M4 2v20l3-2 3 2 3-2 3 2 3-2 3 2V2l-3 2-3-2-3 2-3-2-3 2-3-2z" />
+								<path d="M8 10h8M8 14h4" />
 							</svg>
 						{:else if action.icon === 'analytics'}
-							<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-								<path d="M18 20V10M12 20V4M6 20v-6"/>
+							<svg
+								width="22"
+								height="22"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.8"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M18 20V10M12 20V4M6 20v-6" />
 							</svg>
 						{/if}
 					</div>
@@ -205,7 +263,7 @@
 	<section class="activity-section" aria-label="Recent activity">
 		<div class="section-header">
 			<h3 class="section-title">Recent Activity</h3>
-			<a href={resolve('/activity' as "/")} class="section-link">View all</a>
+			<a href={resolve('/activity' as '/')} class="section-link">View all</a>
 		</div>
 		<div class="activity-list">
 			{#each recentActivity as item, i (i)}
@@ -264,7 +322,9 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
-		transition: transform 250ms var(--ease-smooth), box-shadow 250ms var(--ease-smooth);
+		transition:
+			transform 250ms var(--ease-smooth),
+			box-shadow 250ms var(--ease-smooth);
 	}
 
 	.stat-card-link {
@@ -279,19 +339,35 @@
 
 	/* Card color variants */
 	.stat-card-green {
-		background: linear-gradient(145deg, var(--color-card-green), color-mix(in srgb, var(--color-card-green) 85%, var(--color-card-green-icon)));
+		background: linear-gradient(
+			145deg,
+			var(--color-card-green),
+			color-mix(in srgb, var(--color-card-green) 85%, var(--color-card-green-icon))
+		);
 	}
 
 	.stat-card-purple {
-		background: linear-gradient(145deg, var(--color-card-purple), color-mix(in srgb, var(--color-card-purple) 85%, var(--color-card-purple-icon)));
+		background: linear-gradient(
+			145deg,
+			var(--color-card-purple),
+			color-mix(in srgb, var(--color-card-purple) 85%, var(--color-card-purple-icon))
+		);
 	}
 
 	.stat-card-blue {
-		background: linear-gradient(145deg, var(--color-card-blue), color-mix(in srgb, var(--color-card-blue) 85%, var(--color-card-blue-icon)));
+		background: linear-gradient(
+			145deg,
+			var(--color-card-blue),
+			color-mix(in srgb, var(--color-card-blue) 85%, var(--color-card-blue-icon))
+		);
 	}
 
 	.stat-card-amber {
-		background: linear-gradient(145deg, var(--color-card-amber), color-mix(in srgb, var(--color-card-amber) 85%, var(--color-card-amber-icon)));
+		background: linear-gradient(
+			145deg,
+			var(--color-card-amber),
+			color-mix(in srgb, var(--color-card-amber) 85%, var(--color-card-amber-icon))
+		);
 	}
 
 	.stat-top {

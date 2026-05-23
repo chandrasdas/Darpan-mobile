@@ -1,7 +1,12 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { eq, and, desc } from 'drizzle-orm';
 import { db } from '$lib/server/db';
-import { studInfo, studSessionEnrollments, studSessions, studSections } from '$lib/server/db/schema/marksheet';
+import {
+	studInfo,
+	studSessionEnrollments,
+	studSessions,
+	studSections
+} from '$lib/server/db/schema/marksheet';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -51,38 +56,52 @@ export const actions: Actions = {
 		}
 
 		const data = await request.formData();
-		
+
 		const name = data.get('name')?.toString();
 		const fname = data.get('fname')?.toString();
 		const dob = data.get('dob')?.toString();
 		const caste = data.get('caste')?.toString();
 		const penNo = data.get('penNo')?.toString() ? parseInt(data.get('penNo') as string) : null;
 		const portalId = data.get('portalId')?.toString();
-		
+
 		const guardianNo = parseInt(data.get('guardianNo') as string);
 		const messageNo = parseInt(data.get('messageNo') as string);
-		
+
 		const sessionId = parseInt(data.get('sessionId') as string);
 		const sectionId = parseInt(data.get('sectionId') as string);
 		const rollNo = parseInt(data.get('rollNo') as string);
 
-		if (!name || !fname || !dob || !caste || !portalId || isNaN(guardianNo) || isNaN(messageNo) || isNaN(sessionId) || isNaN(sectionId) || isNaN(rollNo)) {
+		if (
+			!name ||
+			!fname ||
+			!dob ||
+			!caste ||
+			!portalId ||
+			isNaN(guardianNo) ||
+			isNaN(messageNo) ||
+			isNaN(sessionId) ||
+			isNaN(sectionId) ||
+			isNaN(rollNo)
+		) {
 			return fail(400, { error: 'Please fill out all required fields.' });
 		}
 
 		try {
 			await db.transaction(async (tx) => {
 				// 1. Update personal details
-				await tx.update(studInfo).set({
-					name,
-					fname,
-					dob,
-					caste,
-					penNo,
-					portalId,
-					guardianNo,
-					messageNo,
-				}).where(eq(studInfo.sid, studentId));
+				await tx
+					.update(studInfo)
+					.set({
+						name,
+						fname,
+						dob,
+						caste,
+						penNo,
+						portalId,
+						guardianNo,
+						messageNo
+					})
+					.where(eq(studInfo.sid, studentId));
 
 				// 2. Update enrollment details
 				const existingEnrollment = await tx
@@ -136,9 +155,13 @@ export const actions: Actions = {
 				} else if (errorStr.includes('pen_no')) {
 					return fail(400, { error: 'A student with this PEN Number already exists.' });
 				} else if (errorStr.includes('uq_class_roll')) {
-					return fail(400, { error: 'Roll number already assigned to another student in this class & section.' });
+					return fail(400, {
+						error: 'Roll number already assigned to another student in this class & section.'
+					});
 				}
-				return fail(400, { error: 'A unique constraint failed. Check Portal ID, PEN Number, or Roll Number.' });
+				return fail(400, {
+					error: 'A unique constraint failed. Check Portal ID, PEN Number, or Roll Number.'
+				});
 			}
 			console.error('Database error when updating student:', e);
 			return fail(500, { error: 'Failed to update student details.' });

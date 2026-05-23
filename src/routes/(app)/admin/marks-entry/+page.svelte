@@ -10,7 +10,7 @@
 	import { ALLOWED_TERM_IDS } from '$lib/config/exam-rules';
 
 	// --- Filter state — stored as numbers to avoid scattered parseInt() calls ---
-	
+
 	// svelte-ignore state_referenced_locally
 	let currentSession = $state(data.defaults.session);
 	// svelte-ignore state_referenced_locally
@@ -34,7 +34,7 @@
 	let filteredTerms = $derived.by(() => {
 		const allowed = ALLOWED_TERM_IDS[currentClass];
 		if (!allowed) return data.examTerms;
-		return data.examTerms.filter(t => allowed.includes(t.id));
+		return data.examTerms.filter((t) => allowed.includes(t.id));
 	});
 
 	// Synchronously ensure currentTerm is valid for the current class.
@@ -42,7 +42,7 @@
 	// which runs too late — after fetchSubjects already fired).
 	function ensureValidTerm() {
 		const terms = filteredTerms;
-		const isValid = terms.some(t => t.id === currentTerm);
+		const isValid = terms.some((t) => t.id === currentTerm);
 		if (!isValid && terms.length > 0) {
 			currentTerm = terms[0].id;
 		}
@@ -60,20 +60,24 @@
 	};
 	// svelte-ignore state_referenced_locally
 	let students = $state<StudentRow[]>(
-		data.initialStudents.map(s => ({
+		data.initialStudents.map((s) => ({
 			...s,
 			isPresent: s.isPresent ?? true,
 			marksObtained: s.marksObtained ?? 0
 		}))
 	);
 	// svelte-ignore state_referenced_locally
-	let currentFullMark = $state(data.initialSubjects.length > 0 ? data.initialSubjects[0].fullMark : 0);
+	let currentFullMark = $state(
+		data.initialSubjects.length > 0 ? data.initialSubjects[0].fullMark : 0
+	);
 	// svelte-ignore state_referenced_locally
-	let currentPassMark = $state(data.initialSubjects.length > 0 ? data.initialSubjects[0].passMark : 0);
+	let currentPassMark = $state(
+		data.initialSubjects.length > 0 ? data.initialSubjects[0].passMark : 0
+	);
 
 	// svelte-ignore state_referenced_locally
 	let saveStatus = $state<Record<number, string>>(
-		Object.fromEntries(data.initialStudents.map(s => [s.seid, 'idle']))
+		Object.fromEntries(data.initialStudents.map((s) => [s.seid, 'idle']))
 	);
 
 	// --- Loading states ---
@@ -133,13 +137,13 @@
 				sectionId: currentSection,
 				examSetupId: currentSubject
 			}).run();
-			students = fetched.map(s => ({
+			students = fetched.map((s) => ({
 				...s,
 				isPresent: s.isPresent ?? true,
 				marksObtained: s.marksObtained ?? 0
 			}));
 			// Derive "All Present" from the fetched data
-			allPresentMode = students.length > 0 && students.every(s => s.isPresent);
+			allPresentMode = students.length > 0 && students.every((s) => s.isPresent);
 			// Reset save statuses
 			const newStatus: Record<number, string> = {};
 			for (const s of students) {
@@ -172,7 +176,7 @@
 		currentSubject = 0;
 		subjects = [];
 		students = [];
-		
+
 		const fetchedClasses = await getClasses(currentSession).run();
 		classes = fetchedClasses;
 		if (fetchedClasses.length > 0) {
@@ -198,7 +202,7 @@
 
 	async function handleSubjectChange() {
 		// Update fullMark from the selected subject
-		const selected = subjects.find(s => s.setupId === currentSubject);
+		const selected = subjects.find((s) => s.setupId === currentSubject);
 		currentFullMark = selected?.fullMark ?? 0;
 		currentPassMark = selected?.passMark ?? 0;
 		students = [];
@@ -261,7 +265,7 @@
 	// Initialized from the server data — true only when every student is present
 	// svelte-ignore state_referenced_locally
 	let allPresentMode = $state(
-		data.initialStudents.length > 0 && data.initialStudents.every(s => (s.isPresent ?? true))
+		data.initialStudents.length > 0 && data.initialStudents.every((s) => s.isPresent ?? true)
 	);
 
 	async function handleAllPresentToggle() {
@@ -270,21 +274,25 @@
 			for (const s of students) {
 				s.isPresent = true;
 			}
-			await Promise.all(students.map(s => doSave(s)));
+			await Promise.all(students.map((s) => doSave(s)));
 		}
 		// When turned OFF, user can individually toggle in the now-visible column
 	}
 
 	// Student count & stats
 	let studentCount = $derived(students.length);
-	let presentCount = $derived(students.filter(s => s.isPresent).length);
+	let presentCount = $derived(students.filter((s) => s.isPresent).length);
 	let failedCount = $derived(
-		students.filter(s => s.isPresent && s.marksObtained < currentPassMark).length
+		students.filter((s) => s.isPresent && s.marksObtained < currentPassMark).length
 	);
 
 	// Helper to check if a student has failed
 	function isFailed(student: StudentRow): boolean {
-		return student.isPresent && student.marksObtained < currentPassMark && saveStatus[student.seid] !== 'warning';
+		return (
+			student.isPresent &&
+			student.marksObtained < currentPassMark &&
+			saveStatus[student.seid] !== 'warning'
+		);
 	}
 </script>
 
@@ -298,40 +306,56 @@
 		<div class="hero-content">
 			<div class="hero-header">
 				<h1 class="page-title">Marks Entry</h1>
-				<p class="page-subtitle">Enter marks for each student. Changes save automatically when you move to the next field.</p>
+				<p class="page-subtitle">
+					Enter marks for each student. Changes save automatically when you move to the next field.
+				</p>
 			</div>
 
 			<div class="hero-bottom">
 				<!-- {#if students.length > 0} -->
-					<div class="stats-row">
-						<div class="stat-item">
-							<span class="pulse-dot"></span>
-							<span><strong>{studentCount}</strong> students</span>
-						</div>
-						<span class="stat-separator">•</span>
-						<div class="stat-item">
-							<span><strong>{presentCount}</strong> present</span>
-						</div>
-						{#if failedCount > 0}
-							<span class="stat-separator">•</span>
-							<div class="stat-item error-text">
-								<span><strong>{failedCount}</strong> failed</span>
-							</div>
-						{/if}
+				<div class="stats-row">
+					<div class="stat-item">
+						<span class="pulse-dot"></span>
+						<span><strong>{studentCount}</strong> students</span>
 					</div>
+					<span class="stat-separator">•</span>
+					<div class="stat-item">
+						<span><strong>{presentCount}</strong> present</span>
+					</div>
+					{#if failedCount > 0}
+						<span class="stat-separator">•</span>
+						<div class="stat-item error-text">
+							<span><strong>{failedCount}</strong> failed</span>
+						</div>
+					{/if}
+				</div>
 				<!-- {/if} -->
 
 				<div class="hero-filters">
 					<div class="filter-columns">
 						<!-- Row 1: Session, Class, Section -->
 						<div class="filter-group">
-							<select value={currentSession.toString()} onchange={(e) => { currentSession = Number((e.target as HTMLSelectElement).value); handleSessionChange(); }} class="form-select filter-select">
+							<select
+								value={currentSession.toString()}
+								onchange={(e) => {
+									currentSession = Number((e.target as HTMLSelectElement).value);
+									handleSessionChange();
+								}}
+								class="filter-select form-select"
+							>
 								{#each data.sessions as session (session.id)}
 									<option value={session.id.toString()}>{session.year}</option>
 								{/each}
 							</select>
 
-							<select value={currentClass.toString()} onchange={(e) => { currentClass = Number((e.target as HTMLSelectElement).value); handleClassChange(); }} class="form-select filter-select">
+							<select
+								value={currentClass.toString()}
+								onchange={(e) => {
+									currentClass = Number((e.target as HTMLSelectElement).value);
+									handleClassChange();
+								}}
+								class="filter-select form-select"
+							>
 								{#if classes.length === 0}
 									<option value="0">No Class</option>
 								{/if}
@@ -340,7 +364,14 @@
 								{/each}
 							</select>
 
-							<select value={currentSection.toString()} onchange={(e) => { currentSection = Number((e.target as HTMLSelectElement).value); handleSectionChange(); }} class="form-select filter-select">
+							<select
+								value={currentSection.toString()}
+								onchange={(e) => {
+									currentSection = Number((e.target as HTMLSelectElement).value);
+									handleSectionChange();
+								}}
+								class="filter-select form-select"
+							>
 								{#if sections.length === 0}
 									<option value="0">No sections</option>
 								{/if}
@@ -360,17 +391,31 @@
 									bind:checked={allPresentMode}
 									onchange={handleAllPresentToggle}
 									class="form-checkbox"
-								>
+								/>
 								<span>All Present</span>
 							</label>
 
-							<select value={currentTerm.toString()} onchange={(e) => { currentTerm = Number((e.target as HTMLSelectElement).value); handleTermChange(); }} class="form-select filter-select">
+							<select
+								value={currentTerm.toString()}
+								onchange={(e) => {
+									currentTerm = Number((e.target as HTMLSelectElement).value);
+									handleTermChange();
+								}}
+								class="filter-select form-select"
+							>
 								{#each filteredTerms as term (term.id)}
 									<option value={term.id.toString()}>{term.name}</option>
 								{/each}
 							</select>
 
-							<select value={currentSubject.toString()} onchange={(e) => { currentSubject = Number((e.target as HTMLSelectElement).value); handleSubjectChange(); }} class="form-select filter-select primary-select">
+							<select
+								value={currentSubject.toString()}
+								onchange={(e) => {
+									currentSubject = Number((e.target as HTMLSelectElement).value);
+									handleSubjectChange();
+								}}
+								class="filter-select primary-select form-select"
+							>
 								{#if subjects.length === 0}
 									<option value="0">No subjects configured</option>
 								{/if}
@@ -394,12 +439,13 @@
 						<th class="w-20">Roll</th>
 						<th>Student Name</th>
 						{#if !allPresentMode}
-							<th class="text-center w-28">Present</th>
+							<th class="w-28 text-center">Present</th>
 						{/if}
 						<th class="w-18">
-							Marks {#if currentFullMark > 0} <span class="font-normal text-muted">({currentFullMark})</span>{/if}
+							Marks {#if currentFullMark > 0}
+								<span class="text-muted font-normal">({currentFullMark})</span>{/if}
 						</th>
-						<th class="text-center w-16"></th>
+						<th class="w-16 text-center"></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -411,23 +457,23 @@
 							<td class="font-medium">
 								{student.studentName}
 								{#if student.transferDate}
-									<span class="text-xs text-error font-semibold ml-2 italic">(Transferred)</span>
+									<span class="ml-2 text-xs font-semibold text-error italic">(Transferred)</span>
 								{/if}
 							</td>
 							{#if !allPresentMode}
 								<td class="text-center">
-									<input 
+									<input
 										type="checkbox"
 										bind:checked={student.isPresent}
 										onchange={() => handlePresentToggle(student)}
 										disabled={!!student.transferDate}
 										tabindex="-1"
-										class="form-checkbox mx-auto"
-									>
+										class="mx-auto form-checkbox"
+									/>
 								</td>
 							{/if}
 							<td>
-								<input 
+								<input
 									type="number"
 									min="0"
 									step="0.1"
@@ -436,14 +482,21 @@
 									onfocus={(e) => (e.target as HTMLInputElement).select()}
 									disabled={!!student.transferDate || (!allPresentMode && !student.isPresent)}
 									placeholder="0"
-									class="form-input mark-input {saveStatus[student.seid] === 'warning' ? 'input-warning' : isFailed(student) ? 'input-failed' : ''}"
-								>
+									class="mark-input form-input {saveStatus[student.seid] === 'warning'
+										? 'input-warning'
+										: isFailed(student)
+											? 'input-failed'
+											: ''}"
+								/>
 							</td>
-							<td class="text-center w-10">
+							<td class="w-10 text-center">
 								{#if saveStatus[student.seid] === 'saved'}
 									<span class="status-icon success-icon" in:fade={{ duration: 200 }}>✓</span>
 								{:else if saveStatus[student.seid] === 'warning'}
-									<span class="status-icon warning-icon" title="Marks exceed full marks — please correct">&gt;{currentFullMark}</span>
+									<span
+										class="status-icon warning-icon"
+										title="Marks exceed full marks — please correct">&gt;{currentFullMark}</span
+									>
 								{:else if saveStatus[student.seid] === 'error'}
 									<span class="status-icon error-icon" title="Save failed — try again">✗</span>
 								{/if}
@@ -455,13 +508,25 @@
 						<tr>
 							<td colspan={allPresentMode ? 4 : 5} class="empty-state">
 								<div class="empty-icon">
-									<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-										<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
+									<svg
+										class="h-6 w-6"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+										stroke-width="1.5"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z"
+										/>
 									</svg>
 								</div>
 								{#if subjects.length === 0}
 									<h3 class="empty-title">No subjects configured</h3>
-									<p class="empty-desc">Set up exam configuration first for this session, class, and term.</p>
+									<p class="empty-desc">
+										Set up exam configuration first for this session, class, and term.
+									</p>
 								{:else}
 									<h3 class="empty-title">No students found</h3>
 									<p class="empty-desc">No students are enrolled for the selected section.</p>
@@ -469,7 +534,6 @@
 							</td>
 						</tr>
 					{/if}
-
 				</tbody>
 			</table>
 		</div>
@@ -579,9 +643,15 @@
 	}
 
 	@keyframes pulse {
-		0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-status-success) 50%, transparent); }
-		70% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-status-success) 0%, transparent); }
-		100% { box-shadow: 0 0 0 0 transparent; }
+		0% {
+			box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-status-success) 50%, transparent);
+		}
+		70% {
+			box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-status-success) 0%, transparent);
+		}
+		100% {
+			box-shadow: 0 0 0 0 transparent;
+		}
 	}
 
 	.stat-separator {
@@ -732,20 +802,39 @@
 		background-color: color-mix(in srgb, var(--color-surface-high) 40%, transparent);
 	}
 
-	.text-center { text-align: center; }
-	.font-medium { font-weight: 500; }
-	.font-bold { font-weight: 700; }
-	.text-muted { color: var(--color-on-surface-variant); }
-	.tabular-nums { font-variant-numeric: tabular-nums; }
-	.mx-auto { margin-left: auto; margin-right: auto; }
+	.text-center {
+		text-align: center;
+	}
+	.font-medium {
+		font-weight: 500;
+	}
+	.font-bold {
+		font-weight: 700;
+	}
+	.text-muted {
+		color: var(--color-on-surface-variant);
+	}
+	.tabular-nums {
+		font-variant-numeric: tabular-nums;
+	}
+	.mx-auto {
+		margin-left: auto;
+		margin-right: auto;
+	}
 
-	.w-10 { width: 32px; }
-	.w-16 { width: 36px; }
-	.w-20 { width: 36px; }
-	.w-28 { width: 48px; }
+	.w-10 {
+		width: 32px;
+	}
+	.w-16 {
+		width: 36px;
+	}
+	.w-20 {
+		width: 36px;
+	}
+	.w-28 {
+		width: 48px;
+	}
 	/* .w-36 { width: 64px; } */
-
-
 
 	/* Compact checkbox for grid rows */
 	.data-table .form-checkbox {
@@ -754,7 +843,8 @@
 		border-radius: 2px;
 	}
 
-	.form-select, .form-input {
+	.form-select,
+	.form-input {
 		border-radius: var(--radius-lg);
 		border: 1px solid var(--color-outline);
 		background-color: var(--color-surface);
@@ -774,7 +864,8 @@
 		padding-right: 40px;
 	}
 
-	.form-select:focus, .form-input:focus {
+	.form-select:focus,
+	.form-input:focus {
 		border-color: var(--color-primary);
 		background-color: var(--color-surface-lowest);
 		outline: none;

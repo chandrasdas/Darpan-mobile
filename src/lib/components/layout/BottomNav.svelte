@@ -9,7 +9,7 @@
 	{#each mobileNavItems as item (item.label)}
 		{@const active = isActive(item.href, page.url.pathname)}
 		<a
-			href={resolve(item.href as "/")}
+			href={resolve(item.href as '/')}
 			class="nav-item"
 			class:nav-active={active}
 			aria-current={active ? 'page' : undefined}

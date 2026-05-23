@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer';
 import { env } from '$env/dynamic/private';
 
 const transporter = nodemailer.createTransport({
-	host: "mail.rkmvvmmalda.org",
+	host: 'mail.rkmvvmmalda.org',
 	port: 465,
 	secure: true,
 	auth: {
@@ -11,7 +11,15 @@ const transporter = nodemailer.createTransport({
 	}
 });
 
-export async function sendEmail({ to, subject, html }: { to: string; subject: string; html: string }) {
+export async function sendEmail({
+	to,
+	subject,
+	html
+}: {
+	to: string;
+	subject: string;
+	html: string;
+}) {
 	try {
 		const info = await transporter.sendMail({
 			from: `"Darpan Portal" <${env.SMTP_USER}>`,

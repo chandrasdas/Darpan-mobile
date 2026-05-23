@@ -32,59 +32,127 @@
 		const year = parseInt(parts[0]);
 		const month = parseInt(parts[1]) - 1; // 0-indexed
 		const day = parseInt(parts[2]);
-		
+
 		const months = [
-			"JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
-			"JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"
+			'JANUARY',
+			'FEBRUARY',
+			'MARCH',
+			'APRIL',
+			'MAY',
+			'JUNE',
+			'JULY',
+			'AUGUST',
+			'SEPTEMBER',
+			'OCTOBER',
+			'NOVEMBER',
+			'DECEMBER'
 		];
-		
-		const ones = ["", "FIRST", "SECOND", "THIRD", "FOURTH", "FIFTH", "SIXTH", "SEVENTH", "EIGHTH", "NINTH", "TENTH",
-					  "ELEVENTH", "TWELFTH", "THIRTEENTH", "FOURTEENTH", "FIFTEENTH", "SIXTEENTH", "SEVENTEENTH", "EIGHTEENTH", "NINETEENTH"];
-		const tens = ["", "", "TWENTY", "THIRTY"];
-		
+
+		const ones = [
+			'',
+			'FIRST',
+			'SECOND',
+			'THIRD',
+			'FOURTH',
+			'FIFTH',
+			'SIXTH',
+			'SEVENTH',
+			'EIGHTH',
+			'NINTH',
+			'TENTH',
+			'ELEVENTH',
+			'TWELFTH',
+			'THIRTEENTH',
+			'FOURTEENTH',
+			'FIFTEENTH',
+			'SIXTEENTH',
+			'SEVENTEENTH',
+			'EIGHTEENTH',
+			'NINETEENTH'
+		];
+		const tens = ['', '', 'TWENTY', 'THIRTY'];
+
 		let dayWord = '';
 		if (day < 20) {
 			dayWord = ones[day];
 		} else {
 			const rem = day % 10;
-			dayWord = tens[Math.floor(day / 10)] + (rem > 0 ? "-" + ones[rem] : "");
+			dayWord = tens[Math.floor(day / 10)] + (rem > 0 ? '-' + ones[rem] : '');
 		}
-		if (day === 20) dayWord = "TWENTIETH";
-		if (day === 30) dayWord = "THIRTIETH";
-		if (day === 31) dayWord = "THIRTY-FIRST";
-		if (day === 21) dayWord = "TWENTY-FIRST";
-		if (day === 22) dayWord = "TWENTY-SECOND";
-		if (day === 23) dayWord = "TWENTY-THIRD";
-		if (day === 24) dayWord = "TWENTY-FOURTH";
-		if (day === 25) dayWord = "TWENTY-FIFTH";
-		if (day === 26) dayWord = "TWENTY-SIXTH";
-		if (day === 27) dayWord = "TWENTY-SEVENTH";
-		if (day === 28) dayWord = "TWENTY-EIGHTH";
-		if (day === 29) dayWord = "TWENTY-NINTH";
+		if (day === 20) dayWord = 'TWENTIETH';
+		if (day === 30) dayWord = 'THIRTIETH';
+		if (day === 31) dayWord = 'THIRTY-FIRST';
+		if (day === 21) dayWord = 'TWENTY-FIRST';
+		if (day === 22) dayWord = 'TWENTY-SECOND';
+		if (day === 23) dayWord = 'TWENTY-THIRD';
+		if (day === 24) dayWord = 'TWENTY-FOURTH';
+		if (day === 25) dayWord = 'TWENTY-FIFTH';
+		if (day === 26) dayWord = 'TWENTY-SIXTH';
+		if (day === 27) dayWord = 'TWENTY-SEVENTH';
+		if (day === 28) dayWord = 'TWENTY-EIGHTH';
+		if (day === 29) dayWord = 'TWENTY-NINTH';
 
 		const monthWord = months[month] || '';
-		
+
 		function numberToWords(num: number): string {
-			const onesArr = ["", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN",
-							 "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTEEN", "NINETEEN"];
-			const tensArr = ["", "", "TWENTY", "THIRTY", "FORTY", "FIFTY", "SIXTY", "SEVENTY", "EIGHTY", "NINETY"];
-			
-			if (num === 2000) return "TWO THOUSAND";
+			const onesArr = [
+				'',
+				'ONE',
+				'TWO',
+				'THREE',
+				'FOUR',
+				'FIVE',
+				'SIX',
+				'SEVEN',
+				'EIGHT',
+				'NINE',
+				'TEN',
+				'ELEVEN',
+				'TWELVE',
+				'THIRTEEN',
+				'FOURTEEN',
+				'FIFTEEN',
+				'SIXTEEN',
+				'SEVENTEEN',
+				'EIGHTEEN',
+				'NINETEEN'
+			];
+			const tensArr = [
+				'',
+				'',
+				'TWENTY',
+				'THIRTY',
+				'FORTY',
+				'FIFTY',
+				'SIXTY',
+				'SEVENTY',
+				'EIGHTY',
+				'NINETY'
+			];
+
+			if (num === 2000) return 'TWO THOUSAND';
 			if (num >= 2000 && num < 2100) {
 				const offset = num - 2000;
-				if (offset < 20) return "TWO THOUSAND AND " + onesArr[offset];
-				return "TWO THOUSAND AND " + tensArr[Math.floor(offset / 10)] + (offset % 10 > 0 ? " " + onesArr[offset % 10] : "");
+				if (offset < 20) return 'TWO THOUSAND AND ' + onesArr[offset];
+				return (
+					'TWO THOUSAND AND ' +
+					tensArr[Math.floor(offset / 10)] +
+					(offset % 10 > 0 ? ' ' + onesArr[offset % 10] : '')
+				);
 			}
 			if (num >= 1900 && num < 2000) {
 				const secondPart = num - 1900;
 				let secWord = '';
 				if (secondPart < 20) secWord = onesArr[secondPart];
-				else secWord = tensArr[Math.floor(secondPart / 10)] + (secondPart % 10 > 0 ? "-" + onesArr[secondPart % 10] : "");
-				return "NINETEEN HUNDRED " + secWord;
+				else
+					secWord =
+						tensArr[Math.floor(secondPart / 10)] +
+						(secondPart % 10 > 0 ? '-' + onesArr[secondPart % 10] : '');
+				return 'NINETEEN HUNDRED ' + secWord;
 			}
 			return num.toString();
 		}
-		
+
 		return `${dayWord} DAY OF ${monthWord} ${numberToWords(year)}`;
 	}
 
@@ -96,12 +164,34 @@
 <div class="print-page-shell" in:fade={{ duration: 400 }}>
 	<!-- Action Bar (Hidden during print) -->
 	<div class="action-bar no-print">
-		<a href={resolve('/students/transferred' as "/")} class="back-link">
-			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+		<a href={resolve('/students/transferred' as '/')} class="back-link">
+			<svg
+				width="20"
+				height="20"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg
+			>
 			<span>Back to Registry</span>
 		</a>
 		<button onclick={handlePrint} class="print-btn">
-			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+			<svg
+				width="20"
+				height="20"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				><polyline points="6 9 6 2 18 2 18 9" /><path
+					d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
+				/><rect x="6" y="14" width="12" height="8" /></svg
+			>
 			<span>Print Certificate</span>
 		</button>
 	</div>
@@ -109,8 +199,14 @@
 	<!-- Printable Certificate Wrapper -->
 	<div class="certificate-wrapper relative">
 		<!-- Watermark (Rotated and faded in background) -->
-		<div class="watermark-container absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
-			<img src={resolve('/emblem.jpg' as "/")} alt="Watermark" class="watermark-img opacity-5 select-none" />
+		<div
+			class="watermark-container pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden select-none"
+		>
+			<img
+				src={resolve('/emblem.jpg' as '/')}
+				alt="Watermark"
+				class="watermark-img opacity-5 select-none"
+			/>
 		</div>
 
 		<!-- Certificate Content -->
@@ -118,14 +214,18 @@
 			<!-- Header -->
 			<div class="certificate-header">
 				<div class="header-main-flex">
-					<img src={resolve('/emblem.jpg' as "/")} alt="RKM Logo" class="school-logo-img" />
+					<img src={resolve('/emblem.jpg' as '/')} alt="RKM Logo" class="school-logo-img" />
 					<div class="vertical-separator"></div>
 					<div class="school-info-details">
 						<h1 class="school-name">RAMAKRISHNA MISSION VIVEKANANDA VIDYAMANDIR</h1>
 						<p class="school-address">PO & DT : MALDA &bull; PIN : 732 101 &bull; WEST BENGAL</p>
 						<p class="school-phone">Phone No. : 03512 - 252850</p>
-						<p class="school-web-email">website : www.rkmvvmmalda.org &bull; e-mail : rkmvvmmalda@gmail.com</p>
-						<p class="school-index">School Index No. : Secondary : R1-091 &bull; Higher Secondary : 111082</p>
+						<p class="school-web-email">
+							website : www.rkmvvmmalda.org &bull; e-mail : rkmvvmmalda@gmail.com
+						</p>
+						<p class="school-index">
+							School Index No. : Secondary : R1-091 &bull; Higher Secondary : 111082
+						</p>
 					</div>
 				</div>
 				<div class="title-badge-wrapper">
@@ -134,7 +234,9 @@
 			</div>
 
 			<!-- Metadata row (TC No, Admission No) -->
-			<div class="certificate-meta flex justify-between border-b border-dotted border-slate-400 pb-2 mt-6">
+			<div
+				class="certificate-meta mt-6 flex justify-between border-b border-dotted border-slate-400 pb-2"
+			>
 				<div class="meta-item">
 					<span class="meta-label font-semibold">T.C. Serial No:</span>
 					<span class="meta-value font-bold text-slate-800">TC/2026/{student.sid}</span>
@@ -174,7 +276,7 @@
 					<div class="field-row flex-1">
 						<span class="field-number">5.</span>
 						<span class="field-label">PEN Number:</span>
-						<span class="field-value font-mono font-bold text-xs">{student.penNo || 'N/A'}</span>
+						<span class="field-value font-mono text-xs font-bold">{student.penNo || 'N/A'}</span>
 					</div>
 				</div>
 
@@ -182,7 +284,9 @@
 					<span class="field-number">6.</span>
 					<span class="field-label">Date of first admission in the School:</span>
 					<span class="field-value">
-						{student.createdAt ? formatDateReadable(new Date(student.createdAt).toISOString().split('T')[0]) : 'N/A'}
+						{student.createdAt
+							? formatDateReadable(new Date(student.createdAt).toISOString().split('T')[0])
+							: 'N/A'}
 					</span>
 				</div>
 
@@ -227,7 +331,9 @@
 					<div class="field-row flex-1">
 						<span class="field-number">12.</span>
 						<span class="field-label">Dues paid up to:</span>
-						<span class="field-value font-semibold">Paid (Transfer Date: {student.transferDate})</span>
+						<span class="field-value font-semibold"
+							>Paid (Transfer Date: {student.transferDate})</span
+						>
 					</div>
 				</div>
 
@@ -235,12 +341,16 @@
 					<div class="field-row flex-1">
 						<span class="field-number">13.</span>
 						<span class="field-label">Date of application for Certificate:</span>
-						<span class="field-value">{student.transferDate ? formatDateReadable(student.transferDate) : 'N/A'}</span>
+						<span class="field-value"
+							>{student.transferDate ? formatDateReadable(student.transferDate) : 'N/A'}</span
+						>
 					</div>
 					<div class="field-row flex-1">
 						<span class="field-number">14.</span>
 						<span class="field-label">Date of issue of Certificate:</span>
-						<span class="field-value font-semibold">{student.transferDate ? formatDateReadable(student.transferDate) : 'N/A'}</span>
+						<span class="field-value font-semibold"
+							>{student.transferDate ? formatDateReadable(student.transferDate) : 'N/A'}</span
+						>
 					</div>
 				</div>
 
@@ -258,7 +368,9 @@
 			</div>
 
 			<!-- Footer signatures -->
-			<div class="certificate-footer flex justify-between items-end mt-20 pt-8 border-t border-slate-200">
+			<div
+				class="certificate-footer mt-20 flex items-end justify-between border-t border-slate-200 pt-8"
+			>
 				<div class="signature-line flex flex-col items-center">
 					<div class="sig-space"></div>
 					<span class="sig-label">Signature of Class Teacher</span>
@@ -424,7 +536,9 @@
 		}
 	}
 
-	.school-phone, .school-web-email, .school-index {
+	.school-phone,
+	.school-web-email,
+	.school-index {
 		font-size: 9.5px;
 		margin: 0;
 		color: #475569;
@@ -432,7 +546,9 @@
 	}
 
 	@media (min-width: 640px) {
-		.school-phone, .school-web-email, .school-index {
+		.school-phone,
+		.school-web-email,
+		.school-index {
 			font-size: 10.5px;
 		}
 	}

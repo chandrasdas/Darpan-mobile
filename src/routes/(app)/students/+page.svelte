@@ -33,7 +33,7 @@
 	let totalRecords = $state(data.totalRecords);
 
 	async function fetchStudents(pageToFetch = 1) {
-	try {
+		try {
 			const result = await getFilteredStudents({
 				q: currentQuery,
 				session: currentSession,
@@ -47,8 +47,8 @@
 			hasNextPage = result.hasNextPage;
 			totalRecords = result.totalRecords;
 		} catch (error) {
-			console.error("fetchStudents error:", error);
-			alert("Error fetching students: " + error);
+			console.error('fetchStudents error:', error);
+			alert('Error fetching students: ' + error);
 		}
 	}
 
@@ -56,7 +56,7 @@
 		const target = e.target as HTMLSelectElement;
 		const newClassId = target.value;
 		currentClass = newClassId;
-		
+
 		if (newClassId) {
 			const fetchedSections = await getSections(parseInt(newClassId)).run();
 			sections = fetchedSections;
@@ -72,7 +72,7 @@
 		const target = e.target as HTMLSelectElement;
 		currentSession = target.value;
 		classes = await getClasses(parseInt(currentSession)).run();
-		
+
 		// Reset class and section so all students in the session are shown
 		currentClass = '';
 		sections = [];
@@ -102,31 +102,46 @@
 				<p class="page-subtitle">Manage and search through the student records.</p>
 				<div class="record-count">
 					<span class="status-indicator">
-						<span class="status-ping" class:bg-amber={totalRecords === 0} class:bg-emerald={totalRecords > 0}></span>
-						<span class="status-dot" class:bg-amber-solid={totalRecords === 0} class:bg-emerald-solid={totalRecords > 0}></span>
+						<span
+							class="status-ping"
+							class:bg-amber={totalRecords === 0}
+							class:bg-emerald={totalRecords > 0}
+						></span>
+						<span
+							class="status-dot"
+							class:bg-amber-solid={totalRecords === 0}
+							class:bg-emerald-solid={totalRecords > 0}
+						></span>
 					</span>
 					<span class="count-text">
 						Showing <strong class="count-number">{totalRecords}</strong> students
 					</span>
 				</div>
 			</div>
-			
+
 			<div class="filters-container">
 				<!-- Search -->
 				<div class="search-box">
 					<div class="search-icon-wrapper">
 						<svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+							/>
 						</svg>
 					</div>
-					<input 
-						type="search" 
+					<input
+						type="search"
 						value={currentQuery}
 						oninput={handleSearchInput}
-						onkeydown={(e) => { if (e.key === 'Enter') fetchStudents(1); }}
-						placeholder="Search name or Portal ID..." 
+						onkeydown={(e) => {
+							if (e.key === 'Enter') fetchStudents(1);
+						}}
+						placeholder="Search name or Portal ID..."
 						class="search-input"
-					>
+					/>
 				</div>
 
 				<div class="filter-divider"></div>
@@ -139,18 +154,14 @@
 						{/each}
 					</select>
 
-					<select 
-						value={currentClass} 
-						onchange={handleClassChange}
-						class="filter-select"
-					>
+					<select value={currentClass} onchange={handleClassChange} class="filter-select">
 						<option value="">Select Class</option>
 						{#each classes as cls (cls.id)}
 							<option value={cls.id.toString()}>{cls.name}</option>
 						{/each}
 					</select>
 
-					<select 
+					<select
 						value={currentSection}
 						onchange={(e) => {
 							const target = e.target as HTMLSelectElement;
@@ -186,57 +197,147 @@
 				</thead>
 				<tbody>
 					{#each students as student, i (student.sid)}
-					<tr class:student-transferred={student.transferDate}>
-						<td>{((currentPage - 1) * 80) + (i + 1)}</td>
-						<td class="font-medium">
-							{student.name}
-							{#if student.transferDate}
-								<span class="transfer-badge">Transferred</span>
-							{/if}
-						</td>
-						<td class="text-secondary">{student.className || '-'}</td>
-						<td class="text-secondary">{student.sectionLetter || '-'}</td>
-						<td class="text-secondary">{student.rollNo || '-'}</td>
-						<td class="text-secondary">{student.guardianNo}</td>
-						<td>
-							<div class="actions-flex">
-								<a href={resolve(`/students/${student.sid}` as "/")} class="action-icon-link view" title="View Details">
-									<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-								</a>
+						<tr class:student-transferred={student.transferDate}>
+							<td>{(currentPage - 1) * 80 + (i + 1)}</td>
+							<td class="font-medium">
+								{student.name}
 								{#if student.transferDate}
-									<a href={resolve(`/students/${student.sid}/transfer-certificate` as "/")} class="action-icon-link cert" title="Print Transfer Certificate">
-										<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+									<span class="transfer-badge">Transferred</span>
+								{/if}
+							</td>
+							<td class="text-secondary">{student.className || '-'}</td>
+							<td class="text-secondary">{student.sectionLetter || '-'}</td>
+							<td class="text-secondary">{student.rollNo || '-'}</td>
+							<td class="text-secondary">{student.guardianNo}</td>
+							<td>
+								<div class="actions-flex">
+									<a
+										href={resolve(`/students/${student.sid}` as '/')}
+										class="action-icon-link view"
+										title="View Details"
+									>
+										<svg
+											width="20"
+											height="20"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle
+												cx="12"
+												cy="12"
+												r="3"
+											/></svg
+										>
 									</a>
-								{:else}
-									<a href={resolve(`/students/${student.sid}/bonafide-certificate` as "/")} class="action-icon-link cert" title="Bonafide Certificate">
-										<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
-									</a>
-									{#if currentSession === data.sessions[0]?.id.toString()}
-										<a href={resolve(`/students/transferred?sid=${student.sid}` as "/")} class="action-icon-link transfer" title="Transfer Student">
-											<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
+									{#if student.transferDate}
+										<a
+											href={resolve(`/students/${student.sid}/transfer-certificate` as '/')}
+											class="action-icon-link cert"
+											title="Print Transfer Certificate"
+										>
+											<svg
+												width="20"
+												height="20"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												><path
+													d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"
+												/><polyline points="14 2 14 8 20 8" /><path d="M16 13H8" /><path
+													d="M16 17H8"
+												/><path d="M10 9H8" /></svg
+											>
 										</a>
 									{:else}
-										<button type="button" class="action-icon-link transfer" disabled title="Cannot transfer student from a previous session">
-											<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
-										</button>
+										<a
+											href={resolve(`/students/${student.sid}/bonafide-certificate` as '/')}
+											class="action-icon-link cert"
+											title="Bonafide Certificate"
+										>
+											<svg
+												width="20"
+												height="20"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												><circle cx="12" cy="8" r="6" /><path
+													d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"
+												/></svg
+											>
+										</a>
+										{#if currentSession === data.sessions[0]?.id.toString()}
+											<a
+												href={resolve(`/students/transferred?sid=${student.sid}` as '/')}
+												class="action-icon-link transfer"
+												title="Transfer Student"
+											>
+												<svg
+													width="20"
+													height="20"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													><path d="m16 3 4 4-4 4" /><path d="M20 7H4" /><path
+														d="m8 21-4-4 4-4"
+													/><path d="M4 17h16" /></svg
+												>
+											</a>
+										{:else}
+											<button
+												type="button"
+												class="action-icon-link transfer"
+												disabled
+												title="Cannot transfer student from a previous session"
+											>
+												<svg
+													width="20"
+													height="20"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													><path d="m16 3 4 4-4 4" /><path d="M20 7H4" /><path
+														d="m8 21-4-4 4-4"
+													/><path d="M4 17h16" /></svg
+												>
+											</button>
+										{/if}
 									{/if}
-								{/if}
-							</div>
-						</td>
-					</tr>
+								</div>
+							</td>
+						</tr>
 					{/each}
 					{#if students.length === 0}
-					<tr>
-						<td colspan="7" class="empty-state">
-							<div class="empty-icon-wrapper">
-								<svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-								</svg>
-							</div>
-							<h3 class="empty-title">No students found</h3>
-							<p class="empty-subtitle">We couldn't find any records matching your criteria.</p>
-						</td>
-					</tr>
+						<tr>
+							<td colspan="7" class="empty-state">
+								<div class="empty-icon-wrapper">
+									<svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+										/>
+									</svg>
+								</div>
+								<h3 class="empty-title">No students found</h3>
+								<p class="empty-subtitle">We couldn't find any records matching your criteria.</p>
+							</td>
+						</tr>
 					{/if}
 				</tbody>
 			</table>
@@ -246,33 +347,34 @@
 	<!-- Pagination -->
 	<div class="pagination-container">
 		<p class="pagination-info">
-			Page <span class="pagination-current">{currentPage}</span> of <span class="pagination-total">{totalPages}</span>
+			Page <span class="pagination-current">{currentPage}</span> of
+			<span class="pagination-total">{totalPages}</span>
 		</p>
 		<div class="pagination-controls">
-			<button 
-				onclick={() => fetchStudents(1)} 
+			<button
+				onclick={() => fetchStudents(1)}
 				disabled={currentPage === 1}
 				title="First Page"
 				class="pagination-btn hidden-mobile"
 			>
 				First
 			</button>
-			<button 
-				onclick={() => fetchStudents(currentPage - 1)} 
+			<button
+				onclick={() => fetchStudents(currentPage - 1)}
 				disabled={currentPage === 1}
 				class="pagination-btn"
 			>
 				Previous
 			</button>
-			<button 
-				onclick={() => fetchStudents(currentPage + 1)} 
+			<button
+				onclick={() => fetchStudents(currentPage + 1)}
 				disabled={!hasNextPage}
 				class="pagination-btn"
 			>
 				Next
 			</button>
-			<button 
-				onclick={() => fetchStudents(totalPages)} 
+			<button
+				onclick={() => fetchStudents(totalPages)}
 				disabled={currentPage === totalPages}
 				title="Last Page"
 				class="pagination-btn hidden-mobile"
@@ -366,10 +468,20 @@
 		border-radius: 50%;
 	}
 
-	.bg-amber { background-color: #fbbf24; }
-	.bg-amber-solid { background-color: #f59e0b; box-shadow: 0 0 8px rgba(245, 158, 11, 0.8); }
-	.bg-emerald { background-color: #34d399; }
-	.bg-emerald-solid { background-color: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.8); }
+	.bg-amber {
+		background-color: #fbbf24;
+	}
+	.bg-amber-solid {
+		background-color: #f59e0b;
+		box-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
+	}
+	.bg-emerald {
+		background-color: #34d399;
+	}
+	.bg-emerald-solid {
+		background-color: #10b981;
+		box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+	}
 
 	.count-text {
 		font-size: 14px;
@@ -521,7 +633,8 @@
 		.data-table {
 			font-size: 14px;
 		}
-		.data-table th, .data-table td {
+		.data-table th,
+		.data-table td {
 			padding: 16px;
 			font-size: 14px;
 		}
@@ -614,9 +727,15 @@
 		background-color: color-mix(in srgb, var(--color-on-surface) 5%, transparent);
 	}
 
-	.action-icon-link.view:hover:not(:disabled) { color: var(--color-primary); }
-	.action-icon-link.cert:hover:not(:disabled) { color: #10b981; }
-	.action-icon-link.transfer:hover:not(:disabled) { color: #f59e0b; }
+	.action-icon-link.view:hover:not(:disabled) {
+		color: var(--color-primary);
+	}
+	.action-icon-link.cert:hover:not(:disabled) {
+		color: #10b981;
+	}
+	.action-icon-link.transfer:hover:not(:disabled) {
+		color: #f59e0b;
+	}
 
 	.action-icon-link:disabled {
 		opacity: 0.4;
@@ -670,7 +789,8 @@
 		color: var(--color-on-surface-variant);
 	}
 
-	.pagination-current, .pagination-total {
+	.pagination-current,
+	.pagination-total {
 		font-weight: 500;
 		color: var(--color-on-surface);
 	}
@@ -713,7 +833,8 @@
 	}
 
 	@keyframes ping {
-		75%, 100% {
+		75%,
+		100% {
 			transform: scale(2);
 			opacity: 0;
 		}

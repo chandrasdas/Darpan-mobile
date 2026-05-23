@@ -16,13 +16,13 @@ export const auth = betterAuth({
 	user: {
 		additionalFields: {
 			role: {
-				type: "string",
+				type: 'string',
 				required: true,
-				defaultValue: "teacher"
+				defaultValue: 'teacher'
 			}
 		}
 	},
-	
+
 	databaseHooks: {
 		user: {
 			create: {
@@ -31,17 +31,17 @@ export const auth = betterAuth({
 					const allowedUser = await db.query.allowedStaff.findFirst({
 						where: (staff, { eq }) => eq(staff.email, user.email)
 					});
-					
+
 					if (!allowedUser || !allowedUser.isAllowed) {
-						throw new Error("You are not authorized to create an account.");
+						throw new Error('You are not authorized to create an account.');
 					}
-					
+
 					// Set the user's role from the allowedStaff table
 					user.role = allowedUser.role;
-					
+
 					// Mark email as verified since they already passed the OTP check
 					user.emailVerified = true;
-					
+
 					return {
 						data: user
 					};
@@ -49,10 +49,10 @@ export const auth = betterAuth({
 			}
 		}
 	},
-	
+
 	// Disabled auto-send on signup since we verify BEFORE signup via OTP
 	emailVerification: {
-		sendOnSignUp: false,
+		sendOnSignUp: false
 	},
 
 	plugins: [

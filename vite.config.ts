@@ -3,8 +3,8 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-    plugins: [tailwindcss(), sveltekit()],
-    ssr: {
-        external: ['@libsql/client', 'libsql', 'drizzle-orm']
-    }
+	plugins: [tailwindcss(), sveltekit()],
+	ssr: {
+		external: ['@libsql/client', 'libsql', 'drizzle-orm']
+	}
 });

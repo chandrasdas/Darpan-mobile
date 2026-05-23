@@ -12,15 +12,25 @@
 
 	// Filter out adminOnly items for non-admin users
 	const visibleNavItems = $derived<NavItem[]>(
-		navItems.map((item) => ({
-			...item,
-			subItems: item.subItems?.filter((sub) => !sub.adminOnly || user?.role === 'admin')
-		})).filter((item) => !item.adminOnly || user?.role === 'admin')
+		navItems
+			.map((item) => ({
+				...item,
+				subItems: item.subItems?.filter((sub) => !sub.adminOnly || user?.role === 'admin')
+			}))
+			.filter((item) => !item.adminOnly || user?.role === 'admin')
 	);
 
 	onMount(() => {
 		for (const item of visibleNavItems) {
-			if (item.subItems?.some(sub => isActive(sub.href, page.url.pathname, item.subItems?.map(s => s.href)))) {
+			if (
+				item.subItems?.some((sub) =>
+					isActive(
+						sub.href,
+						page.url.pathname,
+						item.subItems?.map((s) => s.href)
+					)
+				)
+			) {
 				expandedMenus[item.label] = true;
 			}
 		}
@@ -42,30 +52,56 @@
 		<nav class="sidebar-nav">
 			{#each visibleNavItems as item (item.label)}
 				{@const hasSubItems = item.subItems && item.subItems.length > 0}
-				{@const active = item.href ? isActive(item.href, page.url.pathname) : (item.subItems?.some(sub => isActive(sub.href, page.url.pathname, item.subItems?.map(s => s.href))) ?? false)}
-				
+				{@const active = item.href
+					? isActive(item.href, page.url.pathname)
+					: (item.subItems?.some((sub) =>
+							isActive(
+								sub.href,
+								page.url.pathname,
+								item.subItems?.map((s) => s.href)
+							)
+						) ?? false)}
+
 				{#if hasSubItems}
 					<button
-						class="sidebar-link w-full text-left bg-transparent border-none focus:outline-none"
+						class="sidebar-link w-full border-none bg-transparent text-left focus:outline-none"
 						class:sidebar-link-active={active}
-						onclick={() => expandedMenus[item.label] = !expandedMenus[item.label]}
+						onclick={() => (expandedMenus[item.label] = !expandedMenus[item.label])}
 						aria-expanded={expandedMenus[item.label]}
 					>
 						<span class="sidebar-link-icon">
 							<NavIcon iconName={item.icon} {active} />
 						</span>
 						<span class="sidebar-link-text flex-1">{item.label}</span>
-						<span class="sidebar-chevron transition-transform duration-200" class:rotate-180={expandedMenus[item.label]}>
-							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+						<span
+							class="sidebar-chevron transition-transform duration-200"
+							class:rotate-180={expandedMenus[item.label]}
+						>
+							<svg
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"><path d="M6 9l6 6 6-6" /></svg
+							>
 						</span>
 					</button>
 					{#if expandedMenus[item.label]}
-						<div class="sidebar-subnav flex flex-col gap-1 pl-10 pr-4 pb-2">
+						<div class="sidebar-subnav flex flex-col gap-1 pr-4 pb-2 pl-10">
 							{#each item.subItems as sub (sub.label)}
-								{@const subActive = isActive(sub.href, page.url.pathname, item.subItems?.map(s => s.href))}
+								{@const subActive = isActive(
+									sub.href,
+									page.url.pathname,
+									item.subItems?.map((s) => s.href)
+								)}
 								<a
-									href={sub.href === '#' ? '#' : resolve(sub.href as "/")}
-									class="sidebar-sublink flex items-center gap-3 py-2 px-3 rounded-md text-[14px] transition-colors duration-200 {subActive ? 'text-(--color-on-secondary-container) font-medium bg-(--color-secondary-container)' : 'text-(--color-on-surface-variant) hover:text-(--color-on-surface) hover:bg-(--color-surface-high)'}"
+									href={sub.href === '#' ? '#' : resolve(sub.href as '/')}
+									class="sidebar-sublink flex items-center gap-3 rounded-md px-3 py-2 text-[14px] transition-colors duration-200 {subActive
+										? 'bg-(--color-secondary-container) font-medium text-(--color-on-secondary-container)'
+										: 'text-(--color-on-surface-variant) hover:bg-(--color-surface-high) hover:text-(--color-on-surface)'}"
 									onclick={(e) => {
 										if (sub.href === '#') {
 											e.preventDefault();
@@ -74,7 +110,11 @@
 										}
 									}}
 								>
-									<span class="sidebar-sublink-dot w-[5px] h-[5px] rounded-full {subActive ? 'bg-(--color-primary)' : 'bg-current opacity-40'}"></span>
+									<span
+										class="sidebar-sublink-dot h-[5px] w-[5px] rounded-full {subActive
+											? 'bg-(--color-primary)'
+											: 'bg-current opacity-40'}"
+									></span>
 									<span class="sidebar-sublink-text">{sub.label}</span>
 								</a>
 							{/each}
@@ -82,7 +122,7 @@
 					{/if}
 				{:else}
 					<a
-						href={item.href === '#' ? '#' : resolve(item.href as "/")}
+						href={item.href === '#' ? '#' : resolve(item.href as '/')}
 						class="sidebar-link"
 						class:sidebar-link-active={active}
 						aria-current={active ? 'page' : undefined}

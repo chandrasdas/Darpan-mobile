@@ -3,8 +3,8 @@
 	import { fade } from 'svelte/transition';
 	import StudentForm from '$lib/components/StudentForm.svelte';
 	import type { ActionData, PageData } from './$types';
-	
-	let { form, data } = $props<{ form: ActionData, data: PageData }>();
+
+	let { form, data } = $props<{ form: ActionData; data: PageData }>();
 </script>
 
 <svelte:head>
@@ -14,9 +14,14 @@
 <div class="page-shell" in:fade={{ duration: 400 }}>
 	<div class="page-hero">
 		<div class="hero-header">
-			<a href={resolve('/dashboard' as "/")} aria-label="Return to Dashboard" class="back-button">
+			<a href={resolve('/dashboard' as '/')} aria-label="Return to Dashboard" class="back-button">
 				<svg class="back-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M10 19l-7-7m0 0l7-7m-7 7h18"
+					/>
 				</svg>
 			</a>
 			<div class="hero-text">
@@ -30,25 +35,32 @@
 		<div class="success-card">
 			<div class="status-icon-wrapper emerald-icon">
 				<svg class="status-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+					/>
 				</svg>
 			</div>
 			<h2 class="status-title">Student Registered Successfully!</h2>
-			<p class="status-message">The new student has been saved to the database and enrolled in the selected session.</p>
-			
+			<p class="status-message">
+				The new student has been saved to the database and enrolled in the selected session.
+			</p>
+
 			<div class="status-action">
-				<a href={resolve('/students/add' as "/")} class="primary-button" onclick={() => window.location.reload()}>
+				<a
+					href={resolve('/students/add' as '/')}
+					class="primary-button"
+					onclick={() => window.location.reload()}
+				>
 					Register Another Student
 				</a>
 			</div>
 		</div>
 	{:else}
 		<div class="form-card">
-			<StudentForm 
-				sessions={data.sessions} 
-				sections={data.sections} 
-				{form} 
-			/>
+			<StudentForm sessions={data.sessions} sections={data.sections} {form} />
 		</div>
 	{/if}
 </div>

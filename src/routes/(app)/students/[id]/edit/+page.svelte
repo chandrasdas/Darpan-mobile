@@ -4,7 +4,7 @@
 	import StudentForm from '$lib/components/StudentForm.svelte';
 	import type { ActionData, PageData } from './$types';
 
-	let { form, data } = $props<{ form: ActionData, data: PageData }>();
+	let { form, data } = $props<{ form: ActionData; data: PageData }>();
 </script>
 
 <svelte:head>
@@ -14,25 +14,36 @@
 <div class="page-shell" in:fade={{ duration: 400 }}>
 	<div class="page-hero">
 		<div class="hero-header">
-			<a href={resolve(`/students/${data.student.sid}` as "/")} aria-label="Return to Student Details" class="back-button">
+			<a
+				href={resolve(`/students/${data.student.sid}` as '/')}
+				aria-label="Return to Student Details"
+				class="back-button"
+			>
 				<svg class="back-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M10 19l-7-7m0 0l7-7m-7 7h18"
+					/>
 				</svg>
 			</a>
 			<div class="hero-text">
 				<h1 class="page-title">Edit Details</h1>
-				<p class="page-subtitle">Update student information for <strong>{data.student.name}</strong>.</p>
+				<p class="page-subtitle">
+					Update student information for <strong>{data.student.name}</strong>.
+				</p>
 			</div>
 		</div>
 	</div>
 
 	<div class="form-card">
-		<StudentForm 
-			sessions={data.sessions} 
-			sections={data.sections} 
-			student={data.student} 
-			enrollment={data.enrollment} 
-			{form} 
+		<StudentForm
+			sessions={data.sessions}
+			sections={data.sections}
+			student={data.student}
+			enrollment={data.enrollment}
+			{form}
 		/>
 	</div>
 </div>

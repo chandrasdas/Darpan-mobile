@@ -15,7 +15,7 @@
 	<section class="content-section">
 		<div class="card">
 			<p>Report generation module is under construction.</p>
-			<a href={resolve('/dashboard' as "/")} class="back-link">Return to Dashboard</a>
+			<a href={resolve('/dashboard' as '/')} class="back-link">Return to Dashboard</a>
 		</div>
 	</section>
 </div>

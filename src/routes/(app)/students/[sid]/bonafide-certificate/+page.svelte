@@ -42,15 +42,35 @@
 	<!-- Action/Config Area (Hidden during print) -->
 	<div class="config-panel no-print">
 		<div class="panel-header">
-			<a href={resolve('/students' as "/")} class="back-link">
-				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+			<a href={resolve('/students' as '/')} class="back-link">
+				<svg
+					width="20"
+					height="20"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
 				</svg>
 				<span>Back to Registry</span>
 			</a>
 			<button onclick={handlePrint} class="print-btn">
-				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
+				<svg
+					width="20"
+					height="20"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<polyline points="6 9 6 2 18 2 18 9" /><path
+						d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
+					/><rect x="6" y="14" width="12" height="8" />
 				</svg>
 				<span>Print Certificate</span>
 			</button>
@@ -58,27 +78,53 @@
 
 		<div class="panel-body">
 			<h2 class="panel-title">Certificate Customization</h2>
-			<p class="panel-subtitle">Fill in the fields below to update the certificate content in real time.</p>
-			
+			<p class="panel-subtitle">
+				Fill in the fields below to update the certificate content in real time.
+			</p>
+
 			<div class="input-grid">
 				<div class="input-group">
 					<label for="village">Village / Locality</label>
-					<input type="text" id="village" bind:value={village} placeholder="e.g. Kshempur" class="form-input">
+					<input
+						type="text"
+						id="village"
+						bind:value={village}
+						placeholder="e.g. Kshempur"
+						class="form-input"
+					/>
 				</div>
 
 				<div class="input-group">
 					<label for="postOffice">Post Office (P.O.)</label>
-					<input type="text" id="postOffice" bind:value={postOffice} placeholder="e.g. Chorolmoni" class="form-input">
+					<input
+						type="text"
+						id="postOffice"
+						bind:value={postOffice}
+						placeholder="e.g. Chorolmoni"
+						class="form-input"
+					/>
 				</div>
 
 				<div class="input-group">
 					<label for="district">District</label>
-					<input type="text" id="district" bind:value={district} placeholder="e.g. Malda" class="form-input">
+					<input
+						type="text"
+						id="district"
+						bind:value={district}
+						placeholder="e.g. Malda"
+						class="form-input"
+					/>
 				</div>
 
 				<div class="input-group">
 					<label for="sessionYear">Academic Session</label>
-					<input type="text" id="sessionYear" bind:value={sessionYear} placeholder="e.g. 2026" class="form-input">
+					<input
+						type="text"
+						id="sessionYear"
+						bind:value={sessionYear}
+						placeholder="e.g. 2026"
+						class="form-input"
+					/>
 				</div>
 
 				<div class="input-group">
@@ -103,7 +149,7 @@
 
 				<div class="input-group full-width">
 					<label for="dateOfIssue">Date of Issue</label>
-					<input type="date" id="dateOfIssue" bind:value={dateOfIssue} class="form-input">
+					<input type="date" id="dateOfIssue" bind:value={dateOfIssue} class="form-input" />
 				</div>
 			</div>
 		</div>
@@ -112,8 +158,14 @@
 	<!-- Printable Certificate Wrapper -->
 	<div class="certificate-wrapper relative">
 		<!-- Watermark (Rotated and faded in background) -->
-		<div class="watermark-container absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
-			<img src={resolve('/emblem.jpg' as "/")} alt="Watermark" class="watermark-img opacity-5 select-none" />
+		<div
+			class="watermark-container pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden select-none"
+		>
+			<img
+				src={resolve('/emblem.jpg' as '/')}
+				alt="Watermark"
+				class="watermark-img opacity-5 select-none"
+			/>
 		</div>
 
 		<!-- Certificate Content -->
@@ -121,14 +173,18 @@
 			<!-- Header -->
 			<div class="certificate-header">
 				<div class="header-main-flex">
-					<img src={resolve('/emblem.jpg' as "/")} alt="RKM Logo" class="school-logo-img" />
+					<img src={resolve('/emblem.jpg' as '/')} alt="RKM Logo" class="school-logo-img" />
 					<div class="vertical-separator"></div>
 					<div class="school-info-details">
 						<h1 class="school-name">RAMAKRISHNA MISSION VIVEKANANDA VIDYAMANDIR</h1>
 						<p class="school-address">PO & DT : MALDA &bull; PIN : 732 101 &bull; WEST BENGAL</p>
 						<p class="school-phone">Phone No. : 03512 - 252850</p>
-						<p class="school-web-email">website : www.rkmvvmmalda.org &bull; e-mail : rkmvvmmalda@gmail.com</p>
-						<p class="school-index">School Index No. : Secondary : R1-091 &bull; Higher Secondary : 111082</p>
+						<p class="school-web-email">
+							website : www.rkmvvmmalda.org &bull; e-mail : rkmvvmmalda@gmail.com
+						</p>
+						<p class="school-index">
+							School Index No. : Secondary : R1-091 &bull; Higher Secondary : 111082
+						</p>
 					</div>
 				</div>
 				<div class="title-badge-wrapper">
@@ -137,7 +193,9 @@
 			</div>
 
 			<!-- Certificate Number / Date -->
-			<div class="certificate-meta flex justify-between mt-6 border-b border-dotted border-slate-400 pb-2">
+			<div
+				class="certificate-meta mt-6 flex justify-between border-b border-dotted border-slate-400 pb-2"
+			>
 				<div class="meta-item">
 					<span class="meta-label">Certificate No:</span>
 					<span class="meta-value font-bold text-slate-800">BC/{sessionYear}/{student.sid}</span>
@@ -151,35 +209,33 @@
 			<!-- Main Body Text -->
 			<div class="certificate-body mt-10">
 				<div class="body-title">TO WHOM IT MAY CONCERN</div>
-				
+
 				<p class="body-text">
-					This is to certify that <span class="highlight">{student.name}</span>, 
-					S/o <span class="highlight">{student.fname}</span>, 
-					resident of Vill – <span class="highlight">{village || '________'}</span>, 
-					P.O. – <span class="highlight">{postOffice || '________'}</span>, 
-					Dist. – <span class="highlight">{district || '________'}</span>, 
-					is a bonafide student of Class – <span class="highlight">{enrollment?.className || '________'}</span>, 
-					Sec. – <span class="highlight">{enrollment?.sectionLetter || '________'}</span>, 
-					Roll No. – <span class="highlight">{enrollment?.rollNo || '________'}</span> 
-					of this institution for the academic session <span class="highlight">{sessionYear}</span>. 
-					His date of birth, as recorded in the admission register of the school, is 
-					<span class="highlight">{formatDate(student.dob)}</span>. 
-					His Banglar Shiksha Portal ID is <span class="highlight">{student.portalId}</span>.
+					This is to certify that <span class="highlight">{student.name}</span>, S/o
+					<span class="highlight">{student.fname}</span>, resident of Vill –
+					<span class="highlight">{village || '________'}</span>, P.O. –
+					<span class="highlight">{postOffice || '________'}</span>, Dist. –
+					<span class="highlight">{district || '________'}</span>, is a bonafide student of Class –
+					<span class="highlight">{enrollment?.className || '________'}</span>, Sec. –
+					<span class="highlight">{enrollment?.sectionLetter || '________'}</span>, Roll No. –
+					<span class="highlight">{enrollment?.rollNo || '________'}</span>
+					of this institution for the academic session <span class="highlight">{sessionYear}</span>.
+					His date of birth, as recorded in the admission register of the school, is
+					<span class="highlight">{formatDate(student.dob)}</span>. His Banglar Shiksha Portal ID is
+					<span class="highlight">{student.portalId}</span>.
 				</p>
 
 				<p class="body-text mt-6">
-					During his time at the school, his conduct has always been 
-					<span class="highlight">{conduct}</span>. 
-					To the best of my knowledge, he bears a <span class="highlight">{character}</span> moral character.
+					During his time at the school, his conduct has always been
+					<span class="highlight">{conduct}</span>. To the best of my knowledge, he bears a
+					<span class="highlight">{character}</span> moral character.
 				</p>
 
-				<p class="body-text mt-6">
-					I wish him every success in life.
-				</p>
+				<p class="body-text mt-6">I wish him every success in life.</p>
 			</div>
 
 			<!-- Footer signatures -->
-			<div class="certificate-footer flex justify-between items-end mt-24 pt-8">
+			<div class="certificate-footer mt-24 flex items-end justify-between pt-8">
 				<div class="signature-line flex flex-col items-center">
 					<div class="sig-space"></div>
 					<span class="sig-label">Prepared By (Office Assistant)</span>
@@ -321,7 +377,8 @@
 		color: var(--color-on-surface-variant);
 	}
 
-	.form-input, .form-select {
+	.form-input,
+	.form-select {
 		border-radius: var(--radius-md);
 		border: 1px solid var(--color-outline);
 		background-color: var(--color-surface);
@@ -333,7 +390,8 @@
 		width: 100%;
 	}
 
-	.form-input:focus, .form-select:focus {
+	.form-input:focus,
+	.form-select:focus {
 		border-color: var(--color-primary);
 		outline: none;
 		box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
@@ -430,7 +488,9 @@
 		}
 	}
 
-	.school-phone, .school-web-email, .school-index {
+	.school-phone,
+	.school-web-email,
+	.school-index {
 		font-size: 9.5px;
 		margin: 0;
 		color: #475569;
@@ -438,7 +498,9 @@
 	}
 
 	@media (min-width: 640px) {
-		.school-phone, .school-web-email, .school-index {
+		.school-phone,
+		.school-web-email,
+		.school-index {
 			font-size: 10.5px;
 		}
 	}

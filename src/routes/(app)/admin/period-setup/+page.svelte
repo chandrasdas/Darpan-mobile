@@ -31,7 +31,7 @@
 	let importTerm = $state(data.defaults.term);
 	// svelte-ignore state_referenced_locally
 	let importSection = $state(data.defaults.section);
-	
+
 	// Dropdown options for import
 	// svelte-ignore state_referenced_locally
 	let importClasses = $state(data.classes);
@@ -41,12 +41,12 @@
 	let filteredTerms = $derived.by(() => {
 		const allowed = ALLOWED_TERM_IDS[currentClass];
 		if (!allowed) return data.examTerms;
-		return data.examTerms.filter(t => allowed.includes(t.id));
+		return data.examTerms.filter((t) => allowed.includes(t.id));
 	});
 
 	function ensureValidTerm() {
 		const terms = filteredTerms;
-		const isValid = terms.some(t => t.id === currentTerm);
+		const isValid = terms.some((t) => t.id === currentTerm);
 		if (!isValid && terms.length > 0) {
 			currentTerm = terms[0].id;
 		}
@@ -55,12 +55,12 @@
 	let filteredImportTerms = $derived.by(() => {
 		const allowed = ALLOWED_TERM_IDS[importClass];
 		if (!allowed) return data.examTerms;
-		return data.examTerms.filter(t => allowed.includes(t.id));
+		return data.examTerms.filter((t) => allowed.includes(t.id));
 	});
 
 	function ensureValidImportTerm() {
 		const terms = filteredImportTerms;
-		const isValid = terms.some(t => t.id === importTerm);
+		const isValid = terms.some((t) => t.id === importTerm);
 		if (!isValid && terms.length > 0) {
 			importTerm = terms[0].id;
 		}
@@ -121,22 +121,27 @@
 		const [draggedItem] = newItems.splice(draggedIndex, 1);
 		newItems.splice(index, 0, draggedItem);
 		periods = newItems;
-		periods.forEach((p, idx) => { p.sortIndex = idx + 1; });
+		periods.forEach((p, idx) => {
+			p.sortIndex = idx + 1;
+		});
 		draggedIndex = null;
 	}
 
 	function addPeriod() {
 		if (!newPeriodName.trim()) return;
-		if (periods.some(p => p.periodName.toLowerCase() === newPeriodName.trim().toLowerCase())) {
+		if (periods.some((p) => p.periodName.toLowerCase() === newPeriodName.trim().toLowerCase())) {
 			alert('A period with this name already exists.');
 			return;
 		}
-		periods = [...periods, {
-			periodName: newPeriodName.trim(),
-			totalWorkingDays: 0,
-			sortIndex: periods.length + 1,
-			isNew: true
-		}];
+		periods = [
+			...periods,
+			{
+				periodName: newPeriodName.trim(),
+				totalWorkingDays: 0,
+				sortIndex: periods.length + 1,
+				isNew: true
+			}
+		];
 		newPeriodName = '';
 	}
 
@@ -144,7 +149,9 @@
 		const p = periods[index];
 		if (confirm(`Remove period "${p.periodName}"?`)) {
 			periods = periods.filter((_, i) => i !== index);
-			periods.forEach((p, idx) => { p.sortIndex = idx + 1; });
+			periods.forEach((p, idx) => {
+				p.sortIndex = idx + 1;
+			});
 		}
 	}
 
@@ -223,9 +230,15 @@
 
 	async function handleImport() {
 		if (!importSession || !importTerm || !importSection) return;
-		
-		if (importSession === currentSession && importSection === currentSection && importTerm === currentTerm) {
-			alert("You are trying to import from the exact same Session, Section, and Term that you are currently editing. Please select a different configuration to import.");
+
+		if (
+			importSession === currentSession &&
+			importSection === currentSection &&
+			importTerm === currentTerm
+		) {
+			alert(
+				'You are trying to import from the exact same Session, Section, and Term that you are currently editing. Please select a different configuration to import.'
+			);
 			return;
 		}
 
@@ -237,12 +250,15 @@
 			}).run();
 
 			if (periodsToImport.length === 0) {
-				alert("No configuration found for the selected Session, Section, and Term.");
+				alert('No configuration found for the selected Session, Section, and Term.');
 				return;
 			}
 
-			if (confirm(`Are you sure you want to import ${periodsToImport.length} periods? This will overwrite the configuration currently shown below. (Changes will not be saved until you click 'Save Configuration')`)) {
-				
+			if (
+				confirm(
+					`Are you sure you want to import ${periodsToImport.length} periods? This will overwrite the configuration currently shown below. (Changes will not be saved until you click 'Save Configuration')`
+				)
+			) {
 				periods = periodsToImport
 					.sort((a, b) => a.sortIndex - b.sortIndex)
 					.map((p, idx) => ({
@@ -250,18 +266,22 @@
 						totalWorkingDays: p.totalWorkingDays,
 						sortIndex: idx + 1
 					}));
-				
-				saveMessage = 'Imported successfully! Click "Save Configuration" at the bottom to apply changes.';
+
+				saveMessage =
+					'Imported successfully! Click "Save Configuration" at the bottom to apply changes.';
 				saveError = false;
 				setTimeout(() => {
-					if (saveMessage === 'Imported successfully! Click "Save Configuration" at the bottom to apply changes.') {
+					if (
+						saveMessage ===
+						'Imported successfully! Click "Save Configuration" at the bottom to apply changes.'
+					) {
 						saveMessage = '';
 					}
 				}, 5000);
 			}
 		} catch (error) {
-			console.error("Import error:", error);
-			alert("An error occurred while fetching the configuration to import.");
+			console.error('Import error:', error);
+			alert('An error occurred while fetching the configuration to import.');
 		}
 	}
 
@@ -271,7 +291,7 @@
 		saveMessage = '';
 		saveError = false;
 
-		const periodsToSave = periods.map(p => ({
+		const periodsToSave = periods.map((p) => ({
 			periodName: p.periodName,
 			totalWorkingDays: Number(p.totalWorkingDays) || 0,
 			sortIndex: p.sortIndex
@@ -311,7 +331,10 @@
 		<div class="hero-content">
 			<div class="hero-header">
 				<h1 class="page-title">Period Setup</h1>
-				<p class="page-subtitle">Configure attendance periods (months) for each section and term. Set total working days per period.</p>
+				<p class="page-subtitle">
+					Configure attendance periods (months) for each section and term. Set total working days
+					per period.
+				</p>
 			</div>
 
 			<div class="hero-bottom">
@@ -322,13 +345,21 @@
 
 				<div class="hero-filters">
 					<div class="filter-group">
-						<select value={currentSession.toString()} onchange={handleSessionChange} class="form-select filter-select">
+						<select
+							value={currentSession.toString()}
+							onchange={handleSessionChange}
+							class="filter-select form-select"
+						>
 							{#each data.sessions as session (session.id)}
 								<option value={session.id.toString()}>{session.year}</option>
 							{/each}
 						</select>
 
-						<select value={currentClass.toString()} onchange={handleClassChange} class="form-select filter-select">
+						<select
+							value={currentClass.toString()}
+							onchange={handleClassChange}
+							class="filter-select form-select"
+						>
 							{#if classes.length === 0}
 								<option value="0">No Class</option>
 							{/if}
@@ -337,7 +368,14 @@
 							{/each}
 						</select>
 
-						<select value={currentSection.toString()} onchange={(e) => { currentSection = Number((e.target as HTMLSelectElement).value); fetchPeriods(); }} class="form-select filter-select">
+						<select
+							value={currentSection.toString()}
+							onchange={(e) => {
+								currentSection = Number((e.target as HTMLSelectElement).value);
+								fetchPeriods();
+							}}
+							class="filter-select form-select"
+						>
 							{#if sections.length === 0}
 								<option value="0">No sections</option>
 							{/if}
@@ -346,10 +384,13 @@
 							{/each}
 						</select>
 
-						<select 
-							value={currentTerm.toString()} 
-							onchange={(e) => { currentTerm = Number((e.target as HTMLSelectElement).value); fetchPeriods(); }} 
-							class="form-select filter-select"
+						<select
+							value={currentTerm.toString()}
+							onchange={(e) => {
+								currentTerm = Number((e.target as HTMLSelectElement).value);
+								fetchPeriods();
+							}}
+							class="filter-select form-select"
 						>
 							{#each filteredTerms as term (term.id)}
 								<option value={term.id.toString()}>{term.name}</option>
@@ -362,22 +403,44 @@
 	</div>
 
 	<!-- Import Configuration Row -->
-	<div class="card" style="margin-bottom: 24px; padding: 12px 20px; background: color-mix(in srgb, var(--color-surface) 90%, var(--color-primary) 10%); border: 1px solid color-mix(in srgb, var(--color-outline-variant) 80%, var(--color-primary) 20%);">
-		<div class="flex items-center flex-wrap gap-4" style="justify-content: space-between;">
-			<div class="text-sm font-medium flex items-center gap-2" style="color: var(--color-primary);">
-				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+	<div
+		class="card"
+		style="margin-bottom: 24px; padding: 12px 20px; background: color-mix(in srgb, var(--color-surface) 90%, var(--color-primary) 10%); border: 1px solid color-mix(in srgb, var(--color-outline-variant) 80%, var(--color-primary) 20%);"
+	>
+		<div class="flex flex-wrap items-center gap-4" style="justify-content: space-between;">
+			<div class="flex items-center gap-2 text-sm font-medium" style="color: var(--color-primary);">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="18"
+					height="18"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline
+						points="7 10 12 15 17 10"
+					></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg
+				>
 				Import from another configuration
 			</div>
-			<div class="flex items-center gap-2 flex-wrap">
-				<select value={importSession.toString()} onchange={handleImportSessionChange} class="form-select" style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 110px; border-color: transparent;">
+			<div class="flex flex-wrap items-center gap-2">
+				<select
+					value={importSession.toString()}
+					onchange={handleImportSessionChange}
+					class="form-select"
+					style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 110px; border-color: transparent;"
+				>
 					{#each data.sessions as session (session.id)}
 						<option value={session.id.toString()}>{session.year}</option>
 					{/each}
 				</select>
-				<select 
-					value={importClass.toString()} 
-					onchange={handleImportClassChange} 
-					class="form-select" style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 110px; border-color: transparent;"
+				<select
+					value={importClass.toString()}
+					onchange={handleImportClassChange}
+					class="form-select"
+					style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 110px; border-color: transparent;"
 				>
 					{#if importClasses.length === 0}
 						<option value="0">No Class</option>
@@ -386,10 +449,13 @@
 						<option value={cls.id.toString()}>{cls.name}</option>
 					{/each}
 				</select>
-				<select 
-					value={importSection.toString()} 
-					onchange={(e) => { importSection = Number((e.target as HTMLSelectElement).value); }} 
-					class="form-select" style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 110px; border-color: transparent;"
+				<select
+					value={importSection.toString()}
+					onchange={(e) => {
+						importSection = Number((e.target as HTMLSelectElement).value);
+					}}
+					class="form-select"
+					style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 110px; border-color: transparent;"
 				>
 					{#if importSections.length === 0}
 						<option value="0">No Sec</option>
@@ -398,16 +464,23 @@
 						<option value={sec.id.toString()}>Sec {sec.letter}</option>
 					{/each}
 				</select>
-				<select 
-					value={importTerm.toString()} 
-					onchange={(e) => { importTerm = Number((e.target as HTMLSelectElement).value); }} 
-					class="form-select" style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 110px; border-color: transparent;"
+				<select
+					value={importTerm.toString()}
+					onchange={(e) => {
+						importTerm = Number((e.target as HTMLSelectElement).value);
+					}}
+					class="form-select"
+					style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 110px; border-color: transparent;"
 				>
 					{#each filteredImportTerms as term (term.id)}
 						<option value={term.id.toString()}>{term.name}</option>
 					{/each}
 				</select>
-				<button onclick={handleImport} class="primary-button flex items-center gap-1" style="padding: 6px 16px; font-size: 13px;">
+				<button
+					onclick={handleImport}
+					class="primary-button flex items-center gap-1"
+					style="padding: 6px 16px; font-size: 13px;"
+				>
 					Import Config
 				</button>
 			</div>
@@ -420,71 +493,156 @@
 			<table class="data-table">
 				<thead>
 					<tr>
-						<th class="w-10 text-center px-1">SL</th>
+						<th class="w-10 px-1 text-center">SL</th>
 						<th class="px-1">Period Name</th>
-						<th class="text-center w-20 px-1" style="line-height: 1.1; font-size: 10px;">Working Days</th>
-						<th class="w-14 text-center px-1">Action</th>
+						<th class="w-20 px-1 text-center" style="line-height: 1.1; font-size: 10px;"
+							>Working Days</th
+						>
+						<th class="w-14 px-1 text-center">Action</th>
 					</tr>
 				</thead>
 				<tbody>
 					{#if periods.length === 0}
-					<tr class="no-hover">
-						<td colspan="4" class="text-center py-8 text-slate-500 font-medium">No periods configured yet. Add a period below.</td>
-					</tr>
+						<tr class="no-hover">
+							<td colspan="4" class="py-8 text-center font-medium text-slate-500"
+								>No periods configured yet. Add a period below.</td
+							>
+						</tr>
 					{/if}
 					{#each periods as period, i (period.periodName)}
-					<tr 
-						draggable="true" 
-						ondragstart={(e) => handleDragStart(e, i)}
-						ondragover={handleDragOver}
-						ondrop={(e) => handleDrop(e, i)}
-						class:dragging={draggedIndex === i}
-					>
-						<td class="font-medium text-slate-500 text-center cursor-grab active:cursor-grabbing" title="Drag to reorder">
-							<div class="flex items-center justify-center gap-1">
-								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400 hover:text-slate-600 transition-colors"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-								{i + 1}
-							</div>
-						</td>
-						<td class="font-medium">{period.periodName}</td>
-						<td>
-							<input 
-								type="number"
-								min="0"
-								max="31"
-								bind:value={period.totalWorkingDays}
-								placeholder="0"
-								class="form-input small-input"
+						<tr
+							draggable="true"
+							ondragstart={(e) => handleDragStart(e, i)}
+							ondragover={handleDragOver}
+							ondrop={(e) => handleDrop(e, i)}
+							class:dragging={draggedIndex === i}
+						>
+							<td
+								class="cursor-grab text-center font-medium text-slate-500 active:cursor-grabbing"
+								title="Drag to reorder"
 							>
-						</td>
-						<td class="text-center">
-							<button type="button" onclick={() => removePeriod(i)} class="text-red-500 hover:text-red-700 transition-colors inline-flex items-center justify-center" title="Remove Period" style="height: 32px; width: 32px; border-radius: 6px; background-color: var(--color-surface); border: 1px solid var(--color-outline-variant);">
-								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-							</button>
-						</td>
-					</tr>
+								<div class="flex items-center justify-center gap-1">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="14"
+										height="14"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										class="text-slate-400 transition-colors hover:text-slate-600"
+										><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"
+										></line><line x1="8" y1="18" x2="21" y2="18"></line><line
+											x1="3"
+											y1="6"
+											x2="3.01"
+											y2="6"
+										></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line
+											x1="3"
+											y1="18"
+											x2="3.01"
+											y2="18"
+										></line></svg
+									>
+									{i + 1}
+								</div>
+							</td>
+							<td class="font-medium">{period.periodName}</td>
+							<td>
+								<input
+									type="number"
+									min="0"
+									max="31"
+									bind:value={period.totalWorkingDays}
+									placeholder="0"
+									class="small-input form-input"
+								/>
+							</td>
+							<td class="text-center">
+								<button
+									type="button"
+									onclick={() => removePeriod(i)}
+									class="inline-flex items-center justify-center text-red-500 transition-colors hover:text-red-700"
+									title="Remove Period"
+									style="height: 32px; width: 32px; border-radius: 6px; background-color: var(--color-surface); border: 1px solid var(--color-outline-variant);"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="16"
+										height="16"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"
+										></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line
+											x1="10"
+											y1="11"
+											x2="10"
+											y2="17"
+										></line><line x1="14" y1="11" x2="14" y2="17"></line></svg
+									>
+								</button>
+							</td>
+						</tr>
 					{/each}
 					{#if periods.length > 0}
-					<tr class="no-hover" style="background-color: var(--color-surface-high);">
-						<td colspan="2" class="text-right font-bold text-slate-500" style="padding-right: 12px; font-size: 11px; text-transform: uppercase;">Total Working Days</td>
-						<td class="text-center font-bold" style="color: var(--color-primary); font-size: 14px;">{totalWorkingDays}</td>
-						<td></td>
-					</tr>
+						<tr class="no-hover" style="background-color: var(--color-surface-high);">
+							<td
+								colspan="2"
+								class="text-right font-bold text-slate-500"
+								style="padding-right: 12px; font-size: 11px; text-transform: uppercase;"
+								>Total Working Days</td
+							>
+							<td
+								class="text-center font-bold"
+								style="color: var(--color-primary); font-size: 14px;">{totalWorkingDays}</td
+							>
+							<td></td>
+						</tr>
 					{/if}
 					<tr class="no-hover">
 						<td></td>
 						<td colspan="3">
 							<div class="flex items-center gap-3 py-2">
-								<input 
-									type="text" 
-									bind:value={newPeriodName} 
-									placeholder="e.g. January, February..." 
-									class="form-input" 
+								<input
+									type="text"
+									bind:value={newPeriodName}
+									placeholder="e.g. January, February..."
+									class="form-input"
 									style="max-width: 250px; padding: 8px 16px;"
-									onkeydown={(e) => { if (e.key === 'Enter') addPeriod(); }}
+									onkeydown={(e) => {
+										if (e.key === 'Enter') addPeriod();
+									}}
+								/>
+								<button
+									type="button"
+									onclick={addPeriod}
+									class="primary-button flex items-center gap-1"
+									disabled={!newPeriodName.trim()}
+									style="padding: 8px 16px; font-size: 13px;"
 								>
-								<button type="button" onclick={addPeriod} class="primary-button flex items-center gap-1" disabled={!newPeriodName.trim()} style="padding: 8px 16px; font-size: 13px;">
-									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="16"
+										height="16"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										><line x1="12" y1="5" x2="12" y2="19"></line><line
+											x1="5"
+											y1="12"
+											x2="19"
+											y2="12"
+										></line></svg
+									>
 									Add Period
 								</button>
 							</div>
@@ -507,16 +665,42 @@
 	</div>
 
 	{#if saveMessage}
-		<div 
+		<div
 			class="floating-toast {saveError ? 'toast-error' : 'toast-success'}"
 			in:fly={{ y: 20, duration: 400 }}
 			out:fade={{ duration: 300 }}
 		>
 			<div class="toast-icon">
 				{#if saveError}
-					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line
+							x1="12"
+							y1="16"
+							x2="12.01"
+							y2="16"
+						/></svg
+					>
 				{:else}
-					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="3"
+						stroke-linecap="round"
+						stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg
+					>
 				{/if}
 			</div>
 			<span class="toast-text">{saveMessage}</span>
@@ -531,7 +715,9 @@
 		flex-direction: column;
 		gap: 24px;
 	}
-	.page-hero { padding: 24px 0 0; }
+	.page-hero {
+		padding: 24px 0 0;
+	}
 	.hero-content {
 		display: flex;
 		flex-direction: column;
@@ -542,7 +728,9 @@
 		border: 1px solid var(--color-outline-variant);
 		box-shadow: var(--shadow-ambient-md);
 	}
-	.hero-header { width: 100%; }
+	.hero-header {
+		width: 100%;
+	}
 	.page-title {
 		font-family: var(--font-heading);
 		font-size: 32px;
@@ -582,10 +770,17 @@
 		color: var(--color-on-surface-variant);
 		line-height: 1.6;
 	}
-	.stat-item strong { color: var(--color-on-surface); }
-	.hero-filters { width: 100%; }
+	.stat-item strong {
+		color: var(--color-on-surface);
+	}
+	.hero-filters {
+		width: 100%;
+	}
 	@media (min-width: 768px) {
-		.hero-filters { width: auto; flex-shrink: 0; }
+		.hero-filters {
+			width: auto;
+			flex-shrink: 0;
+		}
 	}
 	.filter-group {
 		display: flex;
@@ -603,7 +798,9 @@
 		box-shadow: var(--shadow-ambient-md);
 		overflow: hidden;
 	}
-	.table-scroll { overflow-x: auto; }
+	.table-scroll {
+		overflow-x: auto;
+	}
 	.data-table {
 		width: 100%;
 		min-width: 320px;
@@ -640,19 +837,32 @@
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
-	.data-table tbody tr:last-child td { border-bottom: none; }
-	.data-table tbody tr { transition: background-color 100ms ease; }
+	.data-table tbody tr:last-child td {
+		border-bottom: none;
+	}
+	.data-table tbody tr {
+		transition: background-color 100ms ease;
+	}
 	.data-table tbody tr:not(.no-hover):hover {
 		background-color: color-mix(in srgb, var(--color-primary) 3%, transparent);
 	}
 	.data-table tbody tr:nth-child(even) {
 		background-color: color-mix(in srgb, var(--color-surface-high) 40%, transparent);
 	}
-	.text-center { text-align: center; }
-	.font-medium { font-weight: 500; }
-	.font-bold { font-weight: 700; }
-	.text-slate-500 { color: var(--color-on-surface-variant); }
-	.form-select, .form-input {
+	.text-center {
+		text-align: center;
+	}
+	.font-medium {
+		font-weight: 500;
+	}
+	.font-bold {
+		font-weight: 700;
+	}
+	.text-slate-500 {
+		color: var(--color-on-surface-variant);
+	}
+	.form-select,
+	.form-input {
 		border-radius: var(--radius-lg);
 		border: 1px solid var(--color-outline);
 		background-color: var(--color-surface);
@@ -670,7 +880,8 @@
 		background-size: 20px 20px;
 		padding-right: 40px;
 	}
-	.form-select:focus, .form-input:focus {
+	.form-select:focus,
+	.form-input:focus {
 		border-color: var(--color-primary);
 		background-color: var(--color-surface-lowest);
 		outline: none;
@@ -692,7 +903,9 @@
 		-webkit-appearance: none;
 		margin: 0;
 	}
-	.small-input[type=number] { -moz-appearance: textfield; }
+	.small-input[type='number'] {
+		-moz-appearance: textfield;
+	}
 	.small-input:focus {
 		border-color: var(--color-primary);
 		outline: none;
@@ -723,8 +936,13 @@
 		cursor: pointer;
 		transition: all 200ms ease;
 	}
-	.primary-button:hover:not(:disabled) { filter: brightness(1.1); }
-	.primary-button:disabled { opacity: 0.7; cursor: not-allowed; }
+	.primary-button:hover:not(:disabled) {
+		filter: brightness(1.1);
+	}
+	.primary-button:disabled {
+		opacity: 0.7;
+		cursor: not-allowed;
+	}
 	.spinner {
 		width: 16px;
 		height: 16px;
@@ -734,7 +952,11 @@
 		animation: spin 0.8s linear infinite;
 		margin-right: 8px;
 	}
-	@keyframes spin { to { transform: rotate(360deg); } }
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
 	.floating-toast {
 		position: fixed;
 		bottom: 32px;
@@ -745,7 +967,9 @@
 		gap: 12px;
 		padding: 12px 20px;
 		border-radius: var(--radius-xl);
-		box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+		box-shadow:
+			0 10px 25px -5px rgba(0, 0, 0, 0.1),
+			0 8px 10px -6px rgba(0, 0, 0, 0.1);
 		z-index: 1000;
 		min-width: 280px;
 		max-width: calc(100vw - 40px);
@@ -754,12 +978,12 @@
 	.toast-success {
 		background: linear-gradient(135deg, #059669, #10b981);
 		color: white;
-		border: 1px solid rgba(255,255,255,0.1);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 	}
 	.toast-error {
 		background: linear-gradient(135deg, #dc2626, #ef4444);
 		color: white;
-		border: 1px solid rgba(255,255,255,0.1);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 	}
 	.toast-icon {
 		display: flex;
@@ -767,7 +991,7 @@
 		justify-content: center;
 		width: 28px;
 		height: 28px;
-		background: rgba(255,255,255,0.2);
+		background: rgba(255, 255, 255, 0.2);
 		border-radius: 50%;
 		flex-shrink: 0;
 	}
@@ -777,6 +1001,8 @@
 		letter-spacing: 0.01em;
 	}
 	@media (max-width: 640px) {
-		.floating-toast { bottom: 80px; }
+		.floating-toast {
+			bottom: 80px;
+		}
 	}
 </style>

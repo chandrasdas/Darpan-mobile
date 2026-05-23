@@ -25,10 +25,14 @@
 <div class="page-shell" in:fade={{ duration: 400 }}>
 	<!-- Page Header -->
 	<section class="page-hero">
-		<div class="hero-content flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+		<div
+			class="hero-content flex flex-col items-start justify-between gap-4 md:flex-row md:items-center"
+		>
 			<div class="hero-text">
 				<h1 class="page-title">Transferred Students</h1>
-				<p class="page-subtitle">Manage student transfers, issue transfer certificates, and view transfer history.</p>
+				<p class="page-subtitle">
+					Manage student transfers, issue transfer certificates, and view transfer history.
+				</p>
 			</div>
 			<div class="record-count">
 				<span class="count-text">
@@ -43,18 +47,20 @@
 		<!-- Step 1: Search Active Student -->
 		<div class="action-card">
 			<h2 class="card-title">1. Find Active Student</h2>
-			<p class="card-description">Search for an active student by name or portal ID to begin the transfer process.</p>
-			
-			<form method="GET" action="" class="search-form flex flex-col sm:flex-row gap-2 mt-4">
+			<p class="card-description">
+				Search for an active student by name or portal ID to begin the transfer process.
+			</p>
+
+			<form method="GET" action="" class="search-form mt-4 flex flex-col gap-2 sm:flex-row">
 				{#if selectedStudent}
 					<input type="hidden" name="sid" value={selectedStudent.sid} />
 				{/if}
 				<div class="search-input-wrapper flex-1">
-					<input 
-						type="text" 
-						name="searchQ" 
-						bind:value={searchQ} 
-						placeholder="Type name or Portal ID..." 
+					<input
+						type="text"
+						name="searchQ"
+						bind:value={searchQ}
+						placeholder="Type name or Portal ID..."
 						class="search-input-field"
 						required
 					/>
@@ -68,9 +74,9 @@
 					<ul class="results-container">
 						{#each searchResults as res (res.sid)}
 							<li class="result-item">
-								<a 
-									href={resolve(`/students/transferred?searchQ=${searchQ}&sid=${res.sid}` as "/")}
-									class="result-link flex justify-between items-center"
+								<a
+									href={resolve(`/students/transferred?searchQ=${searchQ}&sid=${res.sid}` as '/')}
+									class="result-link flex items-center justify-between"
 									class:selected={selectedStudent && selectedStudent.sid === res.sid}
 								>
 									<div class="result-details">
@@ -78,7 +84,8 @@
 										<span class="result-subtext">
 											Portal ID: {res.portalId}
 											{#if res.className}
-												| Class {res.className} {res.sectionLetter || ''} (Roll: {res.rollNo || '-'})
+												| Class {res.className}
+												{res.sectionLetter || ''} (Roll: {res.rollNo || '-'})
 											{/if}
 										</span>
 									</div>
@@ -100,7 +107,7 @@
 				<div class="selected-student-box mt-4">
 					<p class="label">Selected Student</p>
 					<h3 class="student-name">{selectedStudent.name}</h3>
-					<div class="grid grid-cols-2 gap-2 mt-2 text-xs text-secondary-text">
+					<div class="text-secondary-text mt-2 grid grid-cols-2 gap-2 text-xs">
 						<div><strong>Portal ID:</strong> {selectedStudent.portalId}</div>
 						<div><strong>Father:</strong> {selectedStudent.fname}</div>
 						{#if selectedStudent.className}
@@ -110,34 +117,36 @@
 					</div>
 				</div>
 
-				<form 
-					method="POST" 
-					action="?/transfer" 
+				<form
+					method="POST"
+					action="?/transfer"
 					use:enhance={() => {
 						return async ({ update }) => {
 							await update();
 							searchQ = '';
-							window.location.href = resolve('/students/transferred' as "/");
+							window.location.href = resolve('/students/transferred' as '/');
 						};
 					}}
 					class="transfer-form mt-4 flex flex-col gap-4"
 				>
 					<input type="hidden" name="sid" value={selectedStudent.sid} />
-					
+
 					<div class="form-group">
 						<label for="transferDate" class="form-label">Date of Transfer</label>
-						<input 
-							type="date" 
-							id="transferDate" 
-							name="transferDate" 
-							bind:value={transferDateInput} 
-							class="date-input-field" 
+						<input
+							type="date"
+							id="transferDate"
+							name="transferDate"
+							bind:value={transferDateInput}
+							class="date-input-field"
 							required
 						/>
 					</div>
 
-					<div class="flex justify-between gap-2 mt-2">
-						<a href={resolve('/students/transferred' as "/")} class="btn-cancel flex-1 text-center">Clear Selection</a>
+					<div class="mt-2 flex justify-between gap-2">
+						<a href={resolve('/students/transferred' as '/')} class="btn-cancel flex-1 text-center"
+							>Clear Selection</a
+						>
 						<button type="submit" class="btn-execute flex-1">Mark as Transferred</button>
 					</div>
 				</form>
@@ -148,10 +157,10 @@
 	<!-- Bottom Section: Transferred History Registry (Full Width) -->
 	<div class="w-full">
 		<div class="table-card">
-			<div class="card-header flex justify-between items-center">
+			<div class="card-header flex items-center justify-between">
 				<h2 class="table-card-title">Transfer History Registry</h2>
 			</div>
-			
+
 			<div class="table-container">
 				<table class="data-table">
 					<thead>
@@ -168,13 +177,14 @@
 						{#each transferredStudents as student, i (student.sid)}
 							<tr>
 								<td>{i + 1}</td>
-								<td class="font-medium text-primary-text">{student.name}</td>
+								<td class="text-primary-text font-medium">{student.name}</td>
 								<td class="text-secondary-text tabular-nums">{student.portalId}</td>
 								<td class="text-secondary-text">
 									{#if student.className}
-										Class {student.className} {student.sectionLetter || ''}
+										Class {student.className}
+										{student.sectionLetter || ''}
 										{#if student.rollNo}
-											<span class="text-xs text-muted">(Roll: {student.rollNo})</span>
+											<span class="text-muted text-xs">(Roll: {student.rollNo})</span>
 										{/if}
 									{:else}
 										-
@@ -182,34 +192,59 @@
 								</td>
 								<td class="text-secondary-text font-medium tabular-nums">{student.transferDate}</td>
 								<td>
-									<div class="flex justify-end items-center gap-2">
-										<a 
-											href={resolve(`/students/${student.sid}/transfer-certificate` as "/")} 
+									<div class="flex items-center justify-end gap-2">
+										<a
+											href={resolve(`/students/${student.sid}/transfer-certificate` as '/')}
 											class="btn-action cert-btn flex items-center gap-1"
 											title="View & Print Transfer Certificate"
 										>
-											<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+											<svg
+												width="16"
+												height="16"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												><path
+													d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"
+												/><polyline points="14 2 14 8 20 8" /><path d="M16 13H8" /><path
+													d="M16 17H8"
+												/><path d="M10 9H8" /></svg
+											>
 											<span>Certificate</span>
 										</a>
 
-										<form 
-											method="POST" 
-											action="?/cancelTransfer" 
-											use:enhance
-											class="inline-block"
-										>
+										<form method="POST" action="?/cancelTransfer" use:enhance class="inline-block">
 											<input type="hidden" name="sid" value={student.sid} />
-											<button 
-												type="submit" 
-												class="btn-action undo-btn flex items-center gap-1" 
+											<button
+												type="submit"
+												class="btn-action undo-btn flex items-center gap-1"
 												title="Undo Transfer (Restore Active status)"
 												onclick={(e) => {
-													if (!confirm('Are you sure you want to cancel the transfer for this student? This will restore them back to Active status.')) {
+													if (
+														!confirm(
+															'Are you sure you want to cancel the transfer for this student? This will restore them back to Active status.'
+														)
+													) {
 														e.preventDefault();
 													}
 												}}
 											>
-												<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+												<svg
+													width="16"
+													height="16"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path
+														d="M3 3v5h5"
+													/></svg
+												>
 												<span>Revert</span>
 											</button>
 										</form>
@@ -217,17 +252,31 @@
 								</td>
 							</tr>
 						{/each}
-						
+
 						{#if transferredStudents.length === 0}
 							<tr>
-								<td colspan="6" class="empty-state text-center py-12">
-									<div class="empty-icon-wrapper mx-auto mb-4 flex justify-center items-center">
-										<svg class="h-8 w-8 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+								<td colspan="6" class="empty-state py-12 text-center">
+									<div class="empty-icon-wrapper mx-auto mb-4 flex items-center justify-center">
+										<svg
+											class="text-muted h-8 w-8"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="1.5"
+												d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+											/>
 										</svg>
 									</div>
-									<h3 class="empty-title text-base font-semibold text-primary-text">No Transferred Students</h3>
-									<p class="empty-subtitle text-sm text-secondary-text">There are no records of transferred students in the registry database.</p>
+									<h3 class="empty-title text-primary-text text-base font-semibold">
+										No Transferred Students
+									</h3>
+									<p class="empty-subtitle text-secondary-text text-sm">
+										There are no records of transferred students in the registry database.
+									</p>
 								</td>
 							</tr>
 						{/if}

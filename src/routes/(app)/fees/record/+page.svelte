@@ -9,17 +9,33 @@
 	</section>
 
 	<div class="placeholder-card">
-		<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.3">
-			<path d="M4 2v20l3-2 3 2 3-2 3 2 3-2 3 2V2l-3 2-3-2-3 2-3-2-3 2-3-2z" stroke-linecap="round" stroke-linejoin="round"/>
-			<path d="M8 10h8M8 14h4" stroke-linecap="round" stroke-linejoin="round"/>
+		<svg
+			width="48"
+			height="48"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="1.2"
+			opacity="0.3"
+		>
+			<path
+				d="M4 2v20l3-2 3 2 3-2 3 2 3-2 3 2V2l-3 2-3-2-3 2-3-2-3 2-3-2z"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			/>
+			<path d="M8 10h8M8 14h4" stroke-linecap="round" stroke-linejoin="round" />
 		</svg>
 		<span class="placeholder-text">Fee management module coming soon</span>
 	</div>
 </div>
 
 <style>
-	.page-shell { padding: 0 20px 32px; }
-	.page-hero { padding: 24px 0 20px; }
+	.page-shell {
+		padding: 0 20px 32px;
+	}
+	.page-hero {
+		padding: 24px 0 20px;
+	}
 	.page-title {
 		font-family: var(--font-heading);
 		font-size: 32px;

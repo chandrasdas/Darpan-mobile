@@ -57,7 +57,7 @@
 				error = loginError.message || 'Invalid email or password.';
 			}
 		} else {
-			window.location.href = resolve('/dashboard' as "/");
+			window.location.href = resolve('/dashboard' as '/');
 		}
 	}
 </script>
@@ -68,12 +68,53 @@
 
 <div class="auth-page">
 	<div class="theme-switcher" in:fade={{ duration: 600, delay: 200 }}>
-		<button type="button" class="theme-slide-toggle" class:dark={isDarkMode} onclick={() => setManualTheme(!isDarkMode)} aria-label="Toggle dark mode">
+		<button
+			type="button"
+			class="theme-slide-toggle"
+			class:dark={isDarkMode}
+			onclick={() => setManualTheme(!isDarkMode)}
+			aria-label="Toggle dark mode"
+		>
 			<span class="slide-thumb">
 				{#if isDarkMode}
-					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+					<svg
+						width="14"
+						height="14"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg
+					>
 				{:else}
-					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+					<svg
+						width="14"
+						height="14"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line
+							x1="12"
+							y1="21"
+							x2="12"
+							y2="23"
+						/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line
+							x1="18.36"
+							y1="18.36"
+							x2="19.78"
+							y2="19.78"
+						/><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line
+							x1="4.22"
+							y1="19.78"
+							x2="5.64"
+							y2="18.36"
+						/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg
+					>
 				{/if}
 			</span>
 		</button>
@@ -111,7 +152,7 @@
 				<div class="input-group">
 					<div class="input-header">
 						<label for="password" class="input-label">Password</label>
-						<a href={resolve('/forgot-password' as "/")} class="forgot-link">Forgot password?</a>
+						<a href={resolve('/forgot-password' as '/')} class="forgot-link">Forgot password?</a>
 					</div>
 					<input
 						type="password"
@@ -126,15 +167,31 @@
 				<button type="submit" disabled={loading} class="submit-btn">
 					{#if loading}
 						<svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
+							<circle
+								class="opacity-25"
+								cx="12"
+								cy="12"
+								r="10"
+								stroke="currentColor"
+								stroke-width="4"
+							></circle>
+							<path
+								class="opacity-75"
+								fill="currentColor"
+								d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+							></path>
+						</svg>
 						Signing in...
 					{:else}
 						Sign In
 						<svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                        </svg>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M14 5l7 7m0 0l-7 7m7-7H3"
+							/>
+						</svg>
 					{/if}
 				</button>
 			</form>
@@ -142,7 +199,7 @@
 
 		<p class="auth-footer">
 			Don't have an account?
-			<a href={resolve('/register' as "/")} class="signup-link">Sign up here</a>
+			<a href={resolve('/register' as '/')} class="signup-link">Sign up here</a>
 		</p>
 	</div>
 </div>
@@ -185,7 +242,9 @@
 		border: 1px solid var(--color-outline-variant);
 		cursor: pointer;
 		padding: 2px;
-		transition: background-color 300ms ease, border-color 300ms ease;
+		transition:
+			background-color 300ms ease,
+			border-color 300ms ease;
 	}
 
 	.theme-slide-toggle.dark {
@@ -201,10 +260,14 @@
 		height: 26px;
 		background-color: var(--color-surface-lowest);
 		border-radius: 50%;
-		box-shadow: var(--shadow-ambient-md), 0 1px 3px rgba(0,0,0,0.1);
+		box-shadow:
+			var(--shadow-ambient-md),
+			0 1px 3px rgba(0, 0, 0, 0.1);
 		border: 1px solid var(--color-outline);
 		color: var(--color-on-surface);
-		transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1), border-color 300ms ease;
+		transition:
+			transform 300ms cubic-bezier(0.4, 0, 0.2, 1),
+			border-color 300ms ease;
 		transform: translateX(0);
 	}
 
@@ -245,10 +308,9 @@
 		justify-content: center;
 		border-radius: var(--radius-xl);
 		background-color: var(--color-secondary-container);
-		box-shadow: 0 10px 25px -5px color-mix(in srgb, var(--color-secondary-container) 40%, transparent);
+		box-shadow: 0 10px 25px -5px
+			color-mix(in srgb, var(--color-secondary-container) 40%, transparent);
 	}
-
-
 
 	.auth-title {
 		font-family: var(--font-heading);
@@ -331,10 +393,10 @@
 		color: var(--color-on-surface);
 		transition: all 200ms ease;
 	}
-    
-    .input-field::placeholder {
-        color: var(--color-outline);
-    }
+
+	.input-field::placeholder {
+		color: var(--color-outline);
+	}
 
 	.input-field:focus {
 		border-color: var(--color-primary);
@@ -405,7 +467,11 @@
 	}
 
 	@keyframes spin {
-		from { transform: rotate(0deg); }
-		to { transform: rotate(360deg); }
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg);
+		}
 	}
 </style>

@@ -9,7 +9,7 @@ import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const user = requireAuth(locals);
-	
+
 	// Pre-fetch if the user has already filled the form
 	const existingStaff = await db.query.staff.findFirst({
 		where: eq(staff.userId, user.id)
@@ -19,8 +19,12 @@ export const load: PageServerLoad = async ({ locals }) => {
 	if (existingStaff) {
 		existingStaffFormatted = {
 			...existingStaff,
-			dateOfBirthFormatted: existingStaff.dateOfBirth ? existingStaff.dateOfBirth.toISOString().split('T')[0] : '',
-			dateOfJoiningFormatted: existingStaff.dateOfJoining ? existingStaff.dateOfJoining.toISOString().split('T')[0] : ''
+			dateOfBirthFormatted: existingStaff.dateOfBirth
+				? existingStaff.dateOfBirth.toISOString().split('T')[0]
+				: '',
+			dateOfJoiningFormatted: existingStaff.dateOfJoining
+				? existingStaff.dateOfJoining.toISOString().split('T')[0]
+				: ''
 		};
 	}
 
@@ -83,8 +87,8 @@ export const actions: Actions = {
 					}
 				}
 
-				const normalizeDate = (d: Date | null) => d ? d.toISOString().split('T')[0] : null;
-				const hasChanges = 
+				const normalizeDate = (d: Date | null) => (d ? d.toISOString().split('T')[0] : null);
+				const hasChanges =
 					existingStaff.empId !== staffData.empId ||
 					existingStaff.name !== staffData.name ||
 					existingStaff.status !== staffData.status ||
@@ -93,8 +97,10 @@ export const actions: Actions = {
 					(existingStaff.phoneNo || null) !== (staffData.phoneNo || null) ||
 					(existingStaff.qualification || null) !== (staffData.qualification || null) ||
 					(existingStaff.primarySubject || null) !== (staffData.primarySubject || null) ||
-					normalizeDate(existingStaff.dateOfBirth) !== normalizeDate(staffData.dateOfBirth as Date | null) ||
-					normalizeDate(existingStaff.dateOfJoining) !== normalizeDate(staffData.dateOfJoining as Date | null);
+					normalizeDate(existingStaff.dateOfBirth) !==
+						normalizeDate(staffData.dateOfBirth as Date | null) ||
+					normalizeDate(existingStaff.dateOfJoining) !==
+						normalizeDate(staffData.dateOfJoining as Date | null);
 
 				if (hasChanges) {
 					await db.update(staff).set(staffData).where(eq(staff.userId, user.id));
@@ -120,9 +126,10 @@ export const actions: Actions = {
 		} catch (error: unknown) {
 			console.error('Error saving staff data:', error);
 			// DrizzleQueryError wraps the SQLite error in `cause`
-			const errorMessage = error instanceof Error
-				? error.message + (error.cause instanceof Error ? ' ' + error.cause.message : '')
-				: '';
+			const errorMessage =
+				error instanceof Error
+					? error.message + (error.cause instanceof Error ? ' ' + error.cause.message : '')
+					: '';
 			if (errorMessage.includes('UNIQUE constraint failed')) {
 				return fail(400, {
 					error: 'A staff member with this Employee ID or Email already exists.',

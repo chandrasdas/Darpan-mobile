@@ -9,8 +9,20 @@
 	</section>
 
 	<div class="placeholder-card">
-		<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.3">
-			<path d="M9 5h6M9 9h6M9 13h4M4 2v20l3-2 3 2 3-2 3 2 3-2 3 2V2l-3 2-3-2-3 2-3-2-3 2-3-2z" stroke-linecap="round" stroke-linejoin="round"/>
+		<svg
+			width="48"
+			height="48"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="1.2"
+			opacity="0.3"
+		>
+			<path
+				d="M9 5h6M9 9h6M9 13h4M4 2v20l3-2 3 2 3-2 3 2 3-2 3 2V2l-3 2-3-2-3 2-3-2-3 2-3-2z"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			/>
 		</svg>
 		<span class="placeholder-text">Fee management coming soon</span>
 	</div>
