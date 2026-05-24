@@ -239,9 +239,7 @@
 		}
 	}
 
-	async function handleSessionChange(e: Event) {
-		const target = e.target as HTMLSelectElement;
-		currentSession = Number(target.value);
+	async function handleSessionChange() {
 		classes = await getClasses(currentSession).run();
 		if (classes.length > 0) {
 			currentClass = classes[0].id;
@@ -252,9 +250,7 @@
 		fetchSetups();
 	}
 
-	async function handleImportSessionChange(e: Event) {
-		const target = e.target as HTMLSelectElement;
-		importSession = Number(target.value);
+	async function handleImportSessionChange() {
 		importClasses = await getClasses(importSession).run();
 		if (importClasses.length > 0) {
 			importClass = importClasses[0].id;
@@ -320,8 +316,9 @@
 				sortInputs = newSorts;
 				includeInputs = newIncludes;
 
-				const setupSubjectIds = new Set(setupsToImport.map((s) => s.subjectId));
-				let newDisplaySubjects = data.subjects.filter((s) => setupSubjectIds.has(s.id));
+				let newDisplaySubjects = data.subjects.filter((s) =>
+					setupsToImport.some((imp) => imp.subjectId === s.id)
+				);
 				newDisplaySubjects.sort((a, b) => {
 					const sortA = setupsToImport.find((s) => s.subjectId === a.id)?.sortIndex ?? 0;
 					const sortB = setupsToImport.find((s) => s.subjectId === b.id)?.sortIndex ?? 0;
@@ -431,44 +428,38 @@
 				<div class="hero-filters">
 					<div class="filter-group">
 						<select
-							value={currentSession.toString()}
+							bind:value={currentSession}
 							onchange={handleSessionChange}
 							class="filter-select form-select"
 						>
 							{#each data.sessions as session (session.id)}
-								<option value={session.id.toString()}>{session.year}</option>
+								<option value={session.id}>{session.year}</option>
 							{/each}
 						</select>
 
 						<select
-							value={currentClass.toString()}
-							onchange={(e) => {
-								const target = e.target as HTMLSelectElement;
-								currentClass = Number(target.value);
+							bind:value={currentClass}
+							onchange={() => {
 								ensureValidTerm();
 								fetchSetups();
 							}}
 							class="filter-select form-select"
 						>
 							{#if classes.length === 0}
-								<option value="0">No Class</option>
+								<option value={0}>No Class</option>
 							{/if}
 							{#each classes as cls (cls.id)}
-								<option value={cls.id.toString()}>{cls.name}</option>
+								<option value={cls.id}>{cls.name}</option>
 							{/each}
 						</select>
 
 						<select
-							value={currentTerm.toString()}
-							onchange={(e) => {
-								const target = e.target as HTMLSelectElement;
-								currentTerm = Number(target.value);
-								fetchSetups();
-							}}
+							bind:value={currentTerm}
+							onchange={fetchSetups}
 							class="filter-select form-select"
 						>
 							{#each filteredTerms as term (term.id)}
-								<option value={term.id.toString()}>{term.name}</option>
+								<option value={term.id}>{term.name}</option>
 							{/each}
 						</select>
 					</div>
@@ -502,46 +493,39 @@
 			</div>
 			<div class="flex flex-wrap items-center gap-2">
 				<select
-					value={importSession.toString()}
+					bind:value={importSession}
 					onchange={handleImportSessionChange}
 					class="form-select"
 					style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 140px; border-color: transparent;"
 				>
 					{#each data.sessions as session (session.id)}
-						<option value={session.id.toString()}>{session.year}</option>
+						<option value={session.id}>{session.year}</option>
 					{/each}
 				</select>
 				<select
-					value={importClass.toString()}
-					onchange={(e) => {
-						const target = e.target as HTMLSelectElement;
-						importClass = Number(target.value);
-						ensureValidImportTerm();
-					}}
+					bind:value={importClass}
+					onchange={ensureValidImportTerm}
 					class="form-select"
 					style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 140px; border-color: transparent;"
 				>
 					{#if importClasses.length === 0}
-						<option value="0">No Class</option>
+						<option value={0}>No Class</option>
 					{/if}
 					{#each importClasses as cls (cls.id)}
-						<option value={cls.id.toString()}>{cls.name}</option>
+						<option value={cls.id}>{cls.name}</option>
 					{/each}
 				</select>
 				<select
-					value={importTerm.toString()}
-					onchange={(e) => {
-						const target = e.target as HTMLSelectElement;
-						importTerm = Number(target.value);
-					}}
+					bind:value={importTerm}
 					class="form-select"
 					style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 140px; border-color: transparent;"
 				>
 					{#each filteredImportTerms as term (term.id)}
-						<option value={term.id.toString()}>{term.name}</option>
+						<option value={term.id}>{term.name}</option>
 					{/each}
 				</select>
 				<button
+					type="button"
 					onclick={handleImport}
 					class="primary-button flex items-center gap-1"
 					style="padding: 6px 16px; font-size: 13px;"
@@ -747,7 +731,7 @@
 	</div>
 
 	<div class="action-bar">
-		<button onclick={handleSave} disabled={isSaving} class="primary-button">
+		<button type="button" onclick={handleSave} disabled={isSaving} class="primary-button">
 			{#if isSaving}
 				<span class="spinner"></span>
 				Saving...
