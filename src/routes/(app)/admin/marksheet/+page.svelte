@@ -380,7 +380,7 @@
 		align-items: center;
 		gap: 8px;
 		background-color: var(--color-primary);
-		color: white;
+		color: var(--color-on-primary);
 		border: none;
 		border-radius: var(--radius-md);
 		padding: 8px 16px;

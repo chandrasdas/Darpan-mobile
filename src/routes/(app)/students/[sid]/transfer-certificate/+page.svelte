@@ -431,7 +431,7 @@
 		align-items: center;
 		gap: 8px;
 		background-color: var(--color-primary);
-		color: white;
+		color: var(--color-on-primary);
 		border: none;
 		border-radius: var(--radius-lg);
 		padding: 10px 18px;
