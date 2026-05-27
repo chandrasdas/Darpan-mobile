@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
+	import { SvelteMap } from 'svelte/reactivity';
 	import { APP_NAME } from '$lib/config';
 	import type { PageData } from './$types';
 	import { getSections, getClasses } from '../../students/students.remote';
@@ -124,7 +125,7 @@
 
 	// Derived metrics
 	let marksMap = $derived.by(() => {
-		const map = new Map<string, (typeof marks)[0]>();
+		const map = new SvelteMap<string, (typeof marks)[0]>();
 		for (const m of marks) {
 			map.set(`${m.sessionEnrollId}_${m.examSetupId}`, m);
 		}

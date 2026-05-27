@@ -48,7 +48,7 @@
 			'DECEMBER'
 		];
 
-		const ones = [
+		const dayWords = [
 			'',
 			'FIRST',
 			'SECOND',
@@ -68,29 +68,22 @@
 			'SIXTEENTH',
 			'SEVENTEENTH',
 			'EIGHTEENTH',
-			'NINETEENTH'
+			'NINETEENTH',
+			'TWENTIETH',
+			'TWENTY-FIRST',
+			'TWENTY-SECOND',
+			'TWENTY-THIRD',
+			'TWENTY-FOURTH',
+			'TWENTY-FIFTH',
+			'TWENTY-SIXTH',
+			'TWENTY-SEVENTH',
+			'TWENTY-EIGHTH',
+			'TWENTY-NINTH',
+			'THIRTIETH',
+			'THIRTY-FIRST'
 		];
-		const tens = ['', '', 'TWENTY', 'THIRTY'];
 
-		let dayWord = '';
-		if (day < 20) {
-			dayWord = ones[day];
-		} else {
-			const rem = day % 10;
-			dayWord = tens[Math.floor(day / 10)] + (rem > 0 ? '-' + ones[rem] : '');
-		}
-		if (day === 20) dayWord = 'TWENTIETH';
-		if (day === 30) dayWord = 'THIRTIETH';
-		if (day === 31) dayWord = 'THIRTY-FIRST';
-		if (day === 21) dayWord = 'TWENTY-FIRST';
-		if (day === 22) dayWord = 'TWENTY-SECOND';
-		if (day === 23) dayWord = 'TWENTY-THIRD';
-		if (day === 24) dayWord = 'TWENTY-FOURTH';
-		if (day === 25) dayWord = 'TWENTY-FIFTH';
-		if (day === 26) dayWord = 'TWENTY-SIXTH';
-		if (day === 27) dayWord = 'TWENTY-SEVENTH';
-		if (day === 28) dayWord = 'TWENTY-EIGHTH';
-		if (day === 29) dayWord = 'TWENTY-NINTH';
+		const dayWord = dayWords[day] || '';
 
 		const monthWord = months[month] || '';
 
@@ -142,12 +135,9 @@
 			}
 			if (num >= 1900 && num < 2000) {
 				const secondPart = num - 1900;
-				let secWord = '';
-				if (secondPart < 20) secWord = onesArr[secondPart];
-				else
-					secWord =
-						tensArr[Math.floor(secondPart / 10)] +
-						(secondPart % 10 > 0 ? '-' + onesArr[secondPart % 10] : '');
+				const secWord = secondPart < 20
+					? onesArr[secondPart]
+					: tensArr[Math.floor(secondPart / 10)] + (secondPart % 10 > 0 ? '-' + onesArr[secondPart % 10] : '');
 				return 'NINETEEN HUNDRED ' + secWord;
 			}
 			return num.toString();
