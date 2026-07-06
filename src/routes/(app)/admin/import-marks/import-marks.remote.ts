@@ -1,4 +1,5 @@
 import { query } from '$app/server';
+import { requireRoleRemote } from '$lib/server/auth-utils';
 import { db } from '$lib/server/db';
 import {
 	studSections,
@@ -19,6 +20,7 @@ export const getImportContext = query(
 		classId: v.number()
 	}),
 	async (params) => {
+		requireRoleRemote('admin');
 		const sections = await db
 			.select()
 			.from(studSections)

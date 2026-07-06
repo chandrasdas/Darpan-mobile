@@ -34,16 +34,16 @@ export const navItems: NavItem[] = [
 		label: 'Examinations',
 		icon: 'assessment',
 		subItems: [
-			{ label: 'Exam Setup', href: '/admin/exam-setup' },
+			{ label: 'Exam Setup', href: '/admin/exam-setup', adminOnly: true },
 			{ label: 'Marks Entry', href: '/admin/marks-entry' },
-			{ label: 'Import Marks', href: '/admin/import-marks' }
+			{ label: 'Import Marks', href: '/admin/import-marks', adminOnly: true }
 		]
 	},
 	{
 		label: 'Attendance',
 		icon: 'event_available',
 		subItems: [
-			{ label: 'Period Setup', href: '/admin/period-setup' },
+			{ label: 'Period Setup', href: '/admin/period-setup', adminOnly: true },
 			{ label: 'Attendance Entry', href: '/admin/attendance-entry' }
 		]
 	},
@@ -51,9 +51,9 @@ export const navItems: NavItem[] = [
 		label: 'Reports & Marksheets',
 		icon: 'reports',
 		subItems: [
-			{ label: 'Tabulation Sheet', href: '/admin/tabulation-sheet' },
+			{ label: 'Tabulation Sheet', href: '/admin/tabulation-sheet', adminOnly: true },
 			{ label: 'Generate Report', href: '/reports/generate' },
-			{ label: 'Marksheet', href: '/admin/marksheet' },
+			{ label: 'Marksheet', href: '/admin/marksheet', adminOnly: true },
 			{ label: 'Class Result Analysis', href: '#' }
 		]
 	},

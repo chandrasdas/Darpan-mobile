@@ -1,8 +1,5 @@
-import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 
-export const load: LayoutServerLoad = async ({ locals }) => {
-	if (locals.user?.role !== 'admin') {
-		redirect(303, '/dashboard');
-	}
+export const load: LayoutServerLoad = async () => {
+	// Protected globally by hooks.server.ts
 };

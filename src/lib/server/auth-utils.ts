@@ -27,3 +27,30 @@ export function requireRole(locals: App.Locals, ...roles: Role[]) {
 	}
 	return user;
 }
+
+import { getRequestEvent } from '$app/server';
+
+/**
+ * Helper to retrieve event.locals inside remote queries using AsyncLocalStorage.
+ */
+export function getLocals(): App.Locals {
+	const event = getRequestEvent();
+	if (!event) {
+		error(500, 'auth-utils: getLocals called outside request context');
+	}
+	return event.locals;
+}
+
+/**
+ * Ensures the remote function caller is authenticated.
+ */
+export function requireAuthRemote() {
+	return requireAuth(getLocals());
+}
+
+/**
+ * Ensures the remote function caller has one of the specified roles.
+ */
+export function requireRoleRemote(...roles: Role[]) {
+	return requireRole(getLocals(), ...roles);
+}

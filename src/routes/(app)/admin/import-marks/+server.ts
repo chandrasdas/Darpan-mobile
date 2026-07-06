@@ -3,8 +3,10 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db';
 import { studMarksEntries } from '$lib/server/db/schema/marksheet';
 import { sql } from 'drizzle-orm';
+import { requireRole } from '$lib/server/auth-utils';
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+	requireRole(locals, 'admin');
 	const { entries } = (await request.json()) as {
 		entries: {
 			sessionEnrollId: number;

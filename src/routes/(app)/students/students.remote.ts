@@ -1,4 +1,5 @@
 import { query } from '$app/server';
+import { requireRoleRemote } from '$lib/server/auth-utils';
 import { db } from '$lib/server/db';
 import {
 	studClasses,
@@ -10,6 +11,7 @@ import { eq, asc, like, or, and, sql } from 'drizzle-orm';
 import * as v from 'valibot';
 
 export const getClasses = query(v.number(), async (sessionId: number) => {
+	requireRoleRemote('admin', 'teacher', 'staff');
 	return await db
 		.select({
 			id: studClasses.id,
@@ -24,6 +26,7 @@ export const getClasses = query(v.number(), async (sessionId: number) => {
 });
 
 export const getSections = query(v.number(), async (classId: number) => {
+	requireRoleRemote('admin', 'teacher', 'staff');
 	return await db
 		.select()
 		.from(studSections)
@@ -40,6 +43,7 @@ export const getFilteredStudents = query(
 		page: v.number()
 	}),
 	async (params) => {
+		requireRoleRemote('admin', 'teacher', 'staff');
 		// console.log("getFilteredStudents called with:", params);
 		const { q, session: sessionFilter, class: classFilter, section: sectionFilter } = params;
 		const limit = 80;

@@ -1,7 +1,9 @@
 import type { Handle } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import { building } from '$app/environment';
 import { auth } from '$lib/server/auth';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
+import { isAuthorized, type UserRole } from '$lib/config/permissions';
 
 const handleBetterAuth: Handle = async ({ event, resolve }) => {
 	const session = await auth.api.getSession({ headers: event.request.headers });
@@ -9,6 +11,32 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 	if (session) {
 		event.locals.session = session.session;
 		event.locals.user = session.user;
+	}
+
+	const pathname = event.url.pathname;
+
+	// Protect all /admin routes, excluding any auth endpoints
+	if (pathname.startsWith('/admin') && !pathname.startsWith('/api/auth')) {
+		if (!event.locals.user) {
+			if (pathname.includes('/api/') || event.request.headers.get('accept') === 'application/json') {
+				return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+					status: 401,
+					headers: { 'Content-Type': 'application/json' }
+				});
+			}
+			throw redirect(302, '/login');
+		}
+
+		const role = event.locals.user.role as UserRole;
+		if (!isAuthorized(role, pathname)) {
+			if (pathname.includes('/api/') || event.request.headers.get('accept') === 'application/json') {
+				return new Response(JSON.stringify({ error: 'Forbidden' }), {
+					status: 403,
+					headers: { 'Content-Type': 'application/json' }
+				});
+			}
+			throw redirect(303, '/dashboard');
+		}
 	}
 
 	return svelteKitHandler({ event, resolve, auth, building });

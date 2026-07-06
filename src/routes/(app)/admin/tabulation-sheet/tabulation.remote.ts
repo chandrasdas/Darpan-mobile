@@ -1,4 +1,5 @@
 import { query } from '$app/server';
+import { requireRoleRemote } from '$lib/server/auth-utils';
 import { db } from '$lib/server/db';
 import {
 	studExamSetups,
@@ -18,6 +19,7 @@ export const getTabulationData = query(
 		examTermId: v.number()
 	}),
 	async (params) => {
+		requireRoleRemote('admin');
 		// 1. Get subjects configured for the marksheet for this class/session/term
 		const subjects = await db
 			.select({

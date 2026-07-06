@@ -1,4 +1,5 @@
 import { query } from '$app/server';
+import { requireRoleRemote } from '$lib/server/auth-utils';
 import { db } from '$lib/server/db';
 import { studAttendancePeriods } from '$lib/server/db/schema/attendance';
 import { eq, and, notInArray, sql } from 'drizzle-orm';
@@ -11,6 +12,7 @@ export const getExistingPeriods = query(
 		examTermId: v.number()
 	}),
 	async (params) => {
+		requireRoleRemote('admin');
 		const periods = await db
 			.select()
 			.from(studAttendancePeriods)
@@ -43,6 +45,7 @@ type SavePeriodSetupsInput = v.InferOutput<typeof savePeriodSetupsSchema>;
 export const savePeriodSetups = query(
 	savePeriodSetupsSchema,
 	async (params: SavePeriodSetupsInput) => {
+		requireRoleRemote('admin');
 		await db.transaction(async (tx) => {
 			const periodNamesToKeep = params.periods.map((p) => p.periodName);
 

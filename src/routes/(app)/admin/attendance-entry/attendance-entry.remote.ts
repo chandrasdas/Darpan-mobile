@@ -1,4 +1,5 @@
 import { query } from '$app/server';
+import { requireRoleRemote } from '$lib/server/auth-utils';
 import { db } from '$lib/server/db';
 import { studAttendancePeriods, studAttendanceEntries } from '$lib/server/db/schema/attendance';
 import { studSessionEnrollments, studInfo } from '$lib/server/db/schema/marksheet';
@@ -15,6 +16,7 @@ export const getPeriodsForSection = query(
 		examTermId: v.number()
 	}),
 	async (params) => {
+		requireRoleRemote('admin', 'teacher');
 		const results = await db
 			.select({
 				periodId: studAttendancePeriods.id,
@@ -45,6 +47,7 @@ export const getStudentsForAttendance = query(
 		examTermId: v.number()
 	}),
 	async (params) => {
+		requireRoleRemote('admin', 'teacher');
 		const students = await db
 			.select({
 				seid: studSessionEnrollments.seid,
@@ -117,6 +120,7 @@ export const saveSingleAttendance = query(
 		daysPresent: v.number()
 	}),
 	async (params) => {
+		requireRoleRemote('admin', 'teacher');
 		await db
 			.insert(studAttendanceEntries)
 			.values({

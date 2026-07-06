@@ -1,4 +1,5 @@
 import { query } from '$app/server';
+import { requireRoleRemote } from '$lib/server/auth-utils';
 import { db } from '$lib/server/db';
 import { studExamSetups } from '$lib/server/db/schema/marksheet';
 import { eq, and, notInArray, sql } from 'drizzle-orm';
@@ -11,6 +12,7 @@ export const getExistingSetups = query(
 		classId: v.number()
 	}),
 	async (params) => {
+		requireRoleRemote('admin');
 		const setups = await db
 			.select()
 			.from(studExamSetups)
@@ -43,6 +45,7 @@ const saveExamSetupsSchema = v.object({
 type SaveExamSetupsInput = v.InferOutput<typeof saveExamSetupsSchema>;
 
 export const saveExamSetups = query(saveExamSetupsSchema, async (params: SaveExamSetupsInput) => {
+	requireRoleRemote('admin');
 	await db.transaction(async (tx) => {
 		const subjectIdsToKeep = params.setups.map((s) => s.subjectId);
 

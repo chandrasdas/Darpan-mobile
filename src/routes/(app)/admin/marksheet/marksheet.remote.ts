@@ -1,4 +1,5 @@
 import { query } from '$app/server';
+import { requireRoleRemote } from '$lib/server/auth-utils';
 import { db } from '$lib/server/db';
 import {
 	studExamSetups,
@@ -17,6 +18,7 @@ export const getStudentsList = query(
 		sectionId: v.number()
 	}),
 	async (params) => {
+		requireRoleRemote('admin');
 		return await db
 			.select({
 				seid: studSessionEnrollments.seid,
@@ -43,6 +45,7 @@ export const getMarksheetData = query(
 		sessionEnrollId: v.number()
 	}),
 	async (params) => {
+		requireRoleRemote('admin');
 		const setups = await db
 			.select({
 				setupId: studExamSetups.setupId,
