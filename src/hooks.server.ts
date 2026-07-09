@@ -18,7 +18,10 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 	// Protect all /admin routes, excluding any auth endpoints
 	if (pathname.startsWith('/admin') && !pathname.startsWith('/api/auth')) {
 		if (!event.locals.user) {
-			if (pathname.includes('/api/') || event.request.headers.get('accept') === 'application/json') {
+			if (
+				pathname.includes('/api/') ||
+				event.request.headers.get('accept') === 'application/json'
+			) {
 				return new Response(JSON.stringify({ error: 'Unauthorized' }), {
 					status: 401,
 					headers: { 'Content-Type': 'application/json' }
@@ -29,7 +32,10 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 
 		const role = event.locals.user.role as UserRole;
 		if (!isAuthorized(role, pathname)) {
-			if (pathname.includes('/api/') || event.request.headers.get('accept') === 'application/json') {
+			if (
+				pathname.includes('/api/') ||
+				event.request.headers.get('accept') === 'application/json'
+			) {
 				return new Response(JSON.stringify({ error: 'Forbidden' }), {
 					status: 403,
 					headers: { 'Content-Type': 'application/json' }

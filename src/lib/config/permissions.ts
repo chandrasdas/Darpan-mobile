@@ -16,7 +16,8 @@ export function isAuthorized(role: UserRole | undefined | null, pathname: string
 	if (role === 'admin') return true; // Admins bypass all routing checks
 
 	// Normalize trailing slashes
-	const cleanPath = pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+	const cleanPath =
+		pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
 
 	// Check if path is under the /admin tree
 	if (cleanPath === '/admin' || cleanPath.startsWith('/admin/')) {

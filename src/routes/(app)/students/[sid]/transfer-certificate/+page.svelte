@@ -135,9 +135,11 @@
 			}
 			if (num >= 1900 && num < 2000) {
 				const secondPart = num - 1900;
-				const secWord = secondPart < 20
-					? onesArr[secondPart]
-					: tensArr[Math.floor(secondPart / 10)] + (secondPart % 10 > 0 ? '-' + onesArr[secondPart % 10] : '');
+				const secWord =
+					secondPart < 20
+						? onesArr[secondPart]
+						: tensArr[Math.floor(secondPart / 10)] +
+							(secondPart % 10 > 0 ? '-' + onesArr[secondPart % 10] : '');
 				return 'NINETEEN HUNDRED ' + secWord;
 			}
 			return num.toString();

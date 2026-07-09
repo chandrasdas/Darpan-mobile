@@ -6,7 +6,7 @@ import {
 	studSections,
 	studSessions
 } from '$lib/server/db/schema/marksheet';
-import { eq, desc, and, or, like, isNull, isNotNull } from 'drizzle-orm';
+import { eq, desc, and, or, like, isNull, isNotNull, type SQL } from 'drizzle-orm';
 import { fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 
@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	const dbSessions = await db.select().from(studSessions).orderBy(desc(studSessions.year));
 	const activeSession = dbSessions[0] || null;
 
-	let sessionCondition = isNotNull(studInfo.transferDate) as any;
+	let sessionCondition: SQL | undefined = isNotNull(studInfo.transferDate);
 	if (activeSession) {
 		sessionCondition = and(
 			isNotNull(studInfo.transferDate),
@@ -83,7 +83,15 @@ export const load: PageServerLoad = async ({ url }) => {
 	}
 
 	// Handle search for active students, restricted to the current active session
-	let searchResults: any[] = [];
+	let searchResults: {
+		sid: number;
+		name: string;
+		portalId: string | null;
+		fname: string | null;
+		className: string | null;
+		sectionLetter: string | null;
+		rollNo: number | null;
+	}[] = [];
 	if (searchQ && searchQ.trim().length >= 2) {
 		const searchConditions = [
 			isNull(studInfo.transferDate),

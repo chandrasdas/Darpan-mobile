@@ -95,7 +95,7 @@
 				error = registerError.message || 'An error occurred during registration.';
 			}
 		} else {
-			window.location.href = resolve('/dashboard' as '/');
+			window.location.href = resolve('/dashboard');
 		}
 	}
 </script>
@@ -105,7 +105,7 @@
 </svelte:head>
 
 <div class="auth-page">
-	<a href={resolve('/' as '/')} class="back-link">
+	<a href={resolve('/')} class="back-link">
 		<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 			<path
 				stroke-linecap="round"
