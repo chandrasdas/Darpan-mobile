@@ -25,8 +25,8 @@ export const navItems: NavItem[] = [
 		icon: 'groups',
 		subItems: [
 			{ label: 'Faculty List', href: '/staff' },
-			{ label: 'Add Staff', href: '/staff-entry' },
-			{ label: 'Allowed Staff', href: '/admin/allowed-staff', adminOnly: true },
+			{ label: 'Add Staff', href: '/staff/entry' },
+			{ label: 'Allowed Staff', href: '/staff/allowed', adminOnly: true },
 			{ label: 'Leave Management', href: '#' }
 		]
 	},
@@ -34,26 +34,26 @@ export const navItems: NavItem[] = [
 		label: 'Examinations',
 		icon: 'assessment',
 		subItems: [
-			{ label: 'Exam Setup', href: '/admin/exam-setup', adminOnly: true },
-			{ label: 'Marks Entry', href: '/admin/marks-entry' },
-			{ label: 'Import Marks', href: '/admin/import-marks', adminOnly: true }
+			{ label: 'Exam Setup', href: '/exams/setup', adminOnly: true },
+			{ label: 'Marks Entry', href: '/exams/marks-entry' },
+			{ label: 'Import Marks', href: '/exams/import', adminOnly: true }
 		]
 	},
 	{
 		label: 'Attendance',
 		icon: 'event_available',
 		subItems: [
-			{ label: 'Period Setup', href: '/admin/period-setup', adminOnly: true },
-			{ label: 'Attendance Entry', href: '/admin/attendance-entry' }
+			{ label: 'Period Setup', href: '/attendance/setup', adminOnly: true },
+			{ label: 'Attendance Entry', href: '/attendance/entry' }
 		]
 	},
 	{
 		label: 'Reports & Marksheets',
 		icon: 'reports',
 		subItems: [
-			{ label: 'Tabulation Sheet', href: '/admin/tabulation-sheet', adminOnly: true },
-			{ label: 'Generate Report', href: '/reports/generate' },
-			{ label: 'Marksheet', href: '/admin/marksheet', adminOnly: true },
+			{ label: 'Tabulation Sheet', href: '/exams/tabulation', adminOnly: true },
+			{ label: 'Generate Report', href: '/exams/reports/generate' },
+			{ label: 'Marksheet', href: '/exams/marksheet', adminOnly: true },
 			{ label: 'Class Result Analysis', href: '#' }
 		]
 	},

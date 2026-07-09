@@ -15,8 +15,11 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 
 	const pathname = event.url.pathname;
 
-	// Protect all /admin routes, excluding any auth endpoints
-	if (pathname.startsWith('/admin') && !pathname.startsWith('/api/auth')) {
+	// Define public paths that bypass auth & role checks
+	const publicPaths = ['/login', '/register', '/forgot-password', '/demo', '/api/auth'];
+	const isPublic = publicPaths.some((p) => pathname === p || pathname.startsWith(p + '/'));
+
+	if (!isPublic) {
 		if (!event.locals.user) {
 			if (
 				pathname.includes('/api/') ||
