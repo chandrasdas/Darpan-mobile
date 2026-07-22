@@ -16,7 +16,15 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 	const pathname = event.url.pathname;
 
 	// Define public paths that bypass auth & role checks
-	const publicPaths = ['/login', '/register', '/forgot-password', '/demo', '/api/auth'];
+	const publicPaths = [
+		'/login',
+		'/register',
+		'/forgot-password',
+		'/demo',
+		'/api/auth',
+		'/api/register',
+		'/api/forgot-password'
+	];
 	const isPublic = publicPaths.some((p) => pathname === p || pathname.startsWith(p + '/'));
 
 	if (!isPublic) {

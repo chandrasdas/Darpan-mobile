@@ -6,6 +6,8 @@
 	let otp = $state('');
 	let newPassword = $state('');
 	let confirmPassword = $state('');
+	let showNewPassword = $state(false);
+	let showConfirmPassword = $state(false);
 	let token = $state(''); // Stores the Better-Auth compatible token returned from OTP verify
 
 	let loading = $state(false);
@@ -244,26 +246,112 @@
 				<form onsubmit={handleResetPassword} class="auth-form">
 					<div class="input-group">
 						<label for="new-password" class="input-label">New Password</label>
-						<input
-							id="new-password"
-							type="password"
-							bind:value={newPassword}
-							required
-							placeholder="••••••••"
-							class="input-field"
-						/>
+						<div class="password-wrapper">
+							<input
+								id="new-password"
+								type={showNewPassword ? 'text' : 'password'}
+								bind:value={newPassword}
+								required
+								placeholder="••••••••"
+								class="input-field"
+							/>
+							<button
+								type="button"
+								class="toggle-password-btn"
+								onclick={() => (showNewPassword = !showNewPassword)}
+								aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+								tabindex="-1"
+							>
+								{#if showNewPassword}
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+										<path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+										<path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+										<line x1="2" y1="2" x2="22" y2="22" />
+									</svg>
+								{:else}
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
+										<circle cx="12" cy="12" r="3" />
+									</svg>
+								{/if}
+							</button>
+						</div>
 					</div>
 
 					<div class="input-group">
 						<label for="confirm-password" class="input-label">Confirm Password</label>
-						<input
-							id="confirm-password"
-							type="password"
-							bind:value={confirmPassword}
-							required
-							placeholder="••••••••"
-							class="input-field"
-						/>
+						<div class="password-wrapper">
+							<input
+								id="confirm-password"
+								type={showConfirmPassword ? 'text' : 'password'}
+								bind:value={confirmPassword}
+								required
+								placeholder="••••••••"
+								class="input-field"
+							/>
+							<button
+								type="button"
+								class="toggle-password-btn"
+								onclick={() => (showConfirmPassword = !showConfirmPassword)}
+								aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+								tabindex="-1"
+							>
+								{#if showConfirmPassword}
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+										<path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+										<path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+										<line x1="2" y1="2" x2="22" y2="22" />
+									</svg>
+								{:else}
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
+										<circle cx="12" cy="12" r="3" />
+									</svg>
+								{/if}
+							</button>
+						</div>
 					</div>
 
 					<button
@@ -442,6 +530,38 @@
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		color: var(--color-on-surface-variant);
+	}
+
+	.password-wrapper {
+		position: relative;
+		display: flex;
+		align-items: center;
+		width: 100%;
+	}
+
+	.password-wrapper .input-field {
+		padding-right: 44px;
+	}
+
+	.toggle-password-btn {
+		position: absolute;
+		right: 6px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 36px;
+		height: 36px;
+		background: transparent;
+		border: none;
+		border-radius: var(--radius-md, 8px);
+		color: var(--color-on-surface-variant);
+		cursor: pointer;
+		transition: color 200ms ease, background-color 200ms ease;
+	}
+
+	.toggle-password-btn:hover {
+		color: var(--color-on-surface);
+		background-color: color-mix(in srgb, var(--color-on-surface) 8%, transparent);
 	}
 
 	.input-field {
